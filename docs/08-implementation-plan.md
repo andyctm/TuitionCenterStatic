@@ -79,9 +79,13 @@ Monorepo with `frontend/` (no build step — plain HTML/CSS/JS evolved from `moc
 
 _(SDD capability: `auth`; SRS: FR-AUTH-_, FR-USR-_)_
 
-**Status: Implemented 2026-09-14** against in-memory fakes (73 passing tests, clean
+**Status: Implemented 2026-09-14** against in-memory fakes (162 passing tests, clean
 typecheck/lint/build); not yet run against a real Neon database (none connected — see M0), and
-`frontend/` isn't wired to call these endpoints yet.
+`frontend/` isn't wired to call these endpoints yet. **Updated 2026-09-14 (post-M3):**
+`authService.register` now also creates a `StudentProfile` row for `role: 'STUDENT'`
+registrations — this was a gap found while implementing M3 (`enrollment` requires a
+`studentProfileId`, and nothing previously created that row), fixed in place rather than left
+as a silent dependency gap.
 
 ### Requirement
 

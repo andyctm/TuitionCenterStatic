@@ -4,6 +4,7 @@ import { omitPasswordHash } from '../lib/publicUser';
 import type {
   PasswordResetTokenRepository,
   RefreshTokenRepository,
+  StudentProfileRepository,
   UserRecord,
   UserRepository,
 } from '../repositories/types';
@@ -29,12 +30,14 @@ export type AuthServiceDeps = {
   userRepo: UserRepository;
   refreshTokenRepo: RefreshTokenRepository;
   passwordResetTokenRepo: PasswordResetTokenRepository;
+  studentProfileRepo: StudentProfileRepository;
   accessTokenSecret: string;
   sendPasswordResetEmail: (email: string, token: string) => Promise<void>;
 };
 
 export function createAuthService(deps: AuthServiceDeps) {
-  const { userRepo, refreshTokenRepo, passwordResetTokenRepo, accessTokenSecret } = deps;
+  const { userRepo, refreshTokenRepo, passwordResetTokenRepo, studentProfileRepo, accessTokenSecret } =
+    deps;
 
   async function issueTokenPair(user: UserRecord) {
     const accessToken = signAccessToken(
@@ -65,6 +68,11 @@ export function createAuthService(deps: AuthServiceDeps) {
         role: input.role,
         status: 'PENDING',
       });
+
+      // enrollment capability depends on every STUDENT user having a StudentProfile row.
+      if (user.role === 'STUDENT') {
+        await studentProfileRepo.create({ userId: user.id });
+      }
 
       return omitPasswordHash(user);
     },

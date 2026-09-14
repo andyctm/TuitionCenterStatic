@@ -3,6 +3,7 @@ import { AppError } from '../errors/AppError';
 import {
   createFakePasswordResetTokenRepository,
   createFakeRefreshTokenRepository,
+  createFakeStudentProfileRepository,
   createFakeUserRepository,
 } from '../testUtils/fakeRepositories';
 import { hashPassword } from './password';
@@ -14,19 +15,28 @@ async function makeService(seedUsers: Parameters<typeof createFakeUserRepository
   const userRepo = createFakeUserRepository(seedUsers);
   const refreshTokenRepo = createFakeRefreshTokenRepository();
   const passwordResetTokenRepo = createFakePasswordResetTokenRepository();
+  const studentProfileRepo = createFakeStudentProfileRepository();
   const sentEmails: { email: string; token: string }[] = [];
 
   const service = createAuthService({
     userRepo,
     refreshTokenRepo,
     passwordResetTokenRepo,
+    studentProfileRepo,
     accessTokenSecret,
     sendPasswordResetEmail: async (email, token) => {
       sentEmails.push({ email, token });
     },
   });
 
-  return { service, userRepo, refreshTokenRepo, passwordResetTokenRepo, sentEmails };
+  return {
+    service,
+    userRepo,
+    refreshTokenRepo,
+    passwordResetTokenRepo,
+    studentProfileRepo,
+    sentEmails,
+  };
 }
 
 async function activeUser(overrides: Partial<{ email: string; password: string }> = {}) {
@@ -72,6 +82,36 @@ describe('authService.register', () => {
         role: 'STUDENT',
       }),
     ).rejects.toMatchObject({ code: 'CONFLICT', httpStatus: 409 });
+  });
+
+  it('creates a StudentProfile linked to the new user for a STUDENT registration', async () => {
+    const { service, studentProfileRepo } = await makeService();
+
+    const user = await service.register({
+      email: 'student@example.com',
+      password: 'a-strong-password',
+      firstName: 'New',
+      lastName: 'Student',
+      role: 'STUDENT',
+    });
+
+    const profile = await studentProfileRepo.findByUserId(user.id);
+    expect(profile).not.toBeNull();
+  });
+
+  it('does not create a StudentProfile for a PARENT registration', async () => {
+    const { service, studentProfileRepo } = await makeService();
+
+    const user = await service.register({
+      email: 'parent@example.com',
+      password: 'a-strong-password',
+      firstName: 'New',
+      lastName: 'Parent',
+      role: 'PARENT',
+    });
+
+    const profile = await studentProfileRepo.findByUserId(user.id);
+    expect(profile).toBeNull();
   });
 });
 

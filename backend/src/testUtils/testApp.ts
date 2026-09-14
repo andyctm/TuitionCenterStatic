@@ -68,6 +68,7 @@ export function createTestApp(
     userRepo,
     refreshTokenRepo,
     passwordResetTokenRepo,
+    studentProfileRepo,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
     sendPasswordResetEmail: async (email, token) => {
       sentEmails.push({ email, token });

@@ -41,6 +41,7 @@ const authService = createAuthService({
   userRepo,
   refreshTokenRepo,
   passwordResetTokenRepo,
+  studentProfileRepo,
   accessTokenSecret: env.jwtAccessSecret,
   sendPasswordResetEmail: async (email, token) => {
     // TODO(M1 follow-up): wire a real transactional email provider using env.emailApiKey.

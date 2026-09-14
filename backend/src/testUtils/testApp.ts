@@ -1,23 +1,56 @@
 import { createApp, type AppDeps } from '../app';
 import { createAuthService } from '../auth/authService';
 import { createUsersService } from '../users/usersService';
+import { createBranchesService } from '../branches/branchesService';
+import { createSubjectsService } from '../academic/subjectsService';
+import { createGradeLevelsService } from '../academic/gradeLevelsService';
+import { createCoursesService } from '../academic/coursesService';
+import { createBatchesService } from '../academic/batchesService';
 import {
+  createFakeBatchRepository,
+  createFakeBranchRepository,
+  createFakeClassScheduleRepository,
+  createFakeCourseRepository,
+  createFakeGradeLevelRepository,
   createFakePasswordResetTokenRepository,
   createFakeRefreshTokenRepository,
+  createFakeSubjectRepository,
   createFakeUserRepository,
 } from './fakeRepositories';
-import type { UserRecord } from '../repositories/types';
+import type {
+  BatchRecord,
+  BranchRecord,
+  CourseRecord,
+  GradeLevelRecord,
+  SubjectRecord,
+  UserRecord,
+} from '../repositories/types';
 
 export const TEST_ACCESS_TOKEN_SECRET = 'test-access-secret';
 export const TEST_ALLOWED_ORIGINS = ['https://acme.github.io'];
 
 export function createTestApp(
-  options: { seedUsers?: UserRecord[]; checkDb?: AppDeps['checkDb'] } = {},
+  options: {
+    seedUsers?: UserRecord[];
+    seedBranches?: BranchRecord[];
+    seedSubjects?: SubjectRecord[];
+    seedGradeLevels?: GradeLevelRecord[];
+    seedCourses?: CourseRecord[];
+    seedBatches?: BatchRecord[];
+    checkDb?: AppDeps['checkDb'];
+  } = {},
 ) {
   const userRepo = createFakeUserRepository(options.seedUsers ?? []);
   const refreshTokenRepo = createFakeRefreshTokenRepository();
   const passwordResetTokenRepo = createFakePasswordResetTokenRepository();
   const sentEmails: { email: string; token: string }[] = [];
+
+  const branchRepo = createFakeBranchRepository(options.seedBranches ?? []);
+  const subjectRepo = createFakeSubjectRepository(options.seedSubjects ?? []);
+  const gradeLevelRepo = createFakeGradeLevelRepository(options.seedGradeLevels ?? []);
+  const courseRepo = createFakeCourseRepository(options.seedCourses ?? []);
+  const batchRepo = createFakeBatchRepository(options.seedBatches ?? []);
+  const classScheduleRepo = createFakeClassScheduleRepository([], batchRepo);
 
   const authService = createAuthService({
     userRepo,
@@ -29,12 +62,27 @@ export function createTestApp(
     },
   });
   const usersService = createUsersService({ userRepo });
+  const branchesService = createBranchesService({ branchRepo });
+  const subjectsService = createSubjectsService({ subjectRepo });
+  const gradeLevelsService = createGradeLevelsService({ gradeLevelRepo });
+  const coursesService = createCoursesService({ courseRepo, subjectRepo, gradeLevelRepo });
+  const batchesService = createBatchesService({
+    batchRepo,
+    courseRepo,
+    branchRepo,
+    classScheduleRepo,
+  });
 
   const app = createApp({
     allowedOrigins: TEST_ALLOWED_ORIGINS,
     checkDb: options.checkDb ?? (async () => undefined),
     authService,
     usersService,
+    branchesService,
+    subjectsService,
+    gradeLevelsService,
+    coursesService,
+    batchesService,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
   });
 
@@ -43,8 +91,20 @@ export function createTestApp(
     userRepo,
     refreshTokenRepo,
     passwordResetTokenRepo,
+    branchRepo,
+    subjectRepo,
+    gradeLevelRepo,
+    courseRepo,
+    batchRepo,
+    classScheduleRepo,
     sentEmails,
     authService,
     usersService,
+    branchesService,
+    subjectsService,
+    gradeLevelsService,
+    coursesService,
+    batchesService,
   };
 }
+

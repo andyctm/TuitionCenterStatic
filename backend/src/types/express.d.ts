@@ -1,11 +1,11 @@
 import type { Logger } from 'pino';
-import type { Role } from '@prisma/client';
+import type { AuthContext } from './authContext';
 
 declare global {
   namespace Express {
     interface Request {
       log: Logger;
-      auth?: { userId: string; role: Role; branchIds: string[] };
+      auth?: AuthContext;
     }
   }
 }

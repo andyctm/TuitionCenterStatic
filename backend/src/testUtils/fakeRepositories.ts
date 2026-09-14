@@ -1,10 +1,24 @@
 import { randomUUID } from 'node:crypto';
 import type {
+  BatchListFilter,
+  BatchRecord,
+  BatchRepository,
+  BranchRecord,
+  BranchRepository,
+  ClassScheduleRecord,
+  ClassScheduleRepository,
+  CourseRecord,
+  CourseRepository,
+  GradeLevelRecord,
+  GradeLevelRepository,
   NewUserInput,
   PasswordResetTokenRecord,
   PasswordResetTokenRepository,
   RefreshTokenRecord,
   RefreshTokenRepository,
+  ScheduleConflictCandidate,
+  SubjectRecord,
+  SubjectRepository,
   UserRecord,
   UserRepository,
 } from '../repositories/types';
@@ -83,3 +97,180 @@ export function createFakePasswordResetTokenRepository(): PasswordResetTokenRepo
     },
   };
 }
+
+export function createFakeBranchRepository(seed: BranchRecord[] = []): BranchRepository {
+  const branches = new Map(seed.map((b) => [b.id, b]));
+
+  return {
+    async findAll(filter) {
+      const all = [...branches.values()];
+      if (!filter?.ids) return all;
+      return all.filter((b) => filter.ids?.includes(b.id));
+    },
+    async findById(id) {
+      return branches.get(id) ?? null;
+    },
+    async create(input) {
+      const record: BranchRecord = {
+        id: randomUUID(),
+        timezone: 'Asia/Colombo',
+        isActive: true,
+        ...input,
+      };
+      branches.set(record.id, record);
+      return record;
+    },
+    async update(id, input) {
+      const existing = branches.get(id);
+      if (!existing) throw new Error(`no fake branch ${id}`);
+      const updated = { ...existing, ...input };
+      branches.set(id, updated);
+      return updated;
+    },
+  };
+}
+
+export function createFakeSubjectRepository(seed: SubjectRecord[] = []): SubjectRepository {
+  const subjects = new Map(seed.map((s) => [s.id, s]));
+
+  return {
+    async findAll() {
+      return [...subjects.values()];
+    },
+    async findByCode(code) {
+      return [...subjects.values()].find((s) => s.code === code) ?? null;
+    },
+    async create(input) {
+      const record: SubjectRecord = { id: randomUUID(), ...input };
+      subjects.set(record.id, record);
+      return record;
+    },
+  };
+}
+
+export function createFakeGradeLevelRepository(
+  seed: GradeLevelRecord[] = [],
+): GradeLevelRepository {
+  const gradeLevels = new Map(seed.map((g) => [g.id, g]));
+
+  return {
+    async findAll() {
+      return [...gradeLevels.values()];
+    },
+    async findByName(name) {
+      return [...gradeLevels.values()].find((g) => g.name === name) ?? null;
+    },
+    async create(input) {
+      const record: GradeLevelRecord = { id: randomUUID(), ...input };
+      gradeLevels.set(record.id, record);
+      return record;
+    },
+  };
+}
+
+export function createFakeCourseRepository(seed: CourseRecord[] = []): CourseRepository {
+  const courses = new Map(seed.map((c) => [c.id, c]));
+
+  return {
+    async findAll() {
+      return [...courses.values()];
+    },
+    async findById(id) {
+      return courses.get(id) ?? null;
+    },
+    async findBySubjectAndGrade(subjectId, gradeLevelId) {
+      return (
+        [...courses.values()].find(
+          (c) => c.subjectId === subjectId && c.gradeLevelId === gradeLevelId,
+        ) ?? null
+      );
+    },
+    async create(input) {
+      const record: CourseRecord = { id: randomUUID(), ...input };
+      courses.set(record.id, record);
+      return record;
+    },
+    async update(id, input) {
+      const existing = courses.get(id);
+      if (!existing) throw new Error(`no fake course ${id}`);
+      const updated = { ...existing, ...input };
+      courses.set(id, updated);
+      return updated;
+    },
+    async delete(id) {
+      courses.delete(id);
+    },
+  };
+}
+
+export function createFakeBatchRepository(seed: BatchRecord[] = []): BatchRepository {
+  const batches = new Map(seed.map((b) => [b.id, b]));
+
+  return {
+    async findAll(filter: BatchListFilter) {
+      return [...batches.values()].filter((b) => {
+        if (filter.branchIds && !filter.branchIds.includes(b.branchId)) return false;
+        if (filter.teacherUserId && b.teacherUserId !== filter.teacherUserId) return false;
+        if (filter.courseId && b.courseId !== filter.courseId) return false;
+        if (filter.status && b.status !== filter.status) return false;
+        if (filter.term && b.term !== filter.term) return false;
+        return true;
+      });
+    },
+    async findById(id) {
+      return batches.get(id) ?? null;
+    },
+    async create(input) {
+      const record: BatchRecord = {
+        id: randomUUID(),
+        teacherUserId: null,
+        status: 'ACTIVE',
+        ...input,
+      };
+      batches.set(record.id, record);
+      return record;
+    },
+    async update(id, input) {
+      const existing = batches.get(id);
+      if (!existing) throw new Error(`no fake batch ${id}`);
+      const updated = { ...existing, ...input };
+      batches.set(id, updated);
+      return updated;
+    },
+  };
+}
+
+export function createFakeClassScheduleRepository(
+  seed: ClassScheduleRecord[] = [],
+  batchRepo?: BatchRepository,
+): ClassScheduleRepository {
+  const schedules = new Map(seed.map((s) => [s.id, s]));
+
+  return {
+    async findByBatch(batchId) {
+      return [...schedules.values()].filter((s) => s.batchId === batchId);
+    },
+    async findById(id) {
+      return schedules.get(id) ?? null;
+    },
+    async findConflictCandidates(branchId, dayOfWeek): Promise<ScheduleConflictCandidate[]> {
+      const candidates: ScheduleConflictCandidate[] = [];
+      for (const schedule of schedules.values()) {
+        if (schedule.dayOfWeek !== dayOfWeek) continue;
+        const batch = await batchRepo?.findById(schedule.batchId);
+        if (!batch || batch.branchId !== branchId) continue;
+        candidates.push({ ...schedule, room: batch.room, teacherUserId: batch.teacherUserId });
+      }
+      return candidates;
+    },
+    async create(input) {
+      const record: ClassScheduleRecord = { id: randomUUID(), ...input };
+      schedules.set(record.id, record);
+      return record;
+    },
+    async delete(id) {
+      schedules.delete(id);
+    },
+  };
+}
+

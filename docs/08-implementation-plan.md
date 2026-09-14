@@ -140,6 +140,12 @@ Express routes under `/api/auth/*` and `/api/users/*`; bcrypt via `bcryptjs` (pu
 
 _(SDD capability: `academic-structure`, `branch-scoping`; SRS: FR-ORG-_, FR-ACAD-_)_
 
+**Status: Implemented 2026-09-14** against in-memory fakes (139 backend tests total); not yet run
+against a real Neon database (none connected — see M0). The overlap check currently runs as a
+service-layer check-then-insert (not yet wrapped in a DB-level serializable transaction or
+`EXCLUDE` constraint — see the note on the Integration Tests item below); the seed-data import
+script is deferred to when a live DB is connected.
+
 ### Requirement
 
 See [06-sdd.md](./06-sdd.md) `academic-structure`/`branch-scoping`.
@@ -150,25 +156,25 @@ See [06-sdd.md](./06-sdd.md) `academic-structure`/`branch-scoping`.
 
 ### Implementation Tasks
 
-- [ ] CRUD for `Branch`, `Subject`, `GradeLevel`, `Course`.
-- [ ] `Batch` CRUD incl. teacher/room assignment.
-- [ ] `ClassSchedule` create/delete with overlap validation.
-- [ ] Batch archive endpoint.
-- [ ] **Seed-data import**: migrate the already-seeded prototype rows (`classes`/`teachers`/`students`/`schedule` in Neon project `TuitionCenter`) into `Course`/`Batch`/`User`(role=TEACHER)/`ClassSchedule` via a one-off migration script, preserving the original IDs as a reference field for traceability.
+- [x] CRUD for `Branch`, `Subject`, `GradeLevel`, `Course`. (`Subject`/`GradeLevel` are list+create only per [04-api-specification.md](./04-api-specification.md) §5; `Course` also supports `PATCH`/`DELETE`.)
+- [x] `Batch` CRUD incl. teacher/room assignment.
+- [x] `ClassSchedule` create/delete with overlap validation.
+- [x] Batch archive endpoint.
+- [ ] **Seed-data import**: migrate the already-seeded prototype rows (`classes`/`teachers`/`students`/`schedule` in Neon project `TuitionCenter`) into `Course`/`Batch`/`User`(role=TEACHER)/`ClassSchedule` via a one-off migration script, preserving the original IDs as a reference field for traceability. Deferred until a Neon DB is actually connected (see M0).
 
 ### Code Review Checklist
 
-- [ ] Every list/get endpoint demonstrably applies branch scoping (test asserts a 404 for out-of-scope IDs, not just "happy path" coverage).
-- [ ] Overlap-check logic covers same-teacher AND same-room cases, and both directions of overlap (new-inside-existing, existing-inside-new).
+- [x] Every list/get endpoint demonstrably applies branch scoping (test asserts a 404 for out-of-scope IDs, not just "happy path" coverage).
+- [x] Overlap-check logic covers same-teacher AND same-room cases, and both directions of overlap (new-inside-existing, existing-inside-new).
 
 ### Unit Tests
 
-- [ ] Overlap detection function: exhaustive interval-overlap cases (touching-but-not-overlapping boundaries must NOT conflict, e.g. 16:00–17:00 then 17:00–18:00).
-- [ ] Branch-scope filter builder unit-tested in isolation from HTTP.
+- [x] Overlap detection function: exhaustive interval-overlap cases (touching-but-not-overlapping boundaries must NOT conflict, e.g. 16:00–17:00 then 17:00–18:00). (`src/academic/scheduleOverlap.test.ts`)
+- [x] Branch-scope filter builder unit-tested in isolation from HTTP. (`src/lib/branchScope.test.ts`, plus `branchesService`/`batchesService` scoping tests)
 
 ### Integration Tests
 
-- [ ] Concurrent schedule-creation race test (two overlapping requests fired near-simultaneously) — exactly one succeeds.
+- [ ] Concurrent schedule-creation race test (two overlapping requests fired near-simultaneously) — exactly one succeeds. Not yet meaningful against in-memory fakes (single-threaded, no real concurrency) or without a connected Neon DB; the current implementation is a check-then-insert in the service layer, **not** yet a DB-level serializable transaction or `EXCLUDE` constraint — this must be revisited before go-live per the Solution Design above (same class of gap flagged for `EnrolLment` in M3).
 - [ ] Seed-data import script run against a scratch DB, row counts verified to match source.
 
 ### UAT Tests
@@ -178,10 +184,11 @@ See [06-sdd.md](./06-sdd.md) `academic-structure`/`branch-scoping`.
 
 ### Risk Assessment
 
-| Risk                                                 | Likelihood | Impact | Mitigation                                                                                                           |
-| ---------------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
-| `btree_gist` extension unavailable on Neon free tier | Medium     | Medium | Fallback to serializable-transaction overlap check in the service layer; documented decision point, not a silent gap |
-| Seed-data import introduces duplicate/orphaned rows  | Low        | Medium | Import script runs inside a transaction with a dry-run/report mode before committing                                 |
+| Risk                                                  | Likelihood | Impact | Mitigation                                                                                                                                                          |
+| ----------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `btree_gist` extension unavailable on Neon free tier  | Medium     | Medium | Fallback to serializable-transaction overlap check in the service layer; documented decision point, not a silent gap                                                |
+| Seed-data import introduces duplicate/orphaned rows   | Low        | Medium | Import script runs inside a transaction with a dry-run/report mode before committing                                                                                |
+| Overlap check-then-insert races under concurrent load | Medium     | Medium | Not yet mitigated at the DB layer (see Integration Tests above) — wrap in a serializable transaction or `EXCLUDE` constraint once Neon is connected, before go-live |
 
 ### Deployment Checklist
 

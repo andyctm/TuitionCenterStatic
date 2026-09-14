@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Environment secrets — never commit real values, only .env.example
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db

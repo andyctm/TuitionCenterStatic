@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home — Parent — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="mobile-first">
+    <div class="mockup-strip">
+      <span>GUI mockup — Parent — visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item is-active" href="parent-home.html"
+            ><i data-icon="home"></i><span class="label">Home</span></a
+          >
+          <a class="nav-item" href="schedule-parent.html"
+            ><i data-icon="schedule"></i><span class="label">Schedule</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="attendance"></i
+            ><span class="label">Attendance</span></a
+          >
+        </nav>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span class="current">Home</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <span class="avatar">PW</span>
+        </div>
+      </header>
+      <main class="content">
+        <div class="tab-strip" data-tab-strip="children">
+          <button class="is-active" data-tab-target="ravindu">
+            <span class="avatar sm">RA</span>Ravindu
+          </button>
+          <button data-tab-target="hasini">
+            <span class="avatar sm">HJ</span>Hasini
+          </button>
+        </div>
+
+        <div data-tab-panel="ravindu" data-tab-group="children">
+          <div class="next-class">
+            <span class="eyebrow-line">Ravindu's next class</span>
+            <h2>Grade 6 Mathematics</h2>
+            <div class="details">
+              <span class="item"
+                ><i data-icon="clock" class="icon-sm"></i>Today, 1:00 – 2:15
+                PM</span
+              >
+              <span class="item"
+                ><i data-icon="mapPin" class="icon-sm"></i>Room 2</span
+              >
+              <span class="item"
+                ><i data-icon="users" class="icon-sm"></i>Mr.
+                Wickramasinghe</span
+              >
+            </div>
+            <a
+              class="btn btn-primary"
+              href="schedule-parent.html"
+              style="align-self: flex-start"
+              >View schedule</a
+            >
+          </div>
+          <section class="panel" style="margin-top: var(--space-6)">
+            <div class="panel-header"><h2>Recent attendance</h2></div>
+            <div class="panel-body no-pad table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Batch</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Date">12 Sep</td>
+                    <td data-label="Batch" class="cell-secondary">
+                      Grade 6 Mathematics
+                    </td>
+                    <td data-label="Status">
+                      <span class="badge badge-success"
+                        ><i data-icon="checkCircle"></i>Present</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-label="Date">10 Sep</td>
+                    <td data-label="Batch" class="cell-secondary">
+                      Grade 6 Science
+                    </td>
+                    <td data-label="Status">
+                      <span class="badge badge-warning"
+                        ><i data-icon="clock"></i>Late</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-label="Date">8 Sep</td>
+                    <td data-label="Batch" class="cell-secondary">
+                      Grade 6 Mathematics
+                    </td>
+                    <td data-label="Status">
+                      <span class="badge badge-success"
+                        ><i data-icon="checkCircle"></i>Present</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div data-tab-panel="hasini" data-tab-group="children" hidden>
+          <div class="next-class">
+            <span class="eyebrow-line">Hasini's next class</span>
+            <h2>Grade 8 Science</h2>
+            <div class="details">
+              <span class="item"
+                ><i data-icon="clock" class="icon-sm"></i>Tomorrow, 9:45 – 11:00
+                AM</span
+              >
+              <span class="item"
+                ><i data-icon="mapPin" class="icon-sm"></i>Room 1</span
+              >
+              <span class="item"
+                ><i data-icon="users" class="icon-sm"></i>Ms. Gunawardena</span
+              >
+            </div>
+            <a
+              class="btn btn-primary"
+              href="schedule-parent.html"
+              style="align-self: flex-start"
+              >View schedule</a
+            >
+          </div>
+          <section class="panel" style="margin-top: var(--space-6)">
+            <div class="panel-header"><h2>Recent attendance</h2></div>
+            <div class="panel-body no-pad table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Batch</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Date">11 Sep</td>
+                    <td data-label="Batch" class="cell-secondary">
+                      Grade 8 Science
+                    </td>
+                    <td data-label="Status">
+                      <span class="badge badge-danger"
+                        ><i data-icon="xCircle"></i>Absent</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-label="Date">9 Sep</td>
+                    <td data-label="Batch" class="cell-secondary">
+                      Grade 8 Science
+                    </td>
+                    <td data-label="Status">
+                      <span class="badge badge-success"
+                        ><i data-icon="checkCircle"></i>Present</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <nav class="bottom-tabbar">
+      <a class="is-active" href="parent-home.html"
+        ><i data-icon="home"></i>Home</a
+      >
+      <a href="schedule-parent.html"><i data-icon="schedule"></i>Schedule</a>
+      <a href="#"><i data-icon="attendance"></i>Attendance</a>
+    </nav>
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

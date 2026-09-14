@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Today — Teacher — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="desktop-first">
+    <div class="mockup-strip">
+      <span>GUI mockup — Teacher — visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item is-active" href="teacher-dashboard.html"
+            ><i data-icon="dashboard"></i
+            ><span class="label">Dashboard</span></a
+          >
+          <a class="nav-item" href="my-batches.html"
+            ><i data-icon="batches"></i><span class="label">My Batches</span></a
+          >
+          <a class="nav-item" href="attendance.html"
+            ><i data-icon="attendance"></i
+            ><span class="label">Attendance</span></a
+          >
+        </nav>
+        <div class="nav-footer">Colombo Main branch</div>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span>Teacher</span><span class="sep">/</span
+          ><span class="current">Today</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <div class="user-chip">
+            <span class="avatar">DW</span>
+            <span class="meta"
+              ><span class="name">Dilshan Wickramasinghe</span
+              ><span class="role">Teacher</span></span
+            >
+            <i data-icon="chevronDown" class="icon-sm"></i>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1>Monday, 14 September</h1>
+            <p class="subtitle">
+              You have 3 sessions today — 1 already marked.
+            </p>
+          </div>
+        </div>
+
+        <section>
+          <div class="session-row">
+            <article class="session-card">
+              <span class="time">8:00 – 9:30 AM</span>
+              <h3>Grade 10 Mathematics</h3>
+              <span class="meta-line"
+                ><i data-icon="mapPin" class="icon-sm"></i>Room 2 · 27
+                students</span
+              >
+              <span class="marked"
+                ><i data-icon="checkCircle" class="icon-sm"></i>Marked at 8:04
+                AM</span
+              >
+            </article>
+            <article class="session-card">
+              <span class="time">1:00 – 2:15 PM</span>
+              <h3>Grade 6 Mathematics</h3>
+              <span class="meta-line"
+                ><i data-icon="mapPin" class="icon-sm"></i>Room 2 · 24
+                students</span
+              >
+              <a class="btn btn-primary" href="attendance.html"
+                >Mark Attendance</a
+              >
+            </article>
+            <article class="session-card">
+              <span class="time">3:30 – 4:45 PM</span>
+              <h3>Grade 9 Mathematics</h3>
+              <span class="meta-line"
+                ><i data-icon="mapPin" class="icon-sm"></i>Room 4 · 22
+                students</span
+              >
+              <a class="btn btn-primary" href="attendance.html"
+                >Mark Attendance</a
+              >
+            </article>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Pending</h2>
+            <span class="hint">Older sessions still needing attendance</span>
+          </div>
+          <div class="panel-body no-pad table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Batch</th>
+                  <th>Session date</th>
+                  <th>Edit window</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary">Grade 9 Mathematics</span>
+                  </td>
+                  <td data-label="Date" class="cell-secondary">
+                    Friday, 11 Sep
+                  </td>
+                  <td data-label="Window">
+                    <span class="badge badge-warning"
+                      ><i data-icon="clock"></i>18 hrs left</span
+                    >
+                  </td>
+                  <td>
+                    <a class="btn btn-secondary btn-sm" href="attendance.html"
+                      >Mark now</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

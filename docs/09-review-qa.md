@@ -1,0 +1,111 @@
+# Senior Developer & QA Review
+
+## Tuition Center Management System (TCMS)
+
+|             |                                                                                                                                                                                                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Version     | 1.0 (Draft — pending approval)                                                                                                                                                                                                                                        |
+| Perspective | Senior TypeScript engineer + QA review pass (in the spirit of Matt Pocock's emphasis on strict typing, inference-friendly APIs, and testing rigor) applied to the design in [01-srs.md](./01-srs.md) through [08-implementation-plan.md](./08-implementation-plan.md) |
+
+---
+
+## 1. TypeScript & Code-Quality Standards (enforced from day one, not retrofitted)
+
+| Standard                                                                                                                                                             | Why                                                                                                                                                                         | Enforcement                                                                                 |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `tsconfig.json`: `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`                                                                | Catches null/undefined bugs at compile time — especially important around Prisma relation fields that are legitimately optional (`teacherUserId?`) vs. accidentally missing | CI fails on any `tsc --noEmit` error                                                        |
+| No `any`; use `unknown` + narrowing, or generics                                                                                                                     | `any` silently disables the type checker exactly where money/PII flow through the system                                                                                    | ESLint `@typescript-eslint/no-explicit-any` as an error, not a warning                      |
+| Zod schemas as the single source of truth for both runtime validation and inferred static types (`z.infer<typeof Schema>`)                                           | Prevents the classic drift where a TS `interface` says one shape and the actual runtime-validated shape is another                                                          | Every API route's input type is `z.infer<...>`, never a hand-written duplicate interface    |
+| Discriminated unions for `EnrollmentStatus`/`AttendanceStatus`/etc. instead of raw strings in application code (Prisma enums map directly, so this is close to free) | Exhaustiveness checking (`switch` + `never` default) catches a missed case when a new status is added, at compile time instead of in production                             | Code review checklist item: every switch over a status enum has an exhaustive `never` check |
+| Branded/nominal ID types (`type StudentId = string & { __brand: "StudentId" }`) for at least the `BatchId`/`StudentProfileId` boundary                               | Prevents accidentally passing a `TeacherId` where a `StudentProfileId` is expected — both are plain `string` otherwise, and the compiler won't catch the swap               | Applied at minimum to the `enrollment` and `attendance` capability boundaries during M3/M4  |
+
+### Concrete example of what this prevents
+
+```ts
+// Without branded IDs — compiles, but is a bug:
+function markAttendance(sessionId: string, studentId: string) {
+  /* ... */
+}
+markAttendance(currentStudentId, currentSessionId); // args swapped — TS says nothing
+
+// With branded IDs — the swap is a compile error:
+function markAttendance(
+  sessionId: ClassSessionId,
+  studentId: StudentProfileId,
+) {
+  /* ... */
+}
+markAttendance(currentStudentId, currentSessionId); // Type error: Argument of type 'StudentProfileId' is not assignable to 'ClassSessionId'
+```
+
+---
+
+## 2. API Design Critique
+
+| Observation                                                                                               | Verdict                                                                                                                                                                                                 | Action                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Bulk upsert endpoint (`PUT /api/sessions/:id/attendance`) accepts an array and applies per-row validation | Good — matches the UI's "mark everyone at once" flow, avoids N round trips                                                                                                                              | Ensure the response reports **per-row** success/failure, not just an all-or-nothing 200/400, so the UI can show which rows failed |
+| 404-not-403 for out-of-scope resources ([04-api-specification.md](./04-api-specification.md) §1.2)        | Good — correct IDOR mitigation                                                                                                                                                                          | Must be tested explicitly per endpoint, not assumed from one example (see §3 test matrix below)                                   |
+| Idempotency-Key specified only for enrollment creation                                                    | Reasonable given enrollment-at-capacity is the endpoint with the most retry/double-submit ambiguity                                                                                                     | Revisit if a future endpoint introduces similar retry-sensitive semantics                                                         |
+| Cron-triggered internal endpoints guarded by a shared secret header                                       | Acceptable, but the shared secret must be treated with the same rigor as a JWT secret (rotated, not logged) — call this out explicitly since "internal" endpoints are often under-scrutinized in review | Add to code review checklist explicitly (see M6)                                                                                  |
+
+---
+
+## 3. QA Test-Coverage Matrix (what "done" means per capability)
+
+For every capability in [06-sdd.md](./06-sdd.md), QA sign-off requires at minimum:
+
+| Capability           | Must-have test beyond the happy path                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `auth`               | Expired token rejected; reused-after-rotation refresh token rejected; pending account blocked                 |
+| `branch-scoping`     | At least one 404-not-403 test per resource type, not just Batch                                               |
+| `academic-structure` | Overlap check tested for both teacher-overlap and room-overlap, and boundary-touching (non-overlapping) times |
+| `enrollment`         | Concurrency test at exact capacity boundary                                                                   |
+| `attendance`         | Window-boundary test (72h0m vs 72h1m); override path unreachable by non-admin roles                           |
+| `audit-log`          | Every capability's audited actions produce exactly one log row, not zero and not duplicated                   |
+
+---
+
+## 4. Consolidated Risk Register
+
+| ID   | Risk                                                                                                                                                                                                                         | Source                                                      | Likelihood                 | Impact                      | Mitigation                                                                                                                                                                                      |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R-00 | Workspace name ("...Static...") suggested a decoupled static-frontend architecture, conflicting with the originally-mandated Next.js-monolith diagram                                                                        | [02-architecture.md](./02-architecture.md) §1               | Medium                     | High (expensive to reverse) | **RESOLVED 2026-09-14**: product owner confirmed the decoupled reading was correct after all — static SPA (GitHub Pages) + separate Express API (Render). Architecture doc reworked accordingly |
+| R-12 | Cross-origin auth: bearer JWT held only in JS memory means any full page reload forces re-login (no silent refresh via httpOnly cookie, since frontend/API are on different top-level domains)                               | [02-architecture.md](./02-architecture.md) §5               | High (by design)           | Low–Medium                  | Accepted trade-off per product owner's explicit choice; document clearly in UX copy on reload/expiry                                                                                            |
+| R-13 | Render free/hobby tier API may cold-start-sleep after inactivity, adding latency to the first request                                                                                                                        | Hosting choice                                              | Medium                     | Low–Medium                  | Acceptable for a small tuition center's traffic; revisit paid tier if UX complaints arise                                                                                                       |
+| R-14 | CORS misconfiguration (e.g. `Access-Control-Allow-Origin: *` with credentials) would be a security hole across two separate origins                                                                                          | [02-architecture.md](./02-architecture.md) §6               | Low                        | High                        | API allow-lists the exact GitHub Pages origin; never wildcard with credentialed requests                                                                                                        |
+| R-01 | Serverless statelessness — no in-process shared memory across invocations                                                                                                                                                    | [02-architecture.md](./02-architecture.md) §7               | High (certain, by design)  | Medium                      | All shared state lives in Neon or Redis, never module-scope variables                                                                                                                           |
+| R-02 | Neon cold-start latency after idle                                                                                                                                                                                           | [02-architecture.md](./02-architecture.md) §7               | Medium                     | Low–Medium                  | Connection pooling; NFR-1 explicitly excludes cold starts from its P95 target                                                                                                                   |
+| R-03 | Vercel function timeout on large report exports                                                                                                                                                                              | [02-architecture.md](./02-architecture.md) §7               | Low                        | Medium                      | Streaming CSV generation (M5)                                                                                                                                                                   |
+| R-04 | `btree_gist` extension unavailable on Neon plan tier, breaking the planned DB-level overlap constraint                                                                                                                       | [08-implementation-plan.md](./08-implementation-plan.md) M2 | Medium                     | Medium                      | Service-layer serializable-transaction fallback, decided during M2, not deferred silently                                                                                                       |
+| R-06 | Six per-role nav configs increase QA surface area                                                                                                                                                                            | [07-ui-ux-design.md](./07-ui-ux-design.md) §8               | Medium                     | Low                         | Declarative single config object, not six components; per-role UAT pass                                                                                                                         |
+| R-07 | Static role enum (no dynamic RBAC) may not satisfy a future custom-permission requirement                                                                                                                                    | [03-database-design.md](./03-database-design.md) §1         | Low (v1), unknown (future) | Medium                      | Documented as a deliberate v2 seam, not a gap — revisit only if evidence of need appears                                                                                                        |
+| R-10 | Attendance "excused" exclusion from percentage denominator is an assumption, not a confirmed business rule                                                                                                                   | [08-implementation-plan.md](./08-implementation-plan.md) M4 | Medium                     | Low                         | Explicit UAT scenario before ship                                                                                                                                                               |
+| R-11 | Fees/billing, exams/results, and communication were explicitly removed from scope per product-owner decision; if reintroduced later, they re-enter as new capabilities against this same design, not a resurrected old draft | This session                                                | Low                        | Low                         | Re-run the SDD capability + implementation-plan-module process for any reintroduced feature rather than reverting docs                                                                          |
+
+---
+
+## 5. OWASP Top 10 Mapping (NFR-4 traceability)
+
+| OWASP category                  | Where addressed                                                                                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| A01 Broken Access Control       | `branch-scoping` capability, 404-not-403 convention, per-endpoint scope tests (§3)                                                           |
+| A02 Cryptographic Failures      | bcrypt for passwords, HTTPS everywhere, secrets never in client bundle                                                                       |
+| A03 Injection                   | Prisma parameterized queries exclusively; no raw string-concatenated SQL except the documented, reviewed `EXCLUDE` constraint migration (M2) |
+| A04 Insecure Design             | This entire design-first process — capabilities, risk register, and approval gates before code                                               |
+| A05 Security Misconfiguration   | Security headers (CSP, `X-Frame-Options`) in M6; env var separation per environment                                                          |
+| A06 Vulnerable Components       | `npm audit`/Dependabot in CI                                                                                                                 |
+| A07 Auth Failures               | Rate limiting, account lockout, rotating refresh tokens (`auth` capability)                                                                  |
+| A08 Software/Data Integrity     | CI-gated migrations, `AuditLog` for attendance-override integrity                                                                            |
+| A09 Logging/Monitoring Failures | Structured logging, `/api/health`, `AuditLog` capability                                                                                     |
+| A10 SSRF                        | No user-supplied URLs are fetched server-side in this scope                                                                                  |
+
+---
+
+## 6. Overall Verdict
+
+Design is internally consistent and traceable (SRS → SDD → DB → API → Implementation Plan all cross-reference the same `FR-*`/capability IDs). R-00 is resolved (decoupled static SPA + separate Express API confirmed 2026-09-14, reversing the initial monolith confirmation from earlier the same day) — everything else in this register is a tracked risk to manage during implementation, not a blocker to starting design sign-off.
+
+## 7. Approval Gate
+
+Sign-off on this review, together with all preceding docs, is required per [00-index.md](./00-index.md) before Module M0 begins.

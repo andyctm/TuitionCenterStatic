@@ -1,0 +1,18 @@
+{
+  "name": "tuition-center-static-git",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TCMS monorepo: static SPA (frontend/) + Express REST API (backend/)",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  },
+  "lint-staged": {
+    "backend/**/*.ts": "npm --prefix backend run lint:fix --",
+    "*.{md,json,css,html}": "prettier --write --ignore-unknown"
+  }
+}

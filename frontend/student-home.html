@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home — Student — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="mobile-first">
+    <div class="mockup-strip">
+      <span>GUI mockup — Student — visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item is-active" href="student-home.html"
+            ><i data-icon="home"></i><span class="label">Home</span></a
+          >
+          <a class="nav-item" href="schedule-student.html"
+            ><i data-icon="schedule"></i><span class="label">Schedule</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="attendance"></i
+            ><span class="label">Attendance</span></a
+          >
+        </nav>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span class="current">Home</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <span class="avatar">RA</span>
+        </div>
+      </header>
+      <main class="content">
+        <div class="next-class">
+          <span class="eyebrow-line">Your next class</span>
+          <h2>Grade 6 Mathematics</h2>
+          <div class="details">
+            <span class="item"
+              ><i data-icon="clock" class="icon-sm"></i>Today, 1:00 – 2:15
+              PM</span
+            >
+            <span class="item"
+              ><i data-icon="mapPin" class="icon-sm"></i>Room 2</span
+            >
+            <span class="item"
+              ><i data-icon="users" class="icon-sm"></i>Mr. Wickramasinghe</span
+            >
+          </div>
+          <a
+            class="btn btn-primary"
+            href="schedule-student.html"
+            style="align-self: flex-start"
+            >View schedule</a
+          >
+        </div>
+
+        <section class="panel">
+          <div class="panel-header"><h2>This week</h2></div>
+          <div class="panel-body no-pad table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Batch</th>
+                  <th>Time</th>
+                  <th>Room</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Day">
+                    <span class="cell-primary">Mon</span>
+                  </td>
+                  <td data-label="Batch">Grade 6 Mathematics</td>
+                  <td data-label="Time">1:00–2:15 PM</td>
+                  <td data-label="Room">Room 2</td>
+                </tr>
+                <tr>
+                  <td data-label="Day">
+                    <span class="cell-primary">Wed</span>
+                  </td>
+                  <td data-label="Batch">Grade 6 Mathematics</td>
+                  <td data-label="Time">1:00–2:15 PM</td>
+                  <td data-label="Room">Room 2</td>
+                </tr>
+                <tr>
+                  <td data-label="Day">
+                    <span class="cell-primary">Wed</span>
+                  </td>
+                  <td data-label="Batch">Grade 6 Science</td>
+                  <td data-label="Time">3:00–4:15 PM</td>
+                  <td data-label="Room">Room 1</td>
+                </tr>
+                <tr>
+                  <td data-label="Day">
+                    <span class="cell-primary">Fri</span>
+                  </td>
+                  <td data-label="Batch">Grade 6 Mathematics</td>
+                  <td data-label="Time">1:00–2:15 PM</td>
+                  <td data-label="Room">Room 2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Attendance summary</h2>
+            <span class="hint">This term</span>
+          </div>
+          <div class="panel-body">
+            <div class="stat-strip" style="border: none; box-shadow: none">
+              <div class="stat">
+                <span class="label">Present</span
+                ><span class="value" style="color: var(--color-success)"
+                  >36</span
+                >
+              </div>
+              <div class="stat">
+                <span class="label">Late</span
+                ><span class="value" style="color: var(--color-warning)"
+                  >2</span
+                >
+              </div>
+              <div class="stat">
+                <span class="label">Absent</span
+                ><span class="value" style="color: var(--color-danger)">1</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <nav class="bottom-tabbar">
+      <a class="is-active" href="student-home.html"
+        ><i data-icon="home"></i>Home</a
+      >
+      <a href="schedule-student.html"><i data-icon="schedule"></i>Schedule</a>
+      <a href="#"><i data-icon="attendance"></i>Attendance</a>
+    </nav>
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

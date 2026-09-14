@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enrollment — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="desktop-first">
+    <div class="mockup-strip">
+      <span>GUI mockup — Enrollment — visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item" href="accountant-dashboard.html"
+            ><i data-icon="dashboard"></i
+            ><span class="label">Dashboard</span></a
+          >
+          <a class="nav-item is-active" href="enrollment.html"
+            ><i data-icon="enrollment"></i
+            ><span class="label">Enrollment</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="reports"></i><span class="label">Reports</span></a
+          >
+        </nav>
+        <div class="nav-footer">Colombo Main branch</div>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span>Accountant</span><span class="sep">/</span
+          ><span class="current">Enrollment</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <div class="user-chip">
+            <span class="avatar">TM</span>
+            <span class="meta"
+              ><span class="name">Tharindu Mendis</span
+              ><span class="role">Accountant</span></span
+            >
+            <i data-icon="chevronDown" class="icon-sm"></i>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1>Enrollment</h1>
+            <p class="subtitle">Colombo Main · showing active enrollments</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" data-open-modal="enroll-dialog">
+              <i data-icon="plus" class="icon-sm"></i> Enroll Student
+            </button>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div
+            class="panel-header"
+            style="gap: var(--space-4); flex-wrap: wrap"
+          >
+            <div class="input-icon-wrap" style="max-width: 280px">
+              <i data-icon="search" class="icon-sm"></i>
+              <input class="input" placeholder="Search students…" />
+            </div>
+            <div style="display: flex; gap: var(--space-2); margin-left: auto">
+              <select class="input" style="width: auto">
+                <option>Status: Active</option>
+                <option>Status: Completed</option>
+                <option>Status: Withdrawn</option>
+                <option>Status: All</option>
+              </select>
+              <select class="input" style="width: auto">
+                <option>Batch: All</option>
+                <option>Grade 10 Mathematics</option>
+                <option>Grade 11 English</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-body no-pad table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Batch</th>
+                  <th>Enrolled since</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Student">
+                    <div class="row-people">
+                      <span class="avatar sm">SP</span>
+                      <div class="meta">
+                        <div>Sithara Perera</div>
+                        <div class="sub">Grade 10</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td data-label="Batch" class="cell-secondary">
+                    Grade 10 Mathematics
+                  </td>
+                  <td data-label="Enrolled since" class="cell-secondary">
+                    14 Sep 2026
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td data-label="Student">
+                    <div class="row-people">
+                      <span class="avatar sm">KD</span>
+                      <div class="meta">
+                        <div>Kasun Dias</div>
+                        <div class="sub">Grade 11</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td data-label="Batch" class="cell-secondary">
+                    Grade 11 English
+                  </td>
+                  <td data-label="Enrolled since" class="cell-secondary">
+                    14 Sep 2026
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td data-label="Student">
+                    <div class="row-people">
+                      <span class="avatar sm">MW</span>
+                      <div class="meta">
+                        <div>Malsha Wijesinghe</div>
+                        <div class="sub">Grade 8</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td data-label="Batch" class="cell-secondary">
+                    Grade 8 Science
+                  </td>
+                  <td data-label="Enrolled since" class="cell-secondary">
+                    2 Sep 2026
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td data-label="Student">
+                    <div class="row-people">
+                      <span class="avatar sm">HJ</span>
+                      <div class="meta">
+                        <div>Hasini Jayawardena</div>
+                        <div class="sub">Grade 6</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td data-label="Batch" class="cell-secondary">
+                    Grade 6 Mathematics
+                  </td>
+                  <td data-label="Enrolled since" class="cell-secondary">
+                    28 Aug 2026
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="enroll-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Enroll a student</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="student-search">Student</label>
+          <div class="input-icon-wrap">
+            <i data-icon="search" class="icon-sm"></i>
+            <input
+              class="input"
+              id="student-search"
+              placeholder="Search by name or student ID…"
+              value="Nimasha Ranasinghe"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label>Choose a batch</label>
+          <div
+            style="display: flex; flex-direction: column; gap: var(--space-2)"
+          >
+            <label class="seat-option" data-seat-option>
+              <div class="row-people">
+                <input type="radio" name="batch" />
+                <div class="meta">
+                  <div class="cell-primary">Grade 10 Mathematics</div>
+                  <div class="sub">Mon/Wed/Fri · 8:00–9:30 AM · Room 2</div>
+                </div>
+              </div>
+              <span class="seat-fill">18 / 30 seats</span>
+            </label>
+            <label class="seat-option" data-seat-option>
+              <div class="row-people">
+                <input type="radio" name="batch" />
+                <div class="meta">
+                  <div class="cell-primary">Grade 10 Mathematics — Evening</div>
+                  <div class="sub">Tue/Thu · 5:00–6:30 PM · Room 1</div>
+                </div>
+              </div>
+              <span class="seat-fill">22 / 25 seats</span>
+            </label>
+            <label class="seat-option is-full" data-seat-option>
+              <div class="row-people">
+                <input type="radio" name="batch" disabled />
+                <div class="meta">
+                  <div class="cell-primary">Grade 11 English</div>
+                  <div class="sub">Mon/Wed/Fri · 11:15–12:30 PM · Room 3</div>
+                </div>
+              </div>
+              <span class="seat-fill">30 / 30 seats</span>
+            </label>
+          </div>
+          <div class="error-msg" data-seat-error hidden>
+            <i data-icon="alertTriangle" class="icon-sm"></i>
+            This batch is at full capacity (30/30). Choose another batch or a
+            waitlist option.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary" data-enroll-confirm disabled>
+          Confirm Enrollment
+        </button>
+      </div>
+    </dialog>
+
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+Act as a senior Full Stack Web Developer and develop a web application for tuition center.
+Create a complete Software Requirement Specification (SRS),
+Software Design Document (SDD),
+Database Design,
+API Specification,
+and Implementation Plan
+
+for a Tuition Center Management System.
+The solution will use:
+- Next.js
+- TypeScript
+- PostgreSQL (Neon)
+- Prisma
+- GitHub
+- Vercel
+
++----------------------------------+
+|            Frontend              |
+|----------------------------------|
+| • HTML                           |
+| • CSS                            |
+| • JavaScript                     |
+| • React / Next.js                |
++----------------------------------+
+                 |
+                 | HTTPS
+                 v
++----------------------------------+
+|            Backend API           |
+|----------------------------------|
+| • Node.js                        |
+| • Next.js API Routes             |
+| • REST API                       |
+| • Authentication (JWT)           |
+| • Business Logic                 |
++----------------------------------+
+                 |
+                 | PostgreSQL
+                 v
++----------------------------------+
+|         Neon PostgreSQL          |
+|----------------------------------|
+| • Cloud Database                 |
+| • PostgreSQL                     |
+| • Backup & Recovery              |
++----------------------------------+
+
+
+Before generating code:
+
+1. Design the complete database.
+2. Create the ERD.
+3. Create the architecture diagram.
+4. Define all API endpoints.
+5. Define all user roles and permissions.
+6. Create the SRS and SDD.
+
+Do not generate code until the design and web GUI design is approve first.
+After the design is completed, generate the solution module by module.
+
+Use Open Spec Skill to create an enterprise-grade SDD.
+Use Matt Pocock Skill to review the design from a Senior Developer and QA perspective.
+Use impeccable Skill to Design a modern enterprise web application from a Senior UI/UX Designer. 
+
+For every design decision:
+
+1. Explain WHY the design was chosen.
+2. Identify risks.
+3. Generate development tasks.
+4. Generate unit tests.
+5. Generate integration tests.
+6. Generate UAT scenarios.
+7. Generate failure scenarios.
+8. Recommend code review checklist items.
+
+Output format:
+
+Requirement
+↓
+Solution Design
+↓
+Implementation Tasks
+↓
+Code Review Checklist
+↓
+Unit Tests
+↓
+Integration Tests
+↓
+UAT Tests
+↓
+Risk Assessment
+↓
+Deployment Checklist
+
+
+
+
+
+
+

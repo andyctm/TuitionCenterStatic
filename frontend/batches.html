@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Batches — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="desktop-first">
+    <div class="mockup-strip">
+      <span>GUI mockup: Batches, visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item" href="center-admin-dashboard.html"
+            ><i data-icon="dashboard"></i
+            ><span class="label">Dashboard</span></a
+          >
+          <a class="nav-item is-active" href="batches.html"
+            ><i data-icon="batches"></i><span class="label">Batches</span></a
+          >
+          <a class="nav-item" href="enrollment.html"
+            ><i data-icon="enrollment"></i
+            ><span class="label">Enrollment</span></a
+          >
+          <a class="nav-item" href="attendance.html"
+            ><i data-icon="attendance"></i
+            ><span class="label">Attendance</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="reports"></i><span class="label">Reports</span></a
+          >
+        </nav>
+        <div class="nav-footer">Colombo Main branch</div>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span>Center Admin</span><span class="sep">/</span
+          ><span class="current">Batches</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <div class="user-chip">
+            <span class="avatar">NP</span>
+            <span class="meta"
+              ><span class="name">Nadeesha Perera</span
+              ><span class="role">Center Admin · Colombo</span></span
+            >
+            <i data-icon="chevronDown" class="icon-sm"></i>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1>Batches</h1>
+            <p class="subtitle">Colombo Main · Term 3, 2026</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" data-open-modal="new-batch-dialog">
+              <i data-icon="plus" class="icon-sm"></i> New Batch
+            </button>
+          </div>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat">
+            <span class="label">Active batches</span
+            ><span class="value">21</span>
+          </div>
+          <div class="stat">
+            <span class="label">Total seats</span><span class="value">560</span>
+          </div>
+          <div class="stat">
+            <span class="label">Seats filled</span
+            ><span class="value">468</span>
+          </div>
+          <div class="stat">
+            <span class="label">Near capacity (≥90%)</span
+            ><span class="value" style="color: var(--color-warning)">3</span>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div
+            class="panel-header"
+            style="gap: var(--space-4); flex-wrap: wrap"
+          >
+            <div class="input-icon-wrap" style="max-width: 260px">
+              <i data-icon="search" class="icon-sm"></i>
+              <input class="input" placeholder="Search batches…" />
+            </div>
+            <div style="display: flex; gap: var(--space-2); margin-left: auto">
+              <select class="input" style="width: auto">
+                <option>Branch: Colombo Main</option>
+                <option>Branch: Kandy</option>
+                <option>Branch: Galle</option>
+                <option>Branch: Negombo</option>
+                <option>Branch: All</option>
+              </select>
+              <select class="input" style="width: auto">
+                <option>Status: Active</option>
+                <option>Status: Archived</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-body no-pad table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Batch</th>
+                  <th>Teacher</th>
+                  <th>Schedule</th>
+                  <th>Room</th>
+                  <th>Seats</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary">Grade 10 Mathematics</span>
+                  </td>
+                  <td data-label="Teacher" class="cell-secondary">
+                    D. Wickramasinghe
+                  </td>
+                  <td data-label="Schedule" class="cell-secondary">
+                    Mon/Wed/Fri · 8:00–9:30 AM
+                  </td>
+                  <td data-label="Room">Room 2</td>
+                  <td data-label="Seats">18 / 30</td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-ghost btn-sm"
+                      data-open-modal="edit-batch-dialog"
+                    >
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary"
+                      >Grade 10 Mathematics — Evening</span
+                    >
+                  </td>
+                  <td data-label="Teacher" class="cell-secondary">
+                    D. Wickramasinghe
+                  </td>
+                  <td data-label="Schedule" class="cell-secondary">
+                    Tue/Thu · 5:00–6:30 PM
+                  </td>
+                  <td data-label="Room">Room 1</td>
+                  <td data-label="Seats">22 / 25</td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary">Grade 11 English</span>
+                  </td>
+                  <td data-label="Teacher" class="cell-secondary">
+                    K. Jayasuriya
+                  </td>
+                  <td data-label="Schedule" class="cell-secondary">
+                    Mon/Wed/Fri · 11:15–12:30 PM
+                  </td>
+                  <td data-label="Room">Room 3</td>
+                  <td data-label="Seats">
+                    <span style="color: var(--color-warning); font-weight: 700"
+                      >30 / 30</span
+                    >
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-warning"
+                      ><i data-icon="alertTriangle"></i>Full</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary">Grade 8 Science</span>
+                  </td>
+                  <td data-label="Teacher" class="cell-secondary">
+                    S. Gunawardena
+                  </td>
+                  <td data-label="Schedule" class="cell-secondary">
+                    Tue/Thu · 9:45–11:00 AM
+                  </td>
+                  <td data-label="Room">Room 1</td>
+                  <td data-label="Seats">24 / 28</td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary">Grade 6 Mathematics</span>
+                  </td>
+                  <td data-label="Teacher" class="cell-secondary">
+                    D. Wickramasinghe
+                  </td>
+                  <td data-label="Schedule" class="cell-secondary">
+                    Mon/Wed/Fri · 1:00–2:15 PM
+                  </td>
+                  <td data-label="Room">Room 2</td>
+                  <td data-label="Seats">24 / 26</td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Batch">
+                    <span class="cell-primary">Grade 9 Mathematics</span>
+                  </td>
+                  <td data-label="Teacher" class="cell-secondary">
+                    D. Wickramasinghe
+                  </td>
+                  <td data-label="Schedule" class="cell-secondary">
+                    Mon/Wed/Fri · 3:30–4:45 PM
+                  </td>
+                  <td data-label="Room">Room 4</td>
+                  <td data-label="Seats">22 / 25</td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="new-batch-dialog" class="modal">
+      <div class="modal-header">
+        <h2>New batch</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="batch-course">Course</label>
+          <select class="input" id="batch-course">
+            <option>Grade 10 Mathematics</option>
+            <option>Grade 11 English</option>
+            <option>Grade 8 Science</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="batch-teacher">Teacher</label>
+          <select class="input" id="batch-teacher">
+            <option>D. Wickramasinghe</option>
+            <option>S. Gunawardena</option>
+            <option>K. Jayasuriya</option>
+          </select>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+          "
+        >
+          <div class="field">
+            <label for="batch-room">Room</label>
+            <select class="input" id="batch-room">
+              <option>Room 1</option>
+              <option>Room 2</option>
+              <option>Room 3</option>
+              <option>Room 4</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="batch-capacity">Capacity</label>
+            <input class="input" id="batch-capacity" type="number" value="30" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Weekly schedule</label>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: var(--space-4);
+            "
+          >
+            <select class="input">
+              <option>Mon/Wed/Fri</option>
+              <option>Tue/Thu</option>
+              <option>Sat</option>
+            </select>
+            <select class="input">
+              <option>8:00 – 9:30 AM</option>
+              <option>9:45 – 11:00 AM</option>
+              <option>1:00 – 2:15 PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="banner banner-warning">
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span
+            ><strong>D. Wickramasinghe</strong> already teaches Grade 6
+            Mathematics in Room 2 at this time. Choose a different room, time,
+            or teacher to avoid a scheduling conflict.</span
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary" disabled>Create Batch</button>
+      </div>
+    </dialog>
+
+    <dialog id="edit-batch-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Edit batch</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Course</label
+          ><input class="input" value="Grade 10 Mathematics" disabled />
+        </div>
+        <div class="field">
+          <label>Teacher</label
+          ><select class="input">
+            <option>D. Wickramasinghe</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Capacity</label
+          ><input class="input" type="number" value="30" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" style="margin-right: auto">
+          <i data-icon="trash" class="icon-sm"></i> Archive Batch
+        </button>
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary">Save Changes</button>
+      </div>
+    </dialog>
+
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

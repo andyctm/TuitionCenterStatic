@@ -1,0 +1,230 @@
+// prisma/schema.prisma
+// Design source of truth: docs/03-database-design.md §4
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  CENTER_ADMIN
+  ACCOUNTANT
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  WITHDRAWN
+}
+
+enum SessionStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum BatchStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  timezone  String   @default("Asia/Colombo")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  users   User[]
+  batches Batch[]
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  role         Role
+  status       UserStatus @default(PENDING)
+  branchId     String?
+  branch       Branch?    @relation(fields: [branchId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  studentProfile StudentProfile?
+  taughtBatches  Batch[]         @relation("BatchTeacher")
+  guardianOf     ParentStudent[] @relation("ParentLink")
+  auditLogs      AuditLog[]
+  refreshTokens  RefreshToken[]
+
+  @@index([role, branchId])
+}
+
+model StudentProfile {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  dateOfBirth DateTime?
+  gender      String?
+
+  guardians   ParentStudent[]
+  enrollments Enrollment[]
+  attendances Attendance[]
+}
+
+model ParentStudent {
+  id               String         @id @default(cuid())
+  parentUserId     String
+  parent           User           @relation("ParentLink", fields: [parentUserId], references: [id])
+  studentProfileId String
+  student          StudentProfile @relation(fields: [studentProfileId], references: [id])
+  relationship     String?
+
+  @@unique([parentUserId, studentProfileId])
+}
+
+model Subject {
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+
+  courses Course[]
+}
+
+model GradeLevel {
+  id        String @id @default(cuid())
+  name      String @unique
+  sortOrder Int
+
+  courses Course[]
+}
+
+model Course {
+  id           String     @id @default(cuid())
+  subjectId    String
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  gradeLevelId String
+  gradeLevel   GradeLevel @relation(fields: [gradeLevelId], references: [id])
+  name         String
+
+  batches Batch[]
+
+  @@unique([subjectId, gradeLevelId])
+}
+
+model Batch {
+  id            String      @id @default(cuid())
+  courseId      String
+  course        Course      @relation(fields: [courseId], references: [id])
+  branchId      String
+  branch        Branch      @relation(fields: [branchId], references: [id])
+  teacherUserId String?
+  teacher       User?       @relation("BatchTeacher", fields: [teacherUserId], references: [id])
+  room          String
+  capacity      Int
+  term          String
+  status        BatchStatus @default(ACTIVE)
+  createdAt     DateTime    @default(now())
+
+  schedules   ClassSchedule[]
+  sessions    ClassSession[]
+  enrollments Enrollment[]
+
+  @@index([branchId, status])
+}
+
+model ClassSchedule {
+  id        String @id @default(cuid())
+  batchId   String
+  batch     Batch  @relation(fields: [batchId], references: [id])
+  dayOfWeek Int // 0=Sunday .. 6=Saturday
+  startTime String // "HH:mm", stored as text; validated by app layer
+  endTime   String
+
+  @@index([batchId])
+}
+
+model ClassSession {
+  id          String        @id @default(cuid())
+  batchId     String
+  batch       Batch         @relation(fields: [batchId], references: [id])
+  sessionDate DateTime
+  status      SessionStatus @default(SCHEDULED)
+
+  attendances Attendance[]
+
+  @@unique([batchId, sessionDate])
+}
+
+model Enrollment {
+  id               String           @id @default(cuid())
+  batchId          String
+  batch            Batch            @relation(fields: [batchId], references: [id])
+  studentProfileId String
+  student          StudentProfile   @relation(fields: [studentProfileId], references: [id])
+  status           EnrollmentStatus @default(ACTIVE)
+  enrolledAt       DateTime         @default(now())
+
+  @@unique([batchId, studentProfileId])
+}
+
+model Attendance {
+  id               String           @id @default(cuid())
+  classSessionId   String
+  classSession     ClassSession     @relation(fields: [classSessionId], references: [id])
+  studentProfileId String
+  student          StudentProfile   @relation(fields: [studentProfileId], references: [id])
+  status           AttendanceStatus
+  remarks          String?
+  markedAt         DateTime         @default(now())
+
+  @@unique([classSessionId, studentProfileId])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String
+  actor       User     @relation(fields: [actorUserId], references: [id])
+  entityType  String
+  entityId    String
+  action      String
+  before      Json?
+  after       Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+}

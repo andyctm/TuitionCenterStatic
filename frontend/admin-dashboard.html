@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard: Super Admin - TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="desktop-first">
+    <div class="mockup-strip">
+      <span>GUI mockup: Super Admin, visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item is-active" href="admin-dashboard.html"
+            ><i data-icon="dashboard"></i
+            ><span class="label">Dashboard</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="branches"></i><span class="label">Branches</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="users"></i><span class="label">Users</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="courses"></i><span class="label">Courses</span></a
+          >
+          <a class="nav-item" href="batches.html"
+            ><i data-icon="batches"></i><span class="label">Batches</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="reports"></i><span class="label">Reports</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="audit"></i><span class="label">Audit Log</span></a
+          >
+          <a class="nav-item" href="#"
+            ><i data-icon="settings"></i><span class="label">Settings</span></a
+          >
+        </nav>
+        <div class="nav-footer">v1.0 · Design mockup</div>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span>Super Admin</span><span class="sep">/</span
+          ><span class="current">Dashboard</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <div class="user-chip">
+            <span class="avatar">AR</span>
+            <span class="meta"
+              ><span class="name">Aruna Rathnayake</span
+              ><span class="role">Super Admin</span></span
+            >
+            <i data-icon="chevronDown" class="icon-sm"></i>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1>Good morning, Aruna</h1>
+            <p class="subtitle">
+              Here's what's happening across all branches today, 14 Sep 2026.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary">
+              <i data-icon="plus" class="icon-sm"></i> Add Branch
+            </button>
+            <button class="btn btn-primary">
+              <i data-icon="plus" class="icon-sm"></i> Add User
+            </button>
+          </div>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat">
+            <span class="label">Branches</span>
+            <span class="value">4</span>
+            <span class="delta up">All operating</span>
+          </div>
+          <div class="stat">
+            <span class="label">Active staff & teachers</span>
+            <span class="value">86</span>
+            <span class="delta up">+3 this month</span>
+          </div>
+          <div class="stat">
+            <span class="label">Active batches</span>
+            <span class="value">52</span>
+            <span class="delta up">+2 this term</span>
+          </div>
+          <div class="stat">
+            <span class="label">Enrolled students</span>
+            <span class="value">612</span>
+            <span class="delta up">+18 this month</span>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: var(--space-6);
+            align-items: start;
+          "
+        >
+          <section class="panel">
+            <div class="panel-header">
+              <h2>Branches</h2>
+              <a class="btn btn-ghost btn-sm" href="#">View all</a>
+            </div>
+            <div class="panel-body no-pad table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Branch</th>
+                    <th>Center admin</th>
+                    <th>Students</th>
+                    <th>Batches</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Branch">
+                      <span class="cell-primary">Colombo Main</span>
+                    </td>
+                    <td data-label="Admin" class="cell-secondary">
+                      Nadeesha Perera
+                    </td>
+                    <td data-label="Students">248</td>
+                    <td data-label="Batches">21</td>
+                    <td data-label="Status">
+                      <span class="badge badge-success"
+                        ><i data-icon="checkCircle"></i>Active</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-label="Branch">
+                      <span class="cell-primary">Kandy</span>
+                    </td>
+                    <td data-label="Admin" class="cell-secondary">
+                      Ruwan Silva
+                    </td>
+                    <td data-label="Students">156</td>
+                    <td data-label="Batches">14</td>
+                    <td data-label="Status">
+                      <span class="badge badge-success"
+                        ><i data-icon="checkCircle"></i>Active</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-label="Branch">
+                      <span class="cell-primary">Galle</span>
+                    </td>
+                    <td data-label="Admin" class="cell-secondary">
+                      Ishara Fernando
+                    </td>
+                    <td data-label="Students">129</td>
+                    <td data-label="Batches">11</td>
+                    <td data-label="Status">
+                      <span class="badge badge-success"
+                        ><i data-icon="checkCircle"></i>Active</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-label="Branch">
+                      <span class="cell-primary">Negombo</span>
+                    </td>
+                    <td data-label="Admin" class="cell-secondary">
+                      Unassigned
+                    </td>
+                    <td data-label="Students">79</td>
+                    <td data-label="Batches">6</td>
+                    <td data-label="Status">
+                      <span class="badge badge-warning"
+                        ><i data-icon="alertTriangle"></i>Needs admin</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h2>Recent audit activity</h2>
+              <a class="btn btn-ghost btn-sm" href="#">Open log</a>
+            </div>
+            <div
+              class="panel-body"
+              style="display: flex; flex-direction: column; gap: var(--space-4)"
+            >
+              <div class="row-people">
+                <span class="avatar sm">NP</span>
+                <div class="meta">
+                  <div>
+                    Nadeesha Perera
+                    <span class="cell-secondary">created a new batch</span>
+                  </div>
+                  <div class="sub">Colombo Main · 8 min ago</div>
+                </div>
+              </div>
+              <div class="row-people">
+                <span class="avatar sm">RS</span>
+                <div class="meta">
+                  <div>
+                    Ruwan Silva
+                    <span class="cell-secondary"
+                      >approved a parent account</span
+                    >
+                  </div>
+                  <div class="sub">Kandy · 41 min ago</div>
+                </div>
+              </div>
+              <div class="row-people">
+                <span class="avatar sm">AR</span>
+                <div class="meta">
+                  <div>
+                    Aruna Rathnayake
+                    <span class="cell-secondary"
+                      >deactivated a staff account</span
+                    >
+                  </div>
+                  <div class="sub">Colombo Main · 2 hr ago</div>
+                </div>
+              </div>
+              <div class="row-people">
+                <span class="avatar sm">IF</span>
+                <div class="meta">
+                  <div>
+                    Ishara Fernando
+                    <span class="cell-secondary">edited batch capacity</span>
+                  </div>
+                  <div class="sub">Galle · Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

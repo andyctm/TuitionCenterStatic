@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import type { BatchesService } from '../academic/batchesService';
+import type { ClassSessionsService } from '../attendance/classSessionsService';
 import { AppError } from '../errors/AppError';
 import { getAuthContext } from '../lib/authContext';
 import { asyncHandler } from '../lib/asyncHandler';
@@ -12,8 +13,10 @@ import {
   createScheduleSchema,
   updateBatchSchema,
 } from '../validation/academicSchemas';
+import { createSessionSchema } from '../validation/attendanceSchemas';
 
 const WRITE_ROLES = ['SUPER_ADMIN', 'CENTER_ADMIN'] as const;
+const SESSION_WRITE_ROLES = ['SUPER_ADMIN', 'CENTER_ADMIN', 'TEACHER'] as const;
 
 function requireParam(value: unknown, message: string): string {
   if (typeof value !== 'string') {
@@ -24,6 +27,7 @@ function requireParam(value: unknown, message: string): string {
 
 export function createBatchesRouter(
   batchesService: BatchesService,
+  classSessionsService: ClassSessionsService,
   accessTokenSecret: string,
 ): Router {
   const router = Router();
@@ -100,6 +104,28 @@ export function createBatchesRouter(
       const scheduleId = requireParam(req.params.scheduleId, 'Schedule not found');
       await batchesService.removeSchedule(id, scheduleId);
       res.status(204).send();
+    }),
+  );
+
+  router.get(
+    '/:id/sessions',
+    authed,
+    asyncHandler(async (req, res) => {
+      const id = requireParam(req.params.id, 'Batch not found');
+      const sessions = await classSessionsService.list(getAuthContext(req), id);
+      res.status(200).json({ data: sessions });
+    }),
+  );
+
+  router.post(
+    '/:id/sessions',
+    authed,
+    requireRole(...SESSION_WRITE_ROLES),
+    asyncHandler(async (req, res) => {
+      const id = requireParam(req.params.id, 'Batch not found');
+      const input = parseBody(createSessionSchema, req.body);
+      const session = await classSessionsService.createAdHoc(getAuthContext(req), id, input);
+      res.status(201).json({ data: session });
     }),
   );
 

@@ -1,4 +1,11 @@
-import type { BatchStatus, EnrollmentStatus, Role, UserStatus } from '@prisma/client';
+import type {
+  AttendanceStatus,
+  BatchStatus,
+  EnrollmentStatus,
+  Role,
+  SessionStatus,
+  UserStatus,
+} from '@prisma/client';
 
 export type UserRecord = {
   id: string;
@@ -251,4 +258,75 @@ export interface EnrollmentRepository {
   createIfCapacityAvailable(input: NewEnrollmentInput): Promise<EnrollmentCreateResult>;
   updateStatus(id: string, status: EnrollmentStatus): Promise<EnrollmentRecord>;
 }
+
+export type ClassSessionRecord = {
+  id: string;
+  batchId: string;
+  sessionDate: Date;
+  status: SessionStatus;
+};
+
+export type NewClassSessionInput = {
+  batchId: string;
+  sessionDate: Date;
+  status?: SessionStatus;
+};
+
+export interface ClassSessionRepository {
+  findByBatch(batchId: string): Promise<ClassSessionRecord[]>;
+  findById(id: string): Promise<ClassSessionRecord | null>;
+  findByBatchAndDate(batchId: string, sessionDate: Date): Promise<ClassSessionRecord | null>;
+  create(input: NewClassSessionInput): Promise<ClassSessionRecord>;
+}
+
+export type AttendanceRecord = {
+  id: string;
+  classSessionId: string;
+  studentProfileId: string;
+  status: AttendanceStatus;
+  remarks: string | null;
+  markedAt: Date;
+};
+
+export type AttendanceUpsertInput = {
+  studentProfileId: string;
+  status: AttendanceStatus;
+  remarks?: string | null;
+};
+
+// Enriched with the parent session's date/batch so history/percentage views don't need a
+// second round trip per record.
+export type StudentAttendanceRecord = AttendanceRecord & {
+  sessionDate: Date;
+  batchId: string;
+};
+
+export interface AttendanceRepository {
+  findBySession(classSessionId: string): Promise<AttendanceRecord[]>;
+  findByStudent(studentProfileId: string): Promise<StudentAttendanceRecord[]>;
+  upsertMany(
+    classSessionId: string,
+    records: AttendanceUpsertInput[],
+  ): Promise<AttendanceRecord[]>;
+}
+
+export type NewAuditLogInput = {
+  actorUserId: string;
+  entityType: string;
+  entityId: string;
+  action: string;
+  before?: unknown;
+  after?: unknown;
+  ipAddress?: string | null;
+};
+
+export type AuditLogRecord = NewAuditLogInput & {
+  id: string;
+  createdAt: Date;
+};
+
+export interface AuditLogRepository {
+  create(input: NewAuditLogInput): Promise<AuditLogRecord>;
+}
+
 

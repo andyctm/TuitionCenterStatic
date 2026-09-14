@@ -7,10 +7,16 @@ import { createGradeLevelsService } from '../academic/gradeLevelsService';
 import { createCoursesService } from '../academic/coursesService';
 import { createBatchesService } from '../academic/batchesService';
 import { createEnrollmentService } from '../enrollment/enrollmentService';
+import { createClassSessionsService } from '../attendance/classSessionsService';
+import { createAttendanceService } from '../attendance/attendanceService';
+import { createSessionMaterializationService } from '../attendance/sessionMaterializationService';
 import {
+  createFakeAttendanceRepository,
+  createFakeAuditLogRepository,
   createFakeBatchRepository,
   createFakeBranchRepository,
   createFakeClassScheduleRepository,
+  createFakeClassSessionRepository,
   createFakeCourseRepository,
   createFakeEnrollmentRepository,
   createFakeGradeLevelRepository,
@@ -22,8 +28,10 @@ import {
   createFakeUserRepository,
 } from './fakeRepositories';
 import type {
+  AttendanceRecord,
   BatchRecord,
   BranchRecord,
+  ClassSessionRecord,
   CourseRecord,
   EnrollmentRecord,
   GradeLevelRecord,
@@ -33,6 +41,7 @@ import type {
 } from '../repositories/types';
 
 export const TEST_ACCESS_TOKEN_SECRET = 'test-access-secret';
+export const TEST_INTERNAL_JOB_SECRET = 'test-internal-job-secret';
 export const TEST_ALLOWED_ORIGINS = ['https://acme.github.io'];
 
 export function createTestApp(
@@ -46,6 +55,8 @@ export function createTestApp(
     seedStudentProfiles?: StudentProfileRecord[];
     seedEnrollments?: EnrollmentRecord[];
     seedParentLinks?: { parentUserId: string; studentProfileId: string }[];
+    seedClassSessions?: ClassSessionRecord[];
+    seedAttendances?: AttendanceRecord[];
     checkDb?: AppDeps['checkDb'];
   } = {},
 ) {
@@ -63,6 +74,12 @@ export function createTestApp(
   const studentProfileRepo = createFakeStudentProfileRepository(options.seedStudentProfiles ?? []);
   const parentStudentRepo = createFakeParentStudentRepository(options.seedParentLinks ?? []);
   const enrollmentRepo = createFakeEnrollmentRepository(options.seedEnrollments ?? [], batchRepo);
+  const classSessionRepo = createFakeClassSessionRepository(options.seedClassSessions ?? []);
+  const attendanceRepo = createFakeAttendanceRepository(
+    options.seedAttendances ?? [],
+    classSessionRepo,
+  );
+  const auditLogRepo = createFakeAuditLogRepository();
 
   const authService = createAuthService({
     userRepo,
@@ -91,6 +108,21 @@ export function createTestApp(
     studentProfileRepo,
     parentStudentRepo,
   });
+  const classSessionsService = createClassSessionsService({ classSessionRepo, batchRepo });
+  const attendanceService = createAttendanceService({
+    attendanceRepo,
+    classSessionRepo,
+    batchRepo,
+    studentProfileRepo,
+    parentStudentRepo,
+    enrollmentRepo,
+    auditLogRepo,
+  });
+  const sessionMaterializationService = createSessionMaterializationService({
+    batchRepo,
+    classScheduleRepo,
+    classSessionRepo,
+  });
 
   const app = createApp({
     allowedOrigins: TEST_ALLOWED_ORIGINS,
@@ -103,7 +135,11 @@ export function createTestApp(
     coursesService,
     batchesService,
     enrollmentService,
+    classSessionsService,
+    attendanceService,
+    sessionMaterializationService,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
+    internalJobSecret: TEST_INTERNAL_JOB_SECRET,
   });
 
   return {
@@ -120,6 +156,9 @@ export function createTestApp(
     studentProfileRepo,
     parentStudentRepo,
     enrollmentRepo,
+    classSessionRepo,
+    attendanceRepo,
+    auditLogRepo,
     sentEmails,
     authService,
     usersService,
@@ -129,6 +168,9 @@ export function createTestApp(
     coursesService,
     batchesService,
     enrollmentService,
+    classSessionsService,
+    attendanceService,
+    sessionMaterializationService,
   };
 }
 

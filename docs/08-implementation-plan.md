@@ -260,30 +260,45 @@ See [06-sdd.md](./06-sdd.md) `enrollment` — capacity check + insert in one tra
 
 _(SDD capability: `attendance`; SRS: FR-ATT-_)*
 
+**Status: Implemented 2026-09-14** against in-memory fakes (205 backend tests total); not yet run
+against a real Neon database. Per the v2.0 architecture rework, "Vercel Cron job" is implemented as
+a plain internal endpoint (`POST /api/internal/jobs/materialize-sessions`, guarded by a shared
+`X-Internal-Job-Secret` header, not a user JWT) that a Render cron/`node-cron` schedule can call —
+see [02-architecture.md](./02-architecture.md) v2.0. Also implemented, beyond the four checklist
+items below, as natural prerequisites documented in [04-api-specification.md](./04-api-specification.md)
+§8: `GET/POST /api/batches/:id/sessions` (ad-hoc session, Admin/Teacher-own-batch) and
+`GET /api/sessions/:id/attendance` (roster). Two status-code ambiguities in the source docs were
+resolved in favor of the more specific scenario-level text over the general convention: (1) editing
+attendance outside the window returns **403** (not the general error table's illustrative 422),
+per 06-sdd.md's explicit scenario and 05-roles-permissions.md's worked example; (2) a Teacher
+acting on a batch they don't teach returns **403** (not the usual 404 IDOR-avoidance convention
+used for branch-out-of-scope elsewhere), per the same two docs' explicit wording — branch-scope
+mismatches for Center Admin/Accountant still return 404 as elsewhere.
+
 ### Requirement / Solution Design
 
 See [06-sdd.md](./06-sdd.md) `attendance` — materialized sessions + 72h edit window + audited override.
 
 ### Implementation Tasks
 
-- [ ] Vercel Cron job: materialize `ClassSession` rows for the next 14 days from `ClassSchedule`.
-- [ ] `PUT /api/sessions/:id/attendance` (bulk upsert, own-batch + window check).
-- [ ] `POST /api/sessions/:id/attendance/override` (admin-only, mandatory reason, writes `AuditLog`).
-- [ ] Attendance-percentage aggregation endpoint for Student/Parent view.
+- [x] Vercel Cron job: materialize `ClassSession` rows for the next 14 days from `ClassSchedule`. (Render-cron-callable internal endpoint, per the note above.)
+- [x] `PUT /api/sessions/:id/attendance` (bulk upsert, own-batch + window check).
+- [x] `POST /api/sessions/:id/attendance/override` (admin-only, mandatory reason, writes `AuditLog`).
+- [x] Attendance-percentage aggregation endpoint for Student/Parent view. (`GET /api/students/:id/attendance`; percentage rule: EXCUSED excluded from the denominator — flagged below for product-owner confirmation.)
 
 ### Code Review Checklist
 
-- [ ] Window check uses server time (not client-supplied timestamps) to prevent clock-tampering bypass.
-- [ ] Override path is unreachable by any role except Admin (test asserts 403 for Teacher attempting the override endpoint, not just the normal endpoint).
+- [x] Window check uses server time (not client-supplied timestamps) to prevent clock-tampering bypass. (`now` defaults server-side in `attendanceService`; never taken from the request body.)
+- [x] Override path is unreachable by any role except Admin (test asserts 403 for Teacher attempting the override endpoint, not just the normal endpoint).
 
 ### Unit Tests
 
-- [ ] Window boundary: exactly 72h0m is inside vs. 72h1m is outside (pick and document one inclusive/exclusive convention).
-- [ ] Attendance-percentage calculation with mixed statuses (excused excluded from denominator — a deliberate rule to confirm with the product owner).
+- [x] Window boundary: exactly 72h0m is inside vs. 72h1m is outside (pick and document one inclusive/exclusive convention). (`src/attendance/attendanceWindow.test.ts` — inclusive at exactly 72h.)
+- [x] Attendance-percentage calculation with mixed statuses (excused excluded from denominator — a deliberate rule to confirm with the product owner). (`src/attendance/attendancePercentage.test.ts`)
 
 ### Integration Tests
 
-- [ ] Materialization job run twice back-to-back does not create duplicate sessions (idempotent via the `(batchId, sessionDate)` unique constraint).
+- [x] Materialization job run twice back-to-back does not create duplicate sessions (idempotent via the `(batchId, sessionDate)` unique constraint). (`src/attendance/sessionMaterializationService.test.ts`)
 
 ### UAT Tests
 
@@ -292,14 +307,16 @@ See [06-sdd.md](./06-sdd.md) `attendance` — materialized sessions + 72h edit w
 
 ### Risk Assessment
 
-| Risk                                                    | Likelihood | Impact | Mitigation                                                                             |
-| ------------------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------- |
-| Cron job failure silently stops session materialization | Medium     | Medium | Health-check alert if `ClassSession` count for "tomorrow" is zero when it shouldn't be |
-| Excused-vs-denominator rule surprises stakeholders      | Medium     | Low    | Explicitly confirmed as a UAT scenario before ship                                     |
+| Risk                                                       | Likelihood | Impact | Mitigation                                                                                                                                           |
+| ---------------------------------------------------------- | ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cron job failure silently stops session materialization    | Medium     | Medium | Health-check alert if `ClassSession` count for "tomorrow" is zero when it shouldn't be                                                               |
+| Excused-vs-denominator rule surprises stakeholders         | Medium     | Low    | Explicitly confirmed as a UAT scenario before ship                                                                                                   |
+| `AuditLog.before`/`after` has no dedicated `reason` column | Low        | Low    | Override `reason` is embedded inside the `after` JSON blob for now; revisit if M6 (`audit-log`) needs a first-class `reason` field for search/filter |
 
 ### Deployment Checklist
 
 - [ ] Cron schedule confirmed against the center's actual timezone (not UTC-naive).
+- [ ] `INTERNAL_JOB_SECRET` set to a strong, unique value in production, distinct from JWT secrets, and only ever configured on the Render cron caller (never exposed to the frontend).
 
 ---
 

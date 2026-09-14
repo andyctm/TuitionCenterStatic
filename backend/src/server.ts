@@ -14,6 +14,9 @@ import { createPrismaClassScheduleRepository } from './repositories/prismaClassS
 import { createPrismaStudentProfileRepository } from './repositories/prismaStudentProfileRepository';
 import { createPrismaParentStudentRepository } from './repositories/prismaParentStudentRepository';
 import { createPrismaEnrollmentRepository } from './repositories/prismaEnrollmentRepository';
+import { createPrismaClassSessionRepository } from './repositories/prismaClassSessionRepository';
+import { createPrismaAttendanceRepository } from './repositories/prismaAttendanceRepository';
+import { createPrismaAuditLogRepository } from './repositories/prismaAuditLogRepository';
 import { createUsersService } from './users/usersService';
 import { createBranchesService } from './branches/branchesService';
 import { createSubjectsService } from './academic/subjectsService';
@@ -21,6 +24,9 @@ import { createGradeLevelsService } from './academic/gradeLevelsService';
 import { createCoursesService } from './academic/coursesService';
 import { createBatchesService } from './academic/batchesService';
 import { createEnrollmentService } from './enrollment/enrollmentService';
+import { createClassSessionsService } from './attendance/classSessionsService';
+import { createAttendanceService } from './attendance/attendanceService';
+import { createSessionMaterializationService } from './attendance/sessionMaterializationService';
 
 const env = parseEnv(process.env);
 
@@ -36,6 +42,9 @@ const classScheduleRepo = createPrismaClassScheduleRepository(prisma);
 const studentProfileRepo = createPrismaStudentProfileRepository(prisma);
 const parentStudentRepo = createPrismaParentStudentRepository(prisma);
 const enrollmentRepo = createPrismaEnrollmentRepository(prisma);
+const classSessionRepo = createPrismaClassSessionRepository(prisma);
+const attendanceRepo = createPrismaAttendanceRepository(prisma);
+const auditLogRepo = createPrismaAuditLogRepository(prisma);
 
 const authService = createAuthService({
   userRepo,
@@ -60,6 +69,21 @@ const enrollmentService = createEnrollmentService({
   studentProfileRepo,
   parentStudentRepo,
 });
+const classSessionsService = createClassSessionsService({ classSessionRepo, batchRepo });
+const attendanceService = createAttendanceService({
+  attendanceRepo,
+  classSessionRepo,
+  batchRepo,
+  studentProfileRepo,
+  parentStudentRepo,
+  enrollmentRepo,
+  auditLogRepo,
+});
+const sessionMaterializationService = createSessionMaterializationService({
+  batchRepo,
+  classScheduleRepo,
+  classSessionRepo,
+});
 
 const app = createApp({
   allowedOrigins: env.allowedOrigins,
@@ -74,7 +98,11 @@ const app = createApp({
   coursesService,
   batchesService,
   enrollmentService,
+  classSessionsService,
+  attendanceService,
+  sessionMaterializationService,
   accessTokenSecret: env.jwtAccessSecret,
+  internalJobSecret: env.internalJobSecret,
 });
 
 app.listen(env.port, () => {

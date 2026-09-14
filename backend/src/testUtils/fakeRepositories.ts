@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import type {
+  AttendanceRecord,
+  AttendanceRepository,
+  AttendanceUpsertInput,
+  AuditLogRecord,
+  AuditLogRepository,
   BatchListFilter,
   BatchRecord,
   BatchRepository,
@@ -7,6 +12,8 @@ import type {
   BranchRepository,
   ClassScheduleRecord,
   ClassScheduleRepository,
+  ClassSessionRecord,
+  ClassSessionRepository,
   CourseRecord,
   CourseRepository,
   EnrollmentCreateResult,
@@ -22,6 +29,7 @@ import type {
   RefreshTokenRecord,
   RefreshTokenRepository,
   ScheduleConflictCandidate,
+  StudentAttendanceRecord,
   StudentProfileRecord,
   StudentProfileRepository,
   SubjectRecord,
@@ -377,6 +385,94 @@ export function createFakeEnrollmentRepository(
       const updated = { ...existing, status };
       enrollments.set(id, updated);
       return updated;
+    },
+  };
+}
+
+export function createFakeClassSessionRepository(
+  seed: ClassSessionRecord[] = [],
+): ClassSessionRepository {
+  const sessions = new Map(seed.map((s) => [s.id, s]));
+
+  return {
+    async findByBatch(batchId) {
+      return [...sessions.values()].filter((s) => s.batchId === batchId);
+    },
+    async findById(id) {
+      return sessions.get(id) ?? null;
+    },
+    async findByBatchAndDate(batchId, sessionDate) {
+      return (
+        [...sessions.values()].find(
+          (s) => s.batchId === batchId && s.sessionDate.getTime() === sessionDate.getTime(),
+        ) ?? null
+      );
+    },
+    async create(input) {
+      const record: ClassSessionRecord = { id: randomUUID(), status: 'SCHEDULED', ...input };
+      sessions.set(record.id, record);
+      return record;
+    },
+  };
+}
+
+export function createFakeAttendanceRepository(
+  seed: AttendanceRecord[] = [],
+  classSessionRepo?: ClassSessionRepository,
+): AttendanceRepository {
+  const attendances = new Map(seed.map((a) => [a.id, a]));
+
+  return {
+    async findBySession(classSessionId) {
+      return [...attendances.values()].filter((a) => a.classSessionId === classSessionId);
+    },
+    async findByStudent(studentProfileId): Promise<StudentAttendanceRecord[]> {
+      const records: StudentAttendanceRecord[] = [];
+      for (const attendance of attendances.values()) {
+        if (attendance.studentProfileId !== studentProfileId) continue;
+        const session = await classSessionRepo?.findById(attendance.classSessionId);
+        if (!session) continue;
+        records.push({ ...attendance, sessionDate: session.sessionDate, batchId: session.batchId });
+      }
+      return records;
+    },
+    async upsertMany(classSessionId, records: AttendanceUpsertInput[]) {
+      const result: AttendanceRecord[] = [];
+      for (const record of records) {
+        const existing = [...attendances.values()].find(
+          (a) => a.classSessionId === classSessionId && a.studentProfileId === record.studentProfileId,
+        );
+        const updated: AttendanceRecord = {
+          id: existing?.id ?? randomUUID(),
+          classSessionId,
+          studentProfileId: record.studentProfileId,
+          status: record.status,
+          remarks: record.remarks ?? null,
+          markedAt: new Date(),
+        };
+        attendances.set(updated.id, updated);
+        result.push(updated);
+      }
+      return result;
+    },
+  };
+}
+
+export function createFakeAuditLogRepository(): AuditLogRepository {
+  const logs: AuditLogRecord[] = [];
+
+  return {
+    async create(input) {
+      const record: AuditLogRecord = {
+        id: randomUUID(),
+        createdAt: new Date(),
+        before: null,
+        after: null,
+        ipAddress: null,
+        ...input,
+      };
+      logs.push(record);
+      return record;
     },
   };
 }

@@ -9,6 +9,9 @@ import type { GradeLevelsService } from './academic/gradeLevelsService';
 import type { CoursesService } from './academic/coursesService';
 import type { BatchesService } from './academic/batchesService';
 import type { EnrollmentService } from './enrollment/enrollmentService';
+import type { ClassSessionsService } from './attendance/classSessionsService';
+import type { AttendanceService } from './attendance/attendanceService';
+import type { SessionMaterializationService } from './attendance/sessionMaterializationService';
 import { isOriginAllowed } from './lib/corsAllowlist';
 import { errorHandler } from './middleware/errorHandler';
 import { createAuthRouter } from './routes/auth';
@@ -18,6 +21,9 @@ import { createBranchesRouter } from './routes/branches';
 import { createCoursesRouter, createGradeLevelsRouter, createSubjectsRouter } from './routes/academicStructure';
 import { createBatchesRouter } from './routes/batches';
 import { createEnrollmentsRouter } from './routes/enrollments';
+import { createAttendanceRouter } from './routes/attendance';
+import { createStudentsRouter } from './routes/students';
+import { createInternalRouter } from './routes/internal';
 
 export type AppDeps = {
   allowedOrigins: string[];
@@ -30,7 +36,11 @@ export type AppDeps = {
   coursesService: CoursesService;
   batchesService: BatchesService;
   enrollmentService: EnrollmentService;
+  classSessionsService: ClassSessionsService;
+  attendanceService: AttendanceService;
+  sessionMaterializationService: SessionMaterializationService;
   accessTokenSecret: string;
+  internalJobSecret: string;
 };
 
 export function createApp(deps: AppDeps): Express {
@@ -60,10 +70,16 @@ export function createApp(deps: AppDeps): Express {
     createGradeLevelsRouter(deps.gradeLevelsService, deps.accessTokenSecret),
   );
   app.use('/api/courses', createCoursesRouter(deps.coursesService, deps.accessTokenSecret));
-  app.use('/api/batches', createBatchesRouter(deps.batchesService, deps.accessTokenSecret));
+  app.use('/api/batches', createBatchesRouter(deps.batchesService, deps.classSessionsService, deps.accessTokenSecret));
   app.use(
     '/api/enrollments',
     createEnrollmentsRouter(deps.enrollmentService, deps.accessTokenSecret),
+  );
+  app.use('/api/sessions', createAttendanceRouter(deps.attendanceService, deps.accessTokenSecret));
+  app.use('/api/students', createStudentsRouter(deps.attendanceService, deps.accessTokenSecret));
+  app.use(
+    '/api/internal',
+    createInternalRouter(deps.sessionMaterializationService, deps.internalJobSecret),
   );
 
   app.use(errorHandler);

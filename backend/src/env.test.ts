@@ -6,6 +6,7 @@ const validEnv = {
   ALLOWED_ORIGINS: 'https://acme.github.io,http://localhost:5500',
   JWT_ACCESS_SECRET: 'access-secret',
   JWT_REFRESH_SECRET: 'refresh-secret',
+  INTERNAL_JOB_SECRET: 'internal-job-secret',
   PORT: '4000',
 };
 

@@ -201,26 +201,40 @@ See [06-sdd.md](./06-sdd.md) `academic-structure`/`branch-scoping`.
 
 _(SDD capability: `enrollment`; SRS: FR-ENR-_)*
 
+**Status: Implemented 2026-09-14** against in-memory fakes (160 backend tests total); not yet run
+against a real Neon database (none connected — see M0). Unlike M2's schedule-overlap check, the
+capacity check + insert here IS a single atomic repository operation
+(`EnrollmentRepository.createIfCapacityAvailable`) — the Prisma implementation wraps it in a
+`prisma.$transaction` with `Serializable` isolation, and the in-memory fake mirrors this by doing
+the check-then-mutate as one synchronous block (no `await` in between), so the concurrency test
+below is meaningful even without a live DB. `Idempotency-Key` header support (mentioned in
+[04-api-specification.md](./04-api-specification.md) §1.4) was not implemented in this pass — not
+listed as an M3 implementation task below, so treated as a deliberately deferred, explicitly-noted
+gap rather than silently dropped. Enrollment also required adding minimal `StudentProfile`/
+`ParentStudent` read paths (not previously wired to anything since M1) so `studentProfileId`
+existence checks and Student/Parent "own" scoping have something to query — no REST endpoints for
+managing `StudentProfile`/`ParentStudent` directly were added, as that's out of M3's scope.
+
 ### Requirement / Solution Design
 
 See [06-sdd.md](./06-sdd.md) `enrollment` — capacity check + insert in one transaction.
 
 ### Implementation Tasks
 
-- [ ] `POST/GET/PATCH /api/enrollments`.
-- [ ] Capacity-checking transaction (serializable isolation or `SELECT ... FOR UPDATE` on the Batch row).
+- [x] `POST/GET/PATCH /api/enrollments`.
+- [x] Capacity-checking transaction (serializable isolation or `SELECT ... FOR UPDATE` on the Batch row).
 
 ### Code Review Checklist
 
-- [ ] Capacity check reads and the insert happen inside the same DB transaction (grep for any capacity check outside a `prisma.$transaction`).
+- [x] Capacity check reads and the insert happen inside the same DB transaction (grep for any capacity check outside a `prisma.$transaction`).
 
 ### Unit Tests
 
-- [ ] Capacity boundary: capacity−1 succeeds, capacity (exact) fails.
+- [x] Capacity boundary: capacity−1 succeeds, capacity (exact) fails. (`src/enrollment/enrollmentService.test.ts`)
 
 ### Integration Tests
 
-- [ ] Concurrency test: fire N parallel enrollment requests at a batch with 1 remaining seat; exactly 1 succeeds.
+- [x] Concurrency test: fire N parallel enrollment requests at a batch with 1 remaining seat; exactly 1 succeeds. (`enrollmentService.test.ts` — `Promise.allSettled` against the fake repo's atomic `createIfCapacityAvailable`; real-DB confirmation still pending a connected Neon instance.)
 
 ### UAT Tests
 

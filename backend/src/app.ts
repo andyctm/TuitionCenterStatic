@@ -8,6 +8,7 @@ import type { SubjectsService } from './academic/subjectsService';
 import type { GradeLevelsService } from './academic/gradeLevelsService';
 import type { CoursesService } from './academic/coursesService';
 import type { BatchesService } from './academic/batchesService';
+import type { EnrollmentService } from './enrollment/enrollmentService';
 import { isOriginAllowed } from './lib/corsAllowlist';
 import { errorHandler } from './middleware/errorHandler';
 import { createAuthRouter } from './routes/auth';
@@ -16,6 +17,7 @@ import { createUsersRouter } from './routes/users';
 import { createBranchesRouter } from './routes/branches';
 import { createCoursesRouter, createGradeLevelsRouter, createSubjectsRouter } from './routes/academicStructure';
 import { createBatchesRouter } from './routes/batches';
+import { createEnrollmentsRouter } from './routes/enrollments';
 
 export type AppDeps = {
   allowedOrigins: string[];
@@ -27,6 +29,7 @@ export type AppDeps = {
   gradeLevelsService: GradeLevelsService;
   coursesService: CoursesService;
   batchesService: BatchesService;
+  enrollmentService: EnrollmentService;
   accessTokenSecret: string;
 };
 
@@ -58,6 +61,10 @@ export function createApp(deps: AppDeps): Express {
   );
   app.use('/api/courses', createCoursesRouter(deps.coursesService, deps.accessTokenSecret));
   app.use('/api/batches', createBatchesRouter(deps.batchesService, deps.accessTokenSecret));
+  app.use(
+    '/api/enrollments',
+    createEnrollmentsRouter(deps.enrollmentService, deps.accessTokenSecret),
+  );
 
   app.use(errorHandler);
 

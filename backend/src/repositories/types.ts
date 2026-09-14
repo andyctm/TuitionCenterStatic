@@ -1,4 +1,4 @@
-import type { BatchStatus, Role, UserStatus } from '@prisma/client';
+import type { BatchStatus, EnrollmentStatus, Role, UserStatus } from '@prisma/client';
 
 export type UserRecord = {
   id: string;
@@ -202,3 +202,53 @@ export interface ClassScheduleRepository {
   create(input: NewClassScheduleInput): Promise<ClassScheduleRecord>;
   delete(id: string): Promise<void>;
 }
+
+export type StudentProfileRecord = { id: string; userId: string };
+
+export interface StudentProfileRepository {
+  findById(id: string): Promise<StudentProfileRecord | null>;
+  findByUserId(userId: string): Promise<StudentProfileRecord | null>;
+  create(input: { userId: string }): Promise<StudentProfileRecord>;
+}
+
+export interface ParentStudentRepository {
+  listStudentProfileIdsForParent(parentUserId: string): Promise<string[]>;
+}
+
+export type EnrollmentRecord = {
+  id: string;
+  batchId: string;
+  studentProfileId: string;
+  status: EnrollmentStatus;
+  enrolledAt: Date;
+};
+
+// Omitting branchIds/studentProfileIds means no restriction on that dimension (Super Admin scope).
+export type EnrollmentListFilter = {
+  branchIds?: string[];
+  studentProfileIds?: string[];
+  batchId?: string;
+  status?: EnrollmentStatus;
+};
+
+export type NewEnrollmentInput = {
+  batchId: string;
+  studentProfileId: string;
+  capacity: number;
+};
+
+// The capacity check and the insert must happen atomically (enrollment capability) — this is a
+// single repository operation rather than a separate "check" then "create" at the service layer,
+// so the Prisma implementation can wrap both in one serializable transaction.
+export type EnrollmentCreateResult =
+  | { outcome: 'CREATED'; enrollment: EnrollmentRecord }
+  | { outcome: 'AT_CAPACITY' }
+  | { outcome: 'DUPLICATE' };
+
+export interface EnrollmentRepository {
+  findAll(filter: EnrollmentListFilter): Promise<EnrollmentRecord[]>;
+  findById(id: string): Promise<EnrollmentRecord | null>;
+  createIfCapacityAvailable(input: NewEnrollmentInput): Promise<EnrollmentCreateResult>;
+  updateStatus(id: string, status: EnrollmentStatus): Promise<EnrollmentRecord>;
+}
+

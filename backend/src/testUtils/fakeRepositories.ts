@@ -9,19 +9,27 @@ import type {
   ClassScheduleRepository,
   CourseRecord,
   CourseRepository,
+  EnrollmentCreateResult,
+  EnrollmentListFilter,
+  EnrollmentRecord,
+  EnrollmentRepository,
   GradeLevelRecord,
   GradeLevelRepository,
   NewUserInput,
+  ParentStudentRepository,
   PasswordResetTokenRecord,
   PasswordResetTokenRepository,
   RefreshTokenRecord,
   RefreshTokenRepository,
   ScheduleConflictCandidate,
+  StudentProfileRecord,
+  StudentProfileRepository,
   SubjectRecord,
   SubjectRepository,
   UserRecord,
   UserRepository,
 } from '../repositories/types';
+
 
 export function createFakeUserRepository(seed: UserRecord[] = []): UserRepository {
   const users = new Map(seed.map((u) => [u.id, u]));
@@ -273,4 +281,104 @@ export function createFakeClassScheduleRepository(
     },
   };
 }
+
+export function createFakeStudentProfileRepository(
+  seed: StudentProfileRecord[] = [],
+): StudentProfileRepository {
+  const profiles = new Map(seed.map((p) => [p.id, p]));
+
+  return {
+    async findById(id) {
+      return profiles.get(id) ?? null;
+    },
+    async findByUserId(userId) {
+      return [...profiles.values()].find((p) => p.userId === userId) ?? null;
+    },
+    async create(input) {
+      const record: StudentProfileRecord = { id: randomUUID(), ...input };
+      profiles.set(record.id, record);
+      return record;
+    },
+  };
+}
+
+export function createFakeParentStudentRepository(
+  links: { parentUserId: string; studentProfileId: string }[] = [],
+): ParentStudentRepository {
+  return {
+    async listStudentProfileIdsForParent(parentUserId) {
+      return links.filter((l) => l.parentUserId === parentUserId).map((l) => l.studentProfileId);
+    },
+  };
+}
+
+export function createFakeEnrollmentRepository(
+  seed: EnrollmentRecord[] = [],
+  batchRepo?: BatchRepository,
+): EnrollmentRepository {
+  const enrollments = new Map(seed.map((e) => [e.id, e]));
+
+  return {
+    async findAll(filter: EnrollmentListFilter) {
+      const filtered: EnrollmentRecord[] = [];
+      for (const enrollment of enrollments.values()) {
+        if (filter.batchId && enrollment.batchId !== filter.batchId) continue;
+        if (filter.status && enrollment.status !== filter.status) continue;
+        if (
+          filter.studentProfileIds &&
+          !filter.studentProfileIds.includes(enrollment.studentProfileId)
+        ) {
+          continue;
+        }
+        if (filter.branchIds) {
+          const batch = await batchRepo?.findById(enrollment.batchId);
+          if (!batch || !filter.branchIds.includes(batch.branchId)) continue;
+        }
+        filtered.push(enrollment);
+      }
+      return filtered;
+    },
+    async findById(id) {
+      return enrollments.get(id) ?? null;
+    },
+    // Synchronous body (no internal await) so this runs as one atomic unit even under
+    // concurrent Promise.all callers — mirrors the serializable transaction in the Prisma impl.
+    async createIfCapacityAvailable(input): Promise<EnrollmentCreateResult> {
+      const duplicate = [...enrollments.values()].find(
+        (e) =>
+          e.batchId === input.batchId &&
+          e.studentProfileId === input.studentProfileId &&
+          e.status === 'ACTIVE',
+      );
+      if (duplicate) {
+        return { outcome: 'DUPLICATE' };
+      }
+
+      const activeCount = [...enrollments.values()].filter(
+        (e) => e.batchId === input.batchId && e.status === 'ACTIVE',
+      ).length;
+      if (activeCount >= input.capacity) {
+        return { outcome: 'AT_CAPACITY' };
+      }
+
+      const enrollment: EnrollmentRecord = {
+        id: randomUUID(),
+        batchId: input.batchId,
+        studentProfileId: input.studentProfileId,
+        status: 'ACTIVE',
+        enrolledAt: new Date(),
+      };
+      enrollments.set(enrollment.id, enrollment);
+      return { outcome: 'CREATED', enrollment };
+    },
+    async updateStatus(id, status) {
+      const existing = enrollments.get(id);
+      if (!existing) throw new Error(`no fake enrollment ${id}`);
+      const updated = { ...existing, status };
+      enrollments.set(id, updated);
+      return updated;
+    },
+  };
+}
+
 

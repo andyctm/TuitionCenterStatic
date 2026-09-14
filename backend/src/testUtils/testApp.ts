@@ -6,14 +6,18 @@ import { createSubjectsService } from '../academic/subjectsService';
 import { createGradeLevelsService } from '../academic/gradeLevelsService';
 import { createCoursesService } from '../academic/coursesService';
 import { createBatchesService } from '../academic/batchesService';
+import { createEnrollmentService } from '../enrollment/enrollmentService';
 import {
   createFakeBatchRepository,
   createFakeBranchRepository,
   createFakeClassScheduleRepository,
   createFakeCourseRepository,
+  createFakeEnrollmentRepository,
   createFakeGradeLevelRepository,
+  createFakeParentStudentRepository,
   createFakePasswordResetTokenRepository,
   createFakeRefreshTokenRepository,
+  createFakeStudentProfileRepository,
   createFakeSubjectRepository,
   createFakeUserRepository,
 } from './fakeRepositories';
@@ -21,7 +25,9 @@ import type {
   BatchRecord,
   BranchRecord,
   CourseRecord,
+  EnrollmentRecord,
   GradeLevelRecord,
+  StudentProfileRecord,
   SubjectRecord,
   UserRecord,
 } from '../repositories/types';
@@ -37,6 +43,9 @@ export function createTestApp(
     seedGradeLevels?: GradeLevelRecord[];
     seedCourses?: CourseRecord[];
     seedBatches?: BatchRecord[];
+    seedStudentProfiles?: StudentProfileRecord[];
+    seedEnrollments?: EnrollmentRecord[];
+    seedParentLinks?: { parentUserId: string; studentProfileId: string }[];
     checkDb?: AppDeps['checkDb'];
   } = {},
 ) {
@@ -51,6 +60,9 @@ export function createTestApp(
   const courseRepo = createFakeCourseRepository(options.seedCourses ?? []);
   const batchRepo = createFakeBatchRepository(options.seedBatches ?? []);
   const classScheduleRepo = createFakeClassScheduleRepository([], batchRepo);
+  const studentProfileRepo = createFakeStudentProfileRepository(options.seedStudentProfiles ?? []);
+  const parentStudentRepo = createFakeParentStudentRepository(options.seedParentLinks ?? []);
+  const enrollmentRepo = createFakeEnrollmentRepository(options.seedEnrollments ?? [], batchRepo);
 
   const authService = createAuthService({
     userRepo,
@@ -72,6 +84,12 @@ export function createTestApp(
     branchRepo,
     classScheduleRepo,
   });
+  const enrollmentService = createEnrollmentService({
+    enrollmentRepo,
+    batchRepo,
+    studentProfileRepo,
+    parentStudentRepo,
+  });
 
   const app = createApp({
     allowedOrigins: TEST_ALLOWED_ORIGINS,
@@ -83,6 +101,7 @@ export function createTestApp(
     gradeLevelsService,
     coursesService,
     batchesService,
+    enrollmentService,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
   });
 
@@ -97,6 +116,9 @@ export function createTestApp(
     courseRepo,
     batchRepo,
     classScheduleRepo,
+    studentProfileRepo,
+    parentStudentRepo,
+    enrollmentRepo,
     sentEmails,
     authService,
     usersService,
@@ -105,6 +127,7 @@ export function createTestApp(
     gradeLevelsService,
     coursesService,
     batchesService,
+    enrollmentService,
   };
 }
 

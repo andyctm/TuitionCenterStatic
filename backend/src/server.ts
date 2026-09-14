@@ -11,12 +11,16 @@ import { createPrismaGradeLevelRepository } from './repositories/prismaGradeLeve
 import { createPrismaCourseRepository } from './repositories/prismaCourseRepository';
 import { createPrismaBatchRepository } from './repositories/prismaBatchRepository';
 import { createPrismaClassScheduleRepository } from './repositories/prismaClassScheduleRepository';
+import { createPrismaStudentProfileRepository } from './repositories/prismaStudentProfileRepository';
+import { createPrismaParentStudentRepository } from './repositories/prismaParentStudentRepository';
+import { createPrismaEnrollmentRepository } from './repositories/prismaEnrollmentRepository';
 import { createUsersService } from './users/usersService';
 import { createBranchesService } from './branches/branchesService';
 import { createSubjectsService } from './academic/subjectsService';
 import { createGradeLevelsService } from './academic/gradeLevelsService';
 import { createCoursesService } from './academic/coursesService';
 import { createBatchesService } from './academic/batchesService';
+import { createEnrollmentService } from './enrollment/enrollmentService';
 
 const env = parseEnv(process.env);
 
@@ -29,6 +33,9 @@ const gradeLevelRepo = createPrismaGradeLevelRepository(prisma);
 const courseRepo = createPrismaCourseRepository(prisma);
 const batchRepo = createPrismaBatchRepository(prisma);
 const classScheduleRepo = createPrismaClassScheduleRepository(prisma);
+const studentProfileRepo = createPrismaStudentProfileRepository(prisma);
+const parentStudentRepo = createPrismaParentStudentRepository(prisma);
+const enrollmentRepo = createPrismaEnrollmentRepository(prisma);
 
 const authService = createAuthService({
   userRepo,
@@ -46,6 +53,12 @@ const subjectsService = createSubjectsService({ subjectRepo });
 const gradeLevelsService = createGradeLevelsService({ gradeLevelRepo });
 const coursesService = createCoursesService({ courseRepo, subjectRepo, gradeLevelRepo });
 const batchesService = createBatchesService({ batchRepo, courseRepo, branchRepo, classScheduleRepo });
+const enrollmentService = createEnrollmentService({
+  enrollmentRepo,
+  batchRepo,
+  studentProfileRepo,
+  parentStudentRepo,
+});
 
 const app = createApp({
   allowedOrigins: env.allowedOrigins,
@@ -59,6 +72,7 @@ const app = createApp({
   gradeLevelsService,
   coursesService,
   batchesService,
+  enrollmentService,
   accessTokenSecret: env.jwtAccessSecret,
 });
 

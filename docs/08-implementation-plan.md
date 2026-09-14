@@ -79,39 +79,43 @@ Monorepo with `frontend/` (no build step — plain HTML/CSS/JS evolved from `moc
 
 _(SDD capability: `auth`; SRS: FR-AUTH-_, FR-USR-_)_
 
+**Status: Implemented 2026-09-14** against in-memory fakes (73 passing tests, clean
+typecheck/lint/build); not yet run against a real Neon database (none connected — see M0), and
+`frontend/` isn't wired to call these endpoints yet.
+
 ### Requirement
 
 See [06-sdd.md](./06-sdd.md) `auth` capability.
 
 ### Solution Design
 
-Route handlers under `/api/auth/*`; bcrypt via `bcryptjs` (pure JS, no native build step — avoids Vercel serverless build issues); JWT via `jose`; refresh tokens stored hashed in `RefreshToken` table with rotation on use.
+Express routes under `/api/auth/*` and `/api/users/*`; bcrypt via `bcryptjs` (pure JS, no native build step); JWT via `jsonwebtoken` (the backend is a CommonJS Express app, not an ESM-only environment, so `jsonwebtoken` avoids `jose`'s ESM-only friction — see repo tooling notes); refresh tokens stored hashed in `RefreshToken` table with rotation on use. Tokens are returned as bearer tokens in the JSON response body (not cookies) per [02-architecture.md](./02-architecture.md) v2.0 §5. Rate limiting uses an in-memory sliding window (`express-rate-limit`) rather than Upstash Redis: Render runs `backend/` as a single long-lived process (not a serverless function), so in-process state persists across requests without an external store; revisit with a Redis-backed store only if the API is horizontally scaled to multiple instances.
 
 ### Implementation Tasks
 
-- [ ] `POST /api/auth/register`, `/login`, `/logout`, `/refresh`, `/forgot-password`, `/reset-password`.
-- [ ] `requireAuth`/`requireRole` middleware helpers.
-- [ ] Rate limiter on `/api/auth/*` (Upstash Redis, sliding window).
-- [ ] Admin approval UI/endpoint for `PENDING` self-registrations (`PATCH /api/users/:id/status`).
-- [ ] `POST /api/users` staff/teacher creation (admin-only).
+- [x] `POST /api/auth/register`, `/login`, `/logout`, `/refresh`, `/forgot-password`, `/reset-password`; `GET /api/auth/me`.
+- [x] `requireAuth`/`requireRole` middleware helpers.
+- [x] Rate limiter on `/api/auth/*` (in-memory sliding window, 5 failed attempts per (email, IP) → 429 for 15 minutes per the `auth` capability).
+- [x] Admin approval UI/endpoint for `PENDING` self-registrations (`PATCH /api/users/:id/status`). Endpoint done; the Center Admin **UI** wiring against this live API is deferred to when `frontend/` gets real `fetch()` calls.
+- [x] `POST /api/users` staff/teacher creation (admin-only).
 
 ### Code Review Checklist
 
-- [ ] Passwords never logged, never returned in any response payload.
-- [ ] JWT secrets read only from env, never hardcoded/committed.
-- [ ] Cookies set `httpOnly`, `secure`, `sameSite=Lax`.
-- [ ] All error paths return the standard error envelope ([04-api-specification.md](./04-api-specification.md) §1.1).
+- [x] Passwords never logged, never returned in any response payload.
+- [x] JWT secrets read only from env, never hardcoded/committed.
+- [x] Tokens are only ever returned in the JSON response body, never set as cookies (cross-origin bearer-token model — see [02-architecture.md](./02-architecture.md) v2.0 §5).
+- [x] All error paths return the standard error envelope ([04-api-specification.md](./04-api-specification.md) §1.1).
 
 ### Unit Tests
 
-- [ ] Password hashing round-trip; hash never equals plaintext.
-- [ ] JWT sign/verify, including expired-token rejection.
-- [ ] Rate limiter logic: 5 fails → blocked, resets after window.
+- [x] Password hashing round-trip; hash never equals plaintext.
+- [x] JWT sign/verify, including expired-token rejection.
+- [x] Rate limiter logic: 5 fails → blocked, resets after window.
 
 ### Integration Tests
 
-- [ ] Full login → protected-route → refresh → logout flow against a real (preview-branch) DB.
-- [ ] Pending registration blocked from login; approved registration succeeds.
+- [ ] Full login → protected-route → refresh → logout flow against a real (preview-branch) DB. Covered instead against an in-memory fake repository (no live Neon DB connected yet — see M0); re-run against a real Neon preview branch once `DATABASE_URL` is configured.
+- [x] Pending registration blocked from login; approved registration succeeds (full register → blocked → admin-approve → login chain, `backend/src/routes/registrationFlow.test.ts`).
 
 ### UAT Tests
 
@@ -128,7 +132,7 @@ Route handlers under `/api/auth/*`; bcrypt via `bcryptjs` (pure JS, no native bu
 ### Deployment Checklist
 
 - [ ] JWT secrets rotated from any values used during development.
-- [ ] Rate limiter backing store (Redis) provisioned in production.
+- [ ] Rate limiter is in-memory per instance; documented explicitly as a single-instance assumption (see Solution Design) — revisit if Render is scaled to multiple instances.
 
 ---
 

@@ -1,13 +1,11 @@
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
-import { createApp } from './app';
-
-const allowedOrigins = ['https://acme.github.io'];
+import { createTestApp } from './testUtils/testApp';
 
 describe('createApp', () => {
   it('GET /api/health returns 200 when the DB check succeeds', async () => {
     const checkDb = vi.fn().mockResolvedValue(undefined);
-    const app = createApp({ allowedOrigins, checkDb });
+    const { app } = createTestApp({ checkDb });
 
     const res = await request(app).get('/api/health');
 
@@ -17,7 +15,7 @@ describe('createApp', () => {
 
   it('GET /api/health returns 503 when the DB check fails', async () => {
     const checkDb = vi.fn().mockRejectedValue(new Error('connection refused'));
-    const app = createApp({ allowedOrigins, checkDb });
+    const { app } = createTestApp({ checkDb });
 
     const res = await request(app).get('/api/health');
 
@@ -26,8 +24,7 @@ describe('createApp', () => {
   });
 
   it('reflects Access-Control-Allow-Origin for an allowed origin', async () => {
-    const checkDb = vi.fn().mockResolvedValue(undefined);
-    const app = createApp({ allowedOrigins, checkDb });
+    const { app } = createTestApp();
 
     const res = await request(app).get('/api/health').set('Origin', 'https://acme.github.io');
 
@@ -35,8 +32,7 @@ describe('createApp', () => {
   });
 
   it('does not reflect Access-Control-Allow-Origin for a disallowed origin', async () => {
-    const checkDb = vi.fn().mockResolvedValue(undefined);
-    const app = createApp({ allowedOrigins, checkDb });
+    const { app } = createTestApp();
 
     const res = await request(app).get('/api/health').set('Origin', 'https://evil.example.com');
 

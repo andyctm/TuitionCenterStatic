@@ -27,7 +27,7 @@ This mirrors OpenSpec's spec-driven-development shape (capability → requiremen
 
 ### Why
 
-JWT-in-httpOnly-cookie was chosen over localStorage or a third-party auth provider because (a) the stakeholder's architecture diagram mandates first-party JWT auth, and (b) httpOnly cookies eliminate the XSS-token-theft class of vulnerability (see [02-architecture.md](./02-architecture.md) §5).
+JWT bearer tokens (held in memory by the SPA, never persisted to localStorage/cookies) were chosen over httpOnly cookies because the frontend (GitHub Pages) and API (Render) are on different top-level domains — cross-site cookies add CORS/`SameSite=None` complexity and browser restrictions that bearer tokens avoid entirely. The trade-off (full page reload forces re-login) was explicitly accepted by the product owner (see [02-architecture.md](./02-architecture.md) v2.0 §5, risk R-12).
 
 ### Requirements
 
@@ -42,7 +42,7 @@ JWT-in-httpOnly-cookie was chosen over localStorage or a third-party auth provid
 
 - GIVEN an ACTIVE user with a known password
 - WHEN they POST `/api/auth/login` with correct credentials
-- THEN the response is 200 with `access_token`/`refresh_token` httpOnly cookies set and no tokens present in the JSON body
+- THEN the response is 200 with `{ accessToken, refreshToken, user }` in the JSON body (no cookies set)
 
 **Scenario: Login blocked by brute-force guard**
 

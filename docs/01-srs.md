@@ -103,7 +103,7 @@ Requirements are grouped by module and given IDs (`FR-<module>-<n>`) that are tr
 
 ### 3.1 Authentication & Account Management (AUTH)
 
-- **FR-AUTH-1**: Users authenticate with email + password; system issues a short-lived JWT access token and a longer-lived rotating refresh token (httpOnly cookie).
+- **FR-AUTH-1**: Users authenticate with email + password; system issues a short-lived JWT access token and a longer-lived rotating refresh token, returned in the JSON response body as bearer tokens (held in memory by the SPA, not a cookie — see [02-architecture.md](./02-architecture.md) v2.0 §5).
 - **FR-AUTH-2**: Passwords are stored using a salted, adaptive hash (bcrypt/argon2); never stored or logged in plaintext.
 - **FR-AUTH-3**: System supports password reset via time-limited, single-use email token.
 - **FR-AUTH-4**: Student/Parent self-registration creates an account in `PENDING` status; a Center Admin must approve before login is permitted.

@@ -79,6 +79,7 @@ model User {
   guardianOf     ParentStudent[] @relation("ParentLink")
   auditLogs      AuditLog[]
   refreshTokens  RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([role, branchId])
 }
@@ -226,5 +227,17 @@ model RefreshToken {
   tokenHash String    @unique
   expiresAt DateTime
   revokedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// Added during M1 implementation: the approved design (docs/03-database-design.md) covered
+// RefreshToken but omitted a table for FR-AUTH-3's password-reset tokens.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
   createdAt DateTime  @default(now())
 }

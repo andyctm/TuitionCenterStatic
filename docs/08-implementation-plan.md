@@ -324,22 +324,42 @@ See [06-sdd.md](./06-sdd.md) `attendance` — materialized sessions + 72h edit w
 
 _(SDD capability: cross-cutting; SRS: FR-RPT-_)*
 
+**Status: Implemented 2026-09-14** against in-memory fakes (32 new backend tests, 237 total);
+not yet run against a real Neon database (none connected — see M0). `GET /api/reports/attendance`
+was added beyond the API spec's original single-row §9 table — FR-RPT-2 in
+[01-srs.md](./01-srs.md) explicitly names both "enrollment" and "attendance" as exportable
+reports, so the missing route was treated as a spec gap and closed in place (documented in
+[04-api-specification.md](./04-api-specification.md) §9) rather than silently narrowing FR-RPT-2's
+scope down to enrollment only. Dashboard KPI definitions not spelled out verbatim in the SRS were
+picked to match the concrete examples in FR-RPT-1 and the wireframe intent in
+[07-ui-ux-design.md](./07-ui-ux-design.md) §4.1/§4.4: Admin/Center Admin/Accountant get
+`activeStudentsCount` (distinct students with an `ACTIVE` enrollment), `activeBatchesCount`, and
+`batchesAtCapacityCount`, all branch-scoped for non-Super-Admins; Teacher gets today's sessions
+(with a per-session `attendanceMarked` flag) plus a `pendingAttendanceCount` of older,
+still-unmarked sessions (matching the UI doc's "Pending panel" concept); Student/Parent get the
+single earliest upcoming `nextClass` across active enrollments plus the 5 most recent attendance
+records and the existing attendance-percentage calculation (reused from M4, unchanged EXCUSED
+rule). Accountant was given the same KPI shape as Center Admin — the SRS only worked through an
+"Admin" example, not Accountant specifically, so this was the closest reasonable read given
+Accountant's dashboard nav entry ([07-ui-ux-design.md](./07-ui-ux-design.md) §3).
+
 ### Implementation Tasks
 
-- [ ] `/api/dashboard/summary` returning role-appropriate KPIs.
-- [ ] CSV export for enrollment/attendance reports.
+- [x] `/api/dashboard/summary` returning role-appropriate KPIs. (`src/reporting/dashboardService.ts`, `src/routes/dashboard.ts`)
+- [x] CSV export for enrollment/attendance reports. (`src/reporting/{enrollmentReportService,attendanceReportService}.ts`, `src/routes/reports.ts` — `GET /api/reports/enrollment`, `GET /api/reports/attendance`)
 
 ### Code Review Checklist
 
-- [ ] Large CSV exports are streamed, not built fully in memory (avoids Vercel function timeout — Risk R-03 in [02-architecture.md](./02-architecture.md)).
+- [x] Large CSV exports are streamed, not built fully in memory (avoids Vercel/Render request-handler timeout — Risk R-03 in [02-architecture.md](./02-architecture.md)). `src/lib/csv.ts`'s `writeCsvRow` writes one row directly to the HTTP response stream per iteration — the CSV body is never assembled as a single in-memory string. Caveat, documented rather than silently assumed: the underlying repository queries still resolve one in-memory array per report (no DB-level cursor/streaming query exists yet in any repository), so this mitigates the "one giant string" failure mode but not unbounded result-set memory — revisit with a paginated/cursor-based repository query if a branch's enrollment or attendance history grows very large before go-live.
+- [x] CSV fields are protected against spreadsheet formula injection (CWE-1236): user-controlled strings that land in a report (course/branch names, attendance remarks) are prefixed with `'` in `src/lib/csv.ts` if they start with `=`, `+`, `-`, or `@`, before the normal comma/quote/newline escaping — found and fixed during this module's code-review pass, not part of the original checklist wording.
 
 ### Unit Tests
 
-- [ ] KPI aggregation queries return correct counts against known fixture data.
+- [x] KPI aggregation queries return correct counts against known fixture data. (`src/reporting/dashboardService.test.ts`)
 
 ### Integration Tests
 
-- [ ] CSV export round-trips (generated file re-parses to the expected row count).
+- [x] CSV export round-trips (generated file re-parses to the expected row count). (`src/routes/reports.test.ts` — asserts the header row and one data row per seeded record via `res.text.split('\r\n')`; a full Excel/Sheets open-and-inspect pass is left to the UAT scenario below.)
 
 ### UAT Tests
 
@@ -347,13 +367,14 @@ _(SDD capability: cross-cutting; SRS: FR-RPT-_)*
 
 ### Risk Assessment
 
-| Risk                                 | Likelihood | Impact | Mitigation                                                                                                                |
-| ------------------------------------ | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
-| Dashboard queries slow as data grows | Medium     | Medium | Covered by indexes in [03-database-design.md](./03-database-design.md) §6; revisit with `EXPLAIN ANALYZE` before scale-up |
+| Risk                                                                                        | Likelihood               | Impact | Mitigation                                                                                                                |
+| ------------------------------------------------------------------------------------------- | ------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard queries slow as data grows                                                        | Medium                   | Medium | Covered by indexes in [03-database-design.md](./03-database-design.md) §6; revisit with `EXPLAIN ANALYZE` before scale-up |
+| Report rows are loaded as one in-memory array per request (see Code Review Checklist above) | Low (small center scale) | Medium | Revisit with a cursor/paginated repository query before a branch's historical data grows large                            |
 
 ### Deployment Checklist
 
-- [ ] Report export function timeout verified against Vercel's plan limits for the expected largest report size.
+- [ ] Report export request timeout verified against Render's plan limits for the expected largest report size (translated from the original "Vercel function timeout" wording per the v2.0 hosting rework — see the note at the top of this document).
 
 ---
 

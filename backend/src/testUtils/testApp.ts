@@ -10,6 +10,9 @@ import { createEnrollmentService } from '../enrollment/enrollmentService';
 import { createClassSessionsService } from '../attendance/classSessionsService';
 import { createAttendanceService } from '../attendance/attendanceService';
 import { createSessionMaterializationService } from '../attendance/sessionMaterializationService';
+import { createDashboardService } from '../reporting/dashboardService';
+import { createEnrollmentReportService } from '../reporting/enrollmentReportService';
+import { createAttendanceReportService } from '../reporting/attendanceReportService';
 import {
   createFakeAttendanceRepository,
   createFakeAuditLogRepository,
@@ -123,6 +126,28 @@ export function createTestApp(
     classScheduleRepo,
     classSessionRepo,
   });
+  const dashboardService = createDashboardService({
+    batchRepo,
+    courseRepo,
+    enrollmentRepo,
+    classSessionRepo,
+    attendanceRepo,
+    studentProfileRepo,
+    parentStudentRepo,
+  });
+  const enrollmentReportService = createEnrollmentReportService({
+    enrollmentRepo,
+    batchRepo,
+    courseRepo,
+    branchRepo,
+  });
+  const attendanceReportService = createAttendanceReportService({
+    batchRepo,
+    courseRepo,
+    branchRepo,
+    classSessionRepo,
+    attendanceRepo,
+  });
 
   const app = createApp({
     allowedOrigins: TEST_ALLOWED_ORIGINS,
@@ -138,6 +163,9 @@ export function createTestApp(
     classSessionsService,
     attendanceService,
     sessionMaterializationService,
+    dashboardService,
+    enrollmentReportService,
+    attendanceReportService,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
     internalJobSecret: TEST_INTERNAL_JOB_SECRET,
   });
@@ -171,6 +199,9 @@ export function createTestApp(
     classSessionsService,
     attendanceService,
     sessionMaterializationService,
+    dashboardService,
+    enrollmentReportService,
+    attendanceReportService,
   };
 }
 

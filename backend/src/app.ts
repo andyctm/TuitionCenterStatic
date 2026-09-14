@@ -12,6 +12,9 @@ import type { EnrollmentService } from './enrollment/enrollmentService';
 import type { ClassSessionsService } from './attendance/classSessionsService';
 import type { AttendanceService } from './attendance/attendanceService';
 import type { SessionMaterializationService } from './attendance/sessionMaterializationService';
+import type { DashboardService } from './reporting/dashboardService';
+import type { EnrollmentReportService } from './reporting/enrollmentReportService';
+import type { AttendanceReportService } from './reporting/attendanceReportService';
 import { isOriginAllowed } from './lib/corsAllowlist';
 import { errorHandler } from './middleware/errorHandler';
 import { createAuthRouter } from './routes/auth';
@@ -24,6 +27,8 @@ import { createEnrollmentsRouter } from './routes/enrollments';
 import { createAttendanceRouter } from './routes/attendance';
 import { createStudentsRouter } from './routes/students';
 import { createInternalRouter } from './routes/internal';
+import { createDashboardRouter } from './routes/dashboard';
+import { createReportsRouter } from './routes/reports';
 
 export type AppDeps = {
   allowedOrigins: string[];
@@ -39,6 +44,9 @@ export type AppDeps = {
   classSessionsService: ClassSessionsService;
   attendanceService: AttendanceService;
   sessionMaterializationService: SessionMaterializationService;
+  dashboardService: DashboardService;
+  enrollmentReportService: EnrollmentReportService;
+  attendanceReportService: AttendanceReportService;
   accessTokenSecret: string;
   internalJobSecret: string;
 };
@@ -80,6 +88,11 @@ export function createApp(deps: AppDeps): Express {
   app.use(
     '/api/internal',
     createInternalRouter(deps.sessionMaterializationService, deps.internalJobSecret),
+  );
+  app.use('/api/dashboard', createDashboardRouter(deps.dashboardService, deps.accessTokenSecret));
+  app.use(
+    '/api/reports',
+    createReportsRouter(deps.enrollmentReportService, deps.attendanceReportService, deps.accessTokenSecret),
   );
 
   app.use(errorHandler);

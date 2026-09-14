@@ -127,7 +127,7 @@ Enrollment creation (`POST /api/enrollments`) accepts an optional `Idempotency-K
 | Method | Path                      | Role              | Description                                        |
 | ------ | ------------------------- | ----------------- | -------------------------------------------------- |
 | GET    | `/api/dashboard/summary`  | Any authenticated | Role-appropriate KPI payload (FR-RPT-1)            |
-| GET    | `/api/reports/enrollment` | Admin             | Enrollment report, CSV export supported (FR-RPT-2) |
+| GET    | `/api/reports/enrollment` | Admin             | Enrollment report, CSV export supported (FR-RPT-2) |     | GET | `/api/reports/attendance` | Admin | Attendance report, CSV export supported (FR-RPT-2) — added during M5 implementation to close a gap left by the original spec, which named "enrollment, attendance" as the two exportable reports in FR-RPT-2 but only listed the enrollment route here |
 
 ## 10. Audit
 

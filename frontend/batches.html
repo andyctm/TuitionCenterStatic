@@ -61,12 +61,21 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">NP</span>
+            <span class="avatar" id="user-avatar">NP</span>
             <span class="meta"
-              ><span class="name">Nadeesha Perera</span
-              ><span class="role">Center Admin · Colombo</span></span
+              ><span class="name" id="user-name">Nadeesha Perera</span
+              ><span class="role" id="user-role-label"
+                >Center Admin · Colombo</span
+              ></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
@@ -74,7 +83,9 @@
         <div class="page-header">
           <div>
             <h1>Batches</h1>
-            <p class="subtitle">Colombo Main · Term 3, 2026</p>
+            <p class="subtitle" id="batches-subtitle">
+              Colombo Main · Term 3, 2026
+            </p>
           </div>
           <div class="header-actions">
             <button class="btn btn-primary" data-open-modal="new-batch-dialog">
@@ -86,18 +97,24 @@
         <div class="stat-strip">
           <div class="stat">
             <span class="label">Active batches</span
-            ><span class="value">21</span>
+            ><span class="value" id="stat-active-batches">21</span>
           </div>
           <div class="stat">
-            <span class="label">Total seats</span><span class="value">560</span>
+            <span class="label">Total seats</span
+            ><span class="value" id="stat-total-seats">560</span>
           </div>
           <div class="stat">
             <span class="label">Seats filled</span
-            ><span class="value">468</span>
+            ><span class="value" id="stat-seats-filled">468</span>
           </div>
           <div class="stat">
             <span class="label">Near capacity (≥90%)</span
-            ><span class="value" style="color: var(--color-warning)">3</span>
+            ><span
+              class="value"
+              id="stat-near-capacity"
+              style="color: var(--color-warning)"
+              >3</span
+            >
           </div>
         </div>
 
@@ -137,153 +154,9 @@
                   <th></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="batches-table-body">
                 <tr>
-                  <td data-label="Batch">
-                    <span class="cell-primary">Grade 10 Mathematics</span>
-                  </td>
-                  <td data-label="Teacher" class="cell-secondary">
-                    D. Wickramasinghe
-                  </td>
-                  <td data-label="Schedule" class="cell-secondary">
-                    Mon/Wed/Fri · 8:00–9:30 AM
-                  </td>
-                  <td data-label="Room">Room 2</td>
-                  <td data-label="Seats">18 / 30</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button
-                      class="btn btn-ghost btn-sm"
-                      data-open-modal="edit-batch-dialog"
-                    >
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Batch">
-                    <span class="cell-primary"
-                      >Grade 10 Mathematics — Evening</span
-                    >
-                  </td>
-                  <td data-label="Teacher" class="cell-secondary">
-                    D. Wickramasinghe
-                  </td>
-                  <td data-label="Schedule" class="cell-secondary">
-                    Tue/Thu · 5:00–6:30 PM
-                  </td>
-                  <td data-label="Room">Room 1</td>
-                  <td data-label="Seats">22 / 25</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Batch">
-                    <span class="cell-primary">Grade 11 English</span>
-                  </td>
-                  <td data-label="Teacher" class="cell-secondary">
-                    K. Jayasuriya
-                  </td>
-                  <td data-label="Schedule" class="cell-secondary">
-                    Mon/Wed/Fri · 11:15–12:30 PM
-                  </td>
-                  <td data-label="Room">Room 3</td>
-                  <td data-label="Seats">
-                    <span style="color: var(--color-warning); font-weight: 700"
-                      >30 / 30</span
-                    >
-                  </td>
-                  <td data-label="Status">
-                    <span class="badge badge-warning"
-                      ><i data-icon="alertTriangle"></i>Full</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Batch">
-                    <span class="cell-primary">Grade 8 Science</span>
-                  </td>
-                  <td data-label="Teacher" class="cell-secondary">
-                    S. Gunawardena
-                  </td>
-                  <td data-label="Schedule" class="cell-secondary">
-                    Tue/Thu · 9:45–11:00 AM
-                  </td>
-                  <td data-label="Room">Room 1</td>
-                  <td data-label="Seats">24 / 28</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Batch">
-                    <span class="cell-primary">Grade 6 Mathematics</span>
-                  </td>
-                  <td data-label="Teacher" class="cell-secondary">
-                    D. Wickramasinghe
-                  </td>
-                  <td data-label="Schedule" class="cell-secondary">
-                    Mon/Wed/Fri · 1:00–2:15 PM
-                  </td>
-                  <td data-label="Room">Room 2</td>
-                  <td data-label="Seats">24 / 26</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Batch">
-                    <span class="cell-primary">Grade 9 Mathematics</span>
-                  </td>
-                  <td data-label="Teacher" class="cell-secondary">
-                    D. Wickramasinghe
-                  </td>
-                  <td data-label="Schedule" class="cell-secondary">
-                    Mon/Wed/Fri · 3:30–4:45 PM
-                  </td>
-                  <td data-label="Room">Room 4</td>
-                  <td data-label="Seats">22 / 25</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
+                  <td colspan="7" class="cell-secondary">Loading…</td>
                 </tr>
               </tbody>
             </table>
@@ -304,21 +177,35 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="banner banner-danger" id="new-batch-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="new-batch-error-message"></span>
+        </div>
         <div class="field">
           <label for="batch-course">Course</label>
           <select class="input" id="batch-course">
-            <option>Grade 10 Mathematics</option>
-            <option>Grade 11 English</option>
-            <option>Grade 8 Science</option>
+            <option>Loading…</option>
           </select>
         </div>
-        <div class="field">
-          <label for="batch-teacher">Teacher</label>
-          <select class="input" id="batch-teacher">
-            <option>D. Wickramasinghe</option>
-            <option>S. Gunawardena</option>
-            <option>K. Jayasuriya</option>
-          </select>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+          "
+        >
+          <div class="field">
+            <label for="batch-branch">Branch</label>
+            <select class="input" id="batch-branch">
+              <option>Loading…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="batch-teacher">Teacher</label>
+            <select class="input" id="batch-teacher">
+              <option value="">Unassigned</option>
+            </select>
+          </div>
         </div>
         <div
           style="
@@ -342,6 +229,10 @@
           </div>
         </div>
         <div class="field">
+          <label for="batch-term">Term</label>
+          <input class="input" id="batch-term" value="Term 3, 2026" />
+        </div>
+        <div class="field">
           <label>Weekly schedule</label>
           <div
             style="
@@ -350,30 +241,24 @@
               gap: var(--space-4);
             "
           >
-            <select class="input">
-              <option>Mon/Wed/Fri</option>
-              <option>Tue/Thu</option>
-              <option>Sat</option>
+            <select class="input" id="batch-days">
+              <option value="1,3,5">Mon/Wed/Fri</option>
+              <option value="2,4">Tue/Thu</option>
+              <option value="6">Sat</option>
             </select>
-            <select class="input">
-              <option>8:00 – 9:30 AM</option>
-              <option>9:45 – 11:00 AM</option>
-              <option>1:00 – 2:15 PM</option>
+            <select class="input" id="batch-time">
+              <option value="08:00,09:30">8:00 – 9:30 AM</option>
+              <option value="09:45,11:00">9:45 – 11:00 AM</option>
+              <option value="13:00,14:15">1:00 – 2:15 PM</option>
             </select>
           </div>
-        </div>
-        <div class="banner banner-warning">
-          <i data-icon="alertTriangle" class="icon-sm"></i>
-          <span
-            ><strong>D. Wickramasinghe</strong> already teaches Grade 6
-            Mathematics in Room 2 at this time. Choose a different room, time,
-            or teacher to avoid a scheduling conflict.</span
-          >
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-close-modal>Cancel</button>
-        <button class="btn btn-primary" disabled>Create Batch</button>
+        <button class="btn btn-primary" id="create-batch-btn">
+          Create Batch
+        </button>
       </div>
     </dialog>
 
@@ -389,31 +274,318 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="field">
-          <label>Course</label
-          ><input class="input" value="Grade 10 Mathematics" disabled />
+        <div class="banner banner-danger" id="edit-batch-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="edit-batch-error-message"></span>
         </div>
         <div class="field">
-          <label>Teacher</label
-          ><select class="input">
-            <option>D. Wickramasinghe</option>
+          <label>Course</label
+          ><input
+            class="input"
+            id="edit-batch-course"
+            value="Grade 10 Mathematics"
+            disabled
+          />
+        </div>
+        <div class="field">
+          <label for="edit-batch-teacher">Teacher</label
+          ><select class="input" id="edit-batch-teacher">
+            <option value="">Unassigned</option>
           </select>
         </div>
         <div class="field">
-          <label>Capacity</label
-          ><input class="input" type="number" value="30" />
+          <label for="edit-batch-capacity">Capacity</label
+          ><input
+            class="input"
+            id="edit-batch-capacity"
+            type="number"
+            value="30"
+          />
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger" style="margin-right: auto">
+        <button
+          class="btn btn-danger"
+          id="archive-batch-btn"
+          style="margin-right: auto"
+        >
           <i data-icon="trash" class="icon-sm"></i> Archive Batch
         </button>
         <button class="btn btn-secondary" data-close-modal>Cancel</button>
-        <button class="btn btn-primary">Save Changes</button>
+        <button class="btn btn-primary" id="save-batch-btn">
+          Save Changes
+        </button>
       </div>
     </dialog>
 
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      let tcmsBatchesCache = [];
+      let tcmsCoursesCache = [];
+      let tcmsTeachersCache = [];
+      let tcmsBranchesCache = [];
+      let tcmsEditingBatchId = null;
+
+      async function refreshBatches() {
+        const [batches, courses, users, branches, enrollments] =
+          await Promise.all([
+            tcmsApiFetch("/batches"),
+            tcmsApiFetch("/courses"),
+            tcmsApiFetch("/users"),
+            tcmsApiFetch("/branches"),
+            tcmsApiFetch("/enrollments?status=ACTIVE"),
+          ]);
+        tcmsBatchesCache = batches;
+        tcmsCoursesCache = courses;
+        tcmsTeachersCache = users.filter((u) => u.role === "TEACHER");
+        tcmsBranchesCache = branches;
+
+        const coursesById = new Map(courses.map((c) => [c.id, c]));
+        const usersById = new Map(users.map((u) => [u.id, u]));
+        const branchesById = new Map(branches.map((b) => [b.id, b]));
+        const seatsByBatch = new Map();
+        for (const enrollment of enrollments) {
+          seatsByBatch.set(
+            enrollment.batchId,
+            (seatsByBatch.get(enrollment.batchId) || 0) + 1,
+          );
+        }
+
+        document.getElementById("batch-course").innerHTML = courses
+          .map((c) => `<option value="${c.id}">${c.name}</option>`)
+          .join("");
+        document.getElementById("batch-branch").innerHTML = branches
+          .map((b) => `<option value="${b.id}">${b.name}</option>`)
+          .join("");
+        const teacherOptions =
+          '<option value="">Unassigned</option>' +
+          tcmsTeachersCache
+            .map(
+              (t) =>
+                `<option value="${t.id}">${t.firstName} ${t.lastName}</option>`,
+            )
+            .join("");
+        document.getElementById("batch-teacher").innerHTML = teacherOptions;
+        document.getElementById("edit-batch-teacher").innerHTML =
+          teacherOptions;
+
+        const activeBatches = batches.filter((b) => b.status === "ACTIVE");
+        document.getElementById("stat-active-batches").textContent =
+          activeBatches.length;
+        const totalSeats = activeBatches.reduce(
+          (sum, b) => sum + b.capacity,
+          0,
+        );
+        document.getElementById("stat-total-seats").textContent = totalSeats;
+        const seatsFilled = activeBatches.reduce(
+          (sum, b) => sum + (seatsByBatch.get(b.id) || 0),
+          0,
+        );
+        document.getElementById("stat-seats-filled").textContent = seatsFilled;
+        const nearCapacity = activeBatches.filter(
+          (b) => (seatsByBatch.get(b.id) || 0) / b.capacity >= 0.9,
+        ).length;
+        document.getElementById("stat-near-capacity").textContent =
+          nearCapacity;
+
+        const schedulesByBatch = await Promise.all(
+          batches.map((b) =>
+            tcmsApiFetch(`/batches/${b.id}/schedules`).catch(() => []),
+          ),
+        );
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        function formatSchedule(schedules) {
+          if (!schedules.length) return "Not scheduled yet";
+          const days = [
+            ...new Set(schedules.map((s) => dayNames[s.dayOfWeek])),
+          ].join("/");
+          const first = schedules[0];
+          return `${days} · ${first.startTime}\u2013${first.endTime}`;
+        }
+
+        const tbody = document.getElementById("batches-table-body");
+        tbody.innerHTML = batches
+          .map((batch, i) => {
+            const course = coursesById.get(batch.courseId);
+            const teacher = batch.teacherUserId
+              ? usersById.get(batch.teacherUserId)
+              : null;
+            const filled = seatsByBatch.get(batch.id) || 0;
+            const isFull = filled >= batch.capacity;
+            const seatsCell = isFull
+              ? `<span style="color: var(--color-warning); font-weight: 700">${filled} / ${batch.capacity}</span>`
+              : `${filled} / ${batch.capacity}`;
+            const statusBadge =
+              batch.status === "ARCHIVED"
+                ? '<span class="badge badge-neutral">Archived</span>'
+                : isFull
+                  ? '<span class="badge badge-warning"><i data-icon="alertTriangle"></i>Full</span>'
+                  : '<span class="badge badge-success"><i data-icon="checkCircle"></i>Active</span>';
+            return `<tr>
+              <td data-label="Batch"><span class="cell-primary">${course ? course.name : "\u2014"}</span></td>
+              <td data-label="Teacher" class="cell-secondary">${teacher ? teacher.firstName + " " + teacher.lastName : "Unassigned"}</td>
+              <td data-label="Schedule" class="cell-secondary">${formatSchedule(schedulesByBatch[i])}</td>
+              <td data-label="Room">${batch.room}</td>
+              <td data-label="Seats">${seatsCell}</td>
+              <td data-label="Status">${statusBadge}</td>
+              <td><button class="btn btn-ghost btn-sm" data-edit-batch="${batch.id}"><i data-icon="edit" class="icon-sm"></i></button></td>
+            </tr>`;
+          })
+          .join("");
+        renderIcons(tbody);
+
+        tbody.querySelectorAll("[data-edit-batch]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const batch = tcmsBatchesCache.find(
+              (b) => b.id === btn.getAttribute("data-edit-batch"),
+            );
+            if (!batch) return;
+            tcmsEditingBatchId = batch.id;
+            const course = coursesById.get(batch.courseId);
+            document.getElementById("edit-batch-course").value = course
+              ? course.name
+              : "\u2014";
+            document.getElementById("edit-batch-teacher").value =
+              batch.teacherUserId || "";
+            document.getElementById("edit-batch-capacity").value =
+              batch.capacity;
+            const archiveBtn = document.getElementById("archive-batch-btn");
+            archiveBtn.innerHTML =
+              batch.status === "ARCHIVED"
+                ? '<i data-icon="checkCircle" class="icon-sm"></i> Reactivate Batch'
+                : '<i data-icon="trash" class="icon-sm"></i> Archive Batch';
+            renderIcons(archiveBtn);
+            document.getElementById("edit-batch-dialog").showModal();
+          });
+        });
+      }
+
+      (async function () {
+        const user = tcmsRequireAuth();
+        if (!user) return;
+        if (user.role !== "SUPER_ADMIN" && user.role !== "CENTER_ADMIN") {
+          window.location.href = tcmsHomeForRole(user.role);
+          return;
+        }
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
+
+        try {
+          await refreshBatches();
+          if (user.branchId)
+            document.getElementById("batch-branch").value = user.branchId;
+        } catch (err) {
+          console.error("Failed to load batches", err);
+        }
+
+        document
+          .getElementById("create-batch-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("new-batch-error");
+            errorBox.hidden = true;
+            const courseId = document.getElementById("batch-course").value;
+            const branchId = document.getElementById("batch-branch").value;
+            const teacherUserId =
+              document.getElementById("batch-teacher").value || undefined;
+            const room = document.getElementById("batch-room").value;
+            const capacity = Number(
+              document.getElementById("batch-capacity").value,
+            );
+            const term = document.getElementById("batch-term").value.trim();
+            const days = document
+              .getElementById("batch-days")
+              .value.split(",")
+              .map(Number);
+            const [startTime, endTime] = document
+              .getElementById("batch-time")
+              .value.split(",");
+
+            try {
+              const batch = await tcmsApiFetch("/batches", {
+                method: "POST",
+                body: JSON.stringify({
+                  courseId,
+                  branchId,
+                  teacherUserId,
+                  room,
+                  capacity,
+                  term,
+                }),
+              });
+              for (const dayOfWeek of days) {
+                await tcmsApiFetch(`/batches/${batch.id}/schedules`, {
+                  method: "POST",
+                  body: JSON.stringify({ dayOfWeek, startTime, endTime }),
+                });
+              }
+              await refreshBatches();
+              document.getElementById("new-batch-dialog").close();
+            } catch (err) {
+              document.getElementById("new-batch-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("save-batch-btn")
+          .addEventListener("click", async () => {
+            if (!tcmsEditingBatchId) return;
+            const errorBox = document.getElementById("edit-batch-error");
+            errorBox.hidden = true;
+            const teacherUserId =
+              document.getElementById("edit-batch-teacher").value || null;
+            const capacity = Number(
+              document.getElementById("edit-batch-capacity").value,
+            );
+            try {
+              await tcmsApiFetch(`/batches/${tcmsEditingBatchId}`, {
+                method: "PATCH",
+                body: JSON.stringify({ teacherUserId, capacity }),
+              });
+              await refreshBatches();
+              document.getElementById("edit-batch-dialog").close();
+            } catch (err) {
+              document.getElementById("edit-batch-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("archive-batch-btn")
+          .addEventListener("click", async () => {
+            if (!tcmsEditingBatchId) return;
+            const batch = tcmsBatchesCache.find(
+              (b) => b.id === tcmsEditingBatchId,
+            );
+            if (!batch) return;
+            try {
+              if (batch.status === "ARCHIVED") {
+                await tcmsApiFetch(`/batches/${tcmsEditingBatchId}`, {
+                  method: "PATCH",
+                  body: JSON.stringify({ status: "ACTIVE" }),
+                });
+              } else {
+                await tcmsApiFetch(`/batches/${tcmsEditingBatchId}/archive`, {
+                  method: "POST",
+                });
+              }
+              await refreshBatches();
+              document.getElementById("edit-batch-dialog").close();
+            } catch (err) {
+              alert(err.message);
+            }
+          });
+      })();
+    </script>
   </body>
 </html>

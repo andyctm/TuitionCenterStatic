@@ -96,6 +96,16 @@ export function createBatchesRouter(
     }),
   );
 
+  router.get(
+    '/:id/schedules',
+    authed,
+    asyncHandler(async (req, res) => {
+      const id = requireParam(req.params.id, 'Batch not found');
+      const schedules = await batchesService.listSchedules(id);
+      res.status(200).json({ data: schedules });
+    }),
+  );
+
   router.delete(
     '/:id/schedules/:scheduleId',
     ...writeAccess,

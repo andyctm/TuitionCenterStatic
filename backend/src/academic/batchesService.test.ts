@@ -171,6 +171,30 @@ describe('batchesService.archive', () => {
   });
 });
 
+describe('batchesService.listSchedules', () => {
+  it('returns the schedules created for a batch', async () => {
+    const deps = makeDeps([seedBatch()]);
+    const service = createBatchesService(deps);
+    await service.addSchedule('batch_1', { dayOfWeek: 1, startTime: '08:00', endTime: '09:30' });
+    await service.addSchedule('batch_1', { dayOfWeek: 3, startTime: '08:00', endTime: '09:30' });
+
+    const schedules = await service.listSchedules('batch_1');
+
+    expect(schedules).toHaveLength(2);
+    expect(schedules.map((s) => s.dayOfWeek).sort()).toEqual([1, 3]);
+  });
+
+  it('throws 404 for a non-existent batch', async () => {
+    const deps = makeDeps();
+    const service = createBatchesService(deps);
+
+    await expect(service.listSchedules('missing')).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+      httpStatus: 404,
+    });
+  });
+});
+
 describe('batchesService.addSchedule', () => {
   it('rejects adding a schedule to an archived batch with 409', async () => {
     const deps = makeDeps([seedBatch({ status: 'ARCHIVED' })]);

@@ -68,12 +68,19 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">AR</span>
+            <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
-              ><span class="name">Aruna Rathnayake</span
+              ><span class="name" id="user-name">Aruna Rathnayake</span
               ><span class="role">Super Admin</span></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
@@ -130,115 +137,9 @@
                   <th></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="courses-table-body">
                 <tr>
-                  <td data-label="Course">
-                    <span class="cell-primary">Grade 10 Mathematics</span>
-                  </td>
-                  <td data-label="Subject" class="cell-secondary">
-                    Mathematics
-                  </td>
-                  <td data-label="Grade level" class="cell-secondary">
-                    Grade 10
-                  </td>
-                  <td data-label="Active batches">2</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button
-                      class="btn btn-ghost btn-sm"
-                      data-open-modal="edit-course-dialog"
-                    >
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Course">
-                    <span class="cell-primary">Grade 11 English</span>
-                  </td>
-                  <td data-label="Subject" class="cell-secondary">English</td>
-                  <td data-label="Grade level" class="cell-secondary">
-                    Grade 11
-                  </td>
-                  <td data-label="Active batches">1</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Course">
-                    <span class="cell-primary">Grade 8 Science</span>
-                  </td>
-                  <td data-label="Subject" class="cell-secondary">Science</td>
-                  <td data-label="Grade level" class="cell-secondary">
-                    Grade 8
-                  </td>
-                  <td data-label="Active batches">1</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Course">
-                    <span class="cell-primary">Grade 6 Mathematics</span>
-                  </td>
-                  <td data-label="Subject" class="cell-secondary">
-                    Mathematics
-                  </td>
-                  <td data-label="Grade level" class="cell-secondary">
-                    Grade 6
-                  </td>
-                  <td data-label="Active batches">1</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Course">
-                    <span class="cell-primary">Grade 9 Mathematics</span>
-                  </td>
-                  <td data-label="Subject" class="cell-secondary">
-                    Mathematics
-                  </td>
-                  <td data-label="Grade level" class="cell-secondary">
-                    Grade 9
-                  </td>
-                  <td data-label="Active batches">1</td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm">
-                      <i data-icon="edit" class="icon-sm"></i>
-                    </button>
-                  </td>
+                  <td colspan="6" class="cell-secondary">Loading…</td>
                 </tr>
               </tbody>
             </table>
@@ -259,6 +160,10 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="banner banner-danger" id="add-course-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="add-course-error-message"></span>
+        </div>
         <div class="field">
           <label for="course-name">Course name</label>
           <input
@@ -277,27 +182,22 @@
           <div class="field">
             <label for="course-subject">Subject</label>
             <select class="input" id="course-subject">
-              <option>Mathematics</option>
-              <option>English</option>
-              <option>Science</option>
+              <option>Loading…</option>
             </select>
           </div>
           <div class="field">
             <label for="course-grade">Grade level</label>
             <select class="input" id="course-grade">
-              <option>Grade 6</option>
-              <option>Grade 7</option>
-              <option>Grade 8</option>
-              <option>Grade 9</option>
-              <option>Grade 10</option>
-              <option>Grade 11</option>
+              <option>Loading…</option>
             </select>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-close-modal>Cancel</button>
-        <button class="btn btn-primary">Create Course</button>
+        <button class="btn btn-primary" id="create-course-btn">
+          Create Course
+        </button>
       </div>
     </dialog>
 
@@ -313,6 +213,10 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="banner banner-danger" id="edit-course-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="edit-course-error-message"></span>
+        </div>
         <div class="field">
           <label for="edit-course-name">Course name</label>
           <input
@@ -321,40 +225,179 @@
             value="Grade 10 Mathematics"
           />
         </div>
-        <div
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--space-4);
-          "
-        >
-          <div class="field">
-            <label for="edit-course-subject">Subject</label>
-            <select class="input" id="edit-course-subject">
-              <option selected>Mathematics</option>
-              <option>English</option>
-              <option>Science</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="edit-course-grade">Grade level</label>
-            <select class="input" id="edit-course-grade">
-              <option selected>Grade 10</option>
-              <option>Grade 11</option>
-            </select>
-          </div>
-        </div>
+        <p class="cell-secondary" style="margin: 0">
+          Subject and grade level can't be changed after creation.
+        </p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger" style="margin-right: auto">
+        <button
+          class="btn btn-danger"
+          id="archive-course-btn"
+          style="margin-right: auto"
+        >
           <i data-icon="trash" class="icon-sm"></i> Archive Course
         </button>
         <button class="btn btn-secondary" data-close-modal>Cancel</button>
-        <button class="btn btn-primary">Save Changes</button>
+        <button class="btn btn-primary" id="save-course-btn">
+          Save Changes
+        </button>
       </div>
     </dialog>
 
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      let tcmsCoursesCache = [];
+      let tcmsSubjectsCache = [];
+      let tcmsGradeLevelsCache = [];
+      let tcmsEditingCourseId = null;
+
+      async function refreshCourses() {
+        const [courses, subjects, gradeLevels, batches] = await Promise.all([
+          tcmsApiFetch("/courses"),
+          tcmsApiFetch("/subjects"),
+          tcmsApiFetch("/grade-levels"),
+          tcmsApiFetch("/batches"),
+        ]);
+        tcmsCoursesCache = courses;
+        tcmsSubjectsCache = subjects;
+        tcmsGradeLevelsCache = gradeLevels;
+
+        const subjectsById = new Map(subjects.map((s) => [s.id, s]));
+        const gradeLevelsById = new Map(gradeLevels.map((g) => [g.id, g]));
+        const batchCountByCourse = new Map();
+        for (const batch of batches) {
+          batchCountByCourse.set(
+            batch.courseId,
+            (batchCountByCourse.get(batch.courseId) || 0) + 1,
+          );
+        }
+
+        const subjectOptions = subjects
+          .map((s) => `<option value="${s.id}">${s.name}</option>`)
+          .join("");
+        const gradeOptions = gradeLevels
+          .map((g) => `<option value="${g.id}">${g.name}</option>`)
+          .join("");
+        document.getElementById("course-subject").innerHTML = subjectOptions;
+        document.getElementById("course-grade").innerHTML = gradeOptions;
+
+        const tbody = document.getElementById("courses-table-body");
+        tbody.innerHTML = courses
+          .map((course) => {
+            const subject = subjectsById.get(course.subjectId);
+            const gradeLevel = gradeLevelsById.get(course.gradeLevelId);
+            const batchCount = batchCountByCourse.get(course.id) || 0;
+            return `<tr>
+              <td data-label="Course"><span class="cell-primary">${course.name}</span></td>
+              <td data-label="Subject" class="cell-secondary">${subject ? subject.name : "—"}</td>
+              <td data-label="Grade level" class="cell-secondary">${gradeLevel ? gradeLevel.name : "—"}</td>
+              <td data-label="Active batches">${batchCount}</td>
+              <td data-label="Status"><span class="badge badge-success"><i data-icon="checkCircle"></i>Active</span></td>
+              <td><button class="btn btn-ghost btn-sm" data-edit-course="${course.id}"><i data-icon="edit" class="icon-sm"></i></button></td>
+            </tr>`;
+          })
+          .join("");
+        renderIcons(tbody);
+
+        tbody.querySelectorAll("[data-edit-course]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const course = tcmsCoursesCache.find(
+              (c) => c.id === btn.getAttribute("data-edit-course"),
+            );
+            if (!course) return;
+            tcmsEditingCourseId = course.id;
+            document.getElementById("edit-course-name").value = course.name;
+            document.getElementById("edit-course-dialog").showModal();
+          });
+        });
+      }
+
+      (async function () {
+        const user = tcmsRequireAuth();
+        if (!user) return;
+        if (user.role !== "SUPER_ADMIN" && user.role !== "CENTER_ADMIN") {
+          window.location.href = tcmsHomeForRole(user.role);
+          return;
+        }
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
+
+        try {
+          await refreshCourses();
+        } catch (err) {
+          console.error("Failed to load courses", err);
+        }
+
+        document
+          .getElementById("create-course-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("add-course-error");
+            errorBox.hidden = true;
+            const name = document.getElementById("course-name").value.trim();
+            const subjectId = document.getElementById("course-subject").value;
+            const gradeLevelId = document.getElementById("course-grade").value;
+            try {
+              await tcmsApiFetch("/courses", {
+                method: "POST",
+                body: JSON.stringify({ name, subjectId, gradeLevelId }),
+              });
+              await refreshCourses();
+              document.getElementById("add-course-dialog").close();
+              document.getElementById("course-name").value = "";
+            } catch (err) {
+              document.getElementById("add-course-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("save-course-btn")
+          .addEventListener("click", async () => {
+            if (!tcmsEditingCourseId) return;
+            const errorBox = document.getElementById("edit-course-error");
+            errorBox.hidden = true;
+            const name = document
+              .getElementById("edit-course-name")
+              .value.trim();
+            try {
+              await tcmsApiFetch(`/courses/${tcmsEditingCourseId}`, {
+                method: "PATCH",
+                body: JSON.stringify({ name }),
+              });
+              await refreshCourses();
+              document.getElementById("edit-course-dialog").close();
+            } catch (err) {
+              document.getElementById("edit-course-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("archive-course-btn")
+          .addEventListener("click", async () => {
+            if (!tcmsEditingCourseId) return;
+            if (!confirm("Archive this course? This can't be undone.")) return;
+            try {
+              await tcmsApiFetch(`/courses/${tcmsEditingCourseId}`, {
+                method: "DELETE",
+              });
+              await refreshCourses();
+              document.getElementById("edit-course-dialog").close();
+            } catch (err) {
+              alert(err.message);
+            }
+          });
+      })();
+    </script>
   </body>
 </html>

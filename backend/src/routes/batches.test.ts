@@ -171,3 +171,30 @@ describe('POST /api/batches/:id/schedules', () => {
     expect(res.status).toBe(204);
   });
 });
+
+describe('GET /api/batches/:id/schedules', () => {
+  it('returns the schedules created for a batch', async () => {
+    const admin = await seedUser({ role: 'CENTER_ADMIN' });
+    const batch = seedBatch();
+    const { app } = createTestApp({
+      seedUsers: [admin],
+      seedBranches: branches,
+      seedCourses: courses,
+      seedBatches: [batch],
+    });
+    const token = await loginAs(app, admin);
+
+    await request(app)
+      .post('/api/batches/batch_1/schedules')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ dayOfWeek: 1, startTime: '16:00', endTime: '17:00' });
+
+    const res = await request(app)
+      .get('/api/batches/batch_1/schedules')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0]).toMatchObject({ dayOfWeek: 1, startTime: '16:00', endTime: '17:00' });
+  });
+});

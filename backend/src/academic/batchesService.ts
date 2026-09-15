@@ -89,6 +89,11 @@ export function createBatchesService(deps: BatchesServiceDeps) {
       return batchRepo.update(id, { status: 'ARCHIVED' });
     },
 
+    async listSchedules(batchId: string): Promise<ClassScheduleRecord[]> {
+      await requireBatch(batchId);
+      return classScheduleRepo.findByBatch(batchId);
+    },
+
     async addSchedule(
       batchId: string,
       input: Omit<NewClassScheduleInput, 'batchId'>,

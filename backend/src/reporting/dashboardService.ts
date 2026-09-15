@@ -10,6 +10,7 @@ import type {
   EnrollmentRepository,
   ParentStudentRepository,
   StudentProfileRepository,
+  UserRepository,
 } from '../repositories/types';
 
 export type DashboardServiceDeps = {
@@ -20,6 +21,13 @@ export type DashboardServiceDeps = {
   attendanceRepo: AttendanceRepository;
   studentProfileRepo: StudentProfileRepository;
   parentStudentRepo: ParentStudentRepository;
+  userRepo: UserRepository;
+};
+
+export type UnassignedTeacherSummary = {
+  userId: string;
+  firstName: string;
+  lastName: string;
 };
 
 export type AdminDashboardSummary = {
@@ -27,6 +35,7 @@ export type AdminDashboardSummary = {
   activeStudentsCount: number;
   activeBatchesCount: number;
   batchesAtCapacityCount: number;
+  unassignedTeachers: UnassignedTeacherSummary[];
 };
 
 export type TodaysSessionSummary = {
@@ -97,13 +106,16 @@ export function createDashboardService(deps: DashboardServiceDeps) {
     attendanceRepo,
     studentProfileRepo,
     parentStudentRepo,
+    userRepo,
   } = deps;
 
   async function getAdminSummary(ctx: AuthContext): Promise<AdminDashboardSummary> {
     const branchIds = isSuperAdmin(ctx) ? undefined : ctx.branchIds;
-    const [batches, activeEnrollments] = await Promise.all([
+    const [batches, activeEnrollments, allBatches, users] = await Promise.all([
       batchRepo.findAll({ branchIds, status: 'ACTIVE' }),
       enrollmentRepo.findAll({ branchIds, status: 'ACTIVE' }),
+      batchRepo.findAll({ branchIds }),
+      userRepo.findAll({ branchIds }),
     ]);
 
     const activeStudentIds = new Set(activeEnrollments.map((e) => e.studentProfileId));
@@ -118,11 +130,20 @@ export function createDashboardService(deps: DashboardServiceDeps) {
       (b) => (enrollmentCountByBatch.get(b.id) ?? 0) >= b.capacity,
     ).length;
 
+    // A teacher counts as "assigned" if they teach any batch of any status, not just ACTIVE ones.
+    const assignedTeacherIds = new Set(
+      allBatches.map((b) => b.teacherUserId).filter((id): id is string => id !== null),
+    );
+    const unassignedTeachers = users
+      .filter((u) => u.role === 'TEACHER' && u.status === 'ACTIVE' && !assignedTeacherIds.has(u.id))
+      .map((u) => ({ userId: u.id, firstName: u.firstName, lastName: u.lastName }));
+
     return {
       role: 'ADMIN',
       activeStudentsCount: activeStudentIds.size,
       activeBatchesCount: batches.length,
       batchesAtCapacityCount,
+      unassignedTeachers,
     };
   }
 

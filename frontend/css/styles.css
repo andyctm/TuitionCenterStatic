@@ -710,6 +710,16 @@ textarea.input:focus {
   background: var(--slate-600);
   color: #fff;
 }
+.segmented button:disabled {
+  cursor: not-allowed;
+}
+.segmented button:disabled:not(.is-selected):hover {
+  background: var(--surface-0);
+}
+#roster-body.is-readonly .remarks-field input:disabled {
+  background: var(--surface-1);
+  cursor: not-allowed;
+}
 
 /* ---------- Session / today cards ---------- */
 .session-row {

@@ -102,6 +102,7 @@ const dashboardService = createDashboardService({
   attendanceRepo,
   studentProfileRepo,
   parentStudentRepo,
+  userRepo,
 });
 const enrollmentReportService = createEnrollmentReportService({
   enrollmentRepo,

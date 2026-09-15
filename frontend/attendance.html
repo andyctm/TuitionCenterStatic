@@ -179,11 +179,12 @@
         );
       }
 
-      function rosterRowHtml(entry) {
+      function rosterRowHtml(entry, readonly) {
         const currentStatus = entry.status ? entry.status.toLowerCase() : null;
+        const disabledAttr = readonly ? "disabled" : "";
         const buttons = TCMS_ATTENDANCE_STATUSES.map((s) => {
           const selected = currentStatus === s.value;
-          return `<button data-status="${s.value}" class="${selected ? "is-selected" : ""}" aria-pressed="${selected}"><i data-icon="${s.icon}" class="icon-sm"></i>${s.label}</button>`;
+          return `<button data-status="${s.value}" class="${selected ? "is-selected" : ""}" aria-pressed="${selected}" ${disabledAttr}><i data-icon="${s.icon}" class="icon-sm"></i>${s.label}</button>`;
         }).join("");
         const initials = (entry.firstName[0] || "") + (entry.lastName[0] || "");
         const remarksHidden =
@@ -195,7 +196,7 @@
           </div>
           <div class="segmented" role="group" aria-label="Attendance status">${buttons}</div>
           <div class="remarks-field" data-remarks ${remarksHidden ? "hidden" : ""}>
-            <input class="input" placeholder="Add a remark…" value="${escapeHtml(entry.remarks || "")}" />
+            <input class="input" placeholder="Add a remark…" value="${escapeHtml(entry.remarks || "")}" ${disabledAttr} />
           </div>
         </div>`;
       }
@@ -272,17 +273,20 @@
           document.getElementById("page-subtitle").textContent =
             subtitleParts.join(" · ");
 
+          const canSave = user.role === "TEACHER";
           const rosterBody = document.getElementById("roster-body");
           if (!roster.length) {
             rosterBody.innerHTML =
               '<div class="roster-row"><div class="row-people"><div class="meta"><div class="cell-primary">No active enrollments for this session.</div></div></div></div>';
           } else {
-            rosterBody.innerHTML = roster.map(rosterRowHtml).join("");
+            rosterBody.innerHTML = roster
+              .map((entry) => rosterRowHtml(entry, !canSave))
+              .join("");
           }
           renderIcons(rosterBody);
           initSegmented();
+          rosterBody.classList.toggle("is-readonly", !canSave);
 
-          const canSave = user.role === "TEACHER";
           document.getElementById("readonly-note").hidden = canSave;
           saveBar.hidden = !roster.length;
           document.querySelector("[data-save-btn]").style.display = canSave
@@ -329,8 +333,12 @@
           );
 
           if (!options.length) {
+            // Distinguish "nothing assigned to me" from "assigned, but no sessions yet" —
+            // both render as an empty options list, but need different guidance for the user.
             document.getElementById("load-error-text").textContent =
-              "No class sessions found for your batches.";
+              !batches.length
+                ? "You don't have any batches assigned yet. Ask your Center Admin or Super Admin to assign you to a batch."
+                : "Your batches don't have any class sessions yet. Check back after your schedule's next session is generated, or ask your Center Admin if this seems wrong.";
             document.getElementById("load-error-banner").hidden = false;
             return;
           }

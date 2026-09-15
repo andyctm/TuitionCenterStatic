@@ -125,6 +125,15 @@
         </div>
 
         <div
+          class="banner banner-warning"
+          id="unassigned-teachers-banner"
+          hidden
+        >
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="unassigned-teachers-text"></span>
+        </div>
+
+        <div
           style="
             display: grid;
             grid-template-columns: 1.6fr 1fr;
@@ -351,6 +360,23 @@
             summary.activeBatchesCount;
           document.getElementById("stat-students").textContent =
             summary.activeStudentsCount;
+
+          const unassignedBanner = document.getElementById(
+            "unassigned-teachers-banner",
+          );
+          const unassignedTeachers = summary.unassignedTeachers || [];
+          if (unassignedTeachers.length) {
+            const names = unassignedTeachers
+              .map((t) => `${t.firstName} ${t.lastName}`)
+              .join(", ");
+            const plural =
+              unassignedTeachers.length === 1 ? "teacher has" : "teachers have";
+            document.getElementById("unassigned-teachers-text").textContent =
+              `${unassignedTeachers.length} ${plural} no batch assigned yet: ${names}. Assign them a batch in Batches so they can mark attendance.`;
+            unassignedBanner.hidden = false;
+          } else {
+            unassignedBanner.hidden = true;
+          }
 
           const batchesByBranch = new Map();
           for (const batch of batches) {

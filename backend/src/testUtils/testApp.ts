@@ -142,6 +142,7 @@ export function createTestApp(
     attendanceRepo,
     studentProfileRepo,
     parentStudentRepo,
+    userRepo,
   });
   const enrollmentReportService = createEnrollmentReportService({
     enrollmentRepo,

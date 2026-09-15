@@ -8,6 +8,7 @@ import {
   createFakeEnrollmentRepository,
   createFakeParentStudentRepository,
   createFakeStudentProfileRepository,
+  createFakeUserRepository,
 } from '../testUtils/fakeRepositories';
 import type { AuthContext } from '../types/authContext';
 import type {
@@ -17,6 +18,7 @@ import type {
   CourseRecord,
   EnrollmentRecord,
   StudentProfileRecord,
+  UserRecord,
 } from '../repositories/types';
 
 function ctx(overrides: Partial<AuthContext> = {}): AuthContext {
@@ -66,6 +68,20 @@ function seedProfile(overrides: Partial<StudentProfileRecord> = {}): StudentProf
   return { id: 'stu_1', userId: 'student_user_1', ...overrides };
 }
 
+function seedUser(overrides: Partial<UserRecord> = {}): UserRecord {
+  return {
+    id: 'teacher_1',
+    email: 'teacher_1@example.com',
+    passwordHash: 'hash',
+    firstName: 'Teacher',
+    lastName: 'One',
+    role: 'TEACHER',
+    status: 'ACTIVE',
+    branchId: 'branch_colombo',
+    ...overrides,
+  };
+}
+
 function makeDeps(options: {
   courses?: CourseRecord[];
   batches?: BatchRecord[];
@@ -74,6 +90,7 @@ function makeDeps(options: {
   attendances?: AttendanceRecord[];
   profiles?: StudentProfileRecord[];
   parentLinks?: { parentUserId: string; studentProfileId: string }[];
+  users?: UserRecord[];
 } = {}) {
   const courseRepo = createFakeCourseRepository(options.courses ?? [seedCourse()]);
   const batchRepo = createFakeBatchRepository(options.batches ?? [seedBatch()]);
@@ -82,7 +99,17 @@ function makeDeps(options: {
   const attendanceRepo = createFakeAttendanceRepository(options.attendances ?? [], classSessionRepo);
   const studentProfileRepo = createFakeStudentProfileRepository(options.profiles ?? [seedProfile()]);
   const parentStudentRepo = createFakeParentStudentRepository(options.parentLinks ?? []);
-  return { courseRepo, batchRepo, enrollmentRepo, classSessionRepo, attendanceRepo, studentProfileRepo, parentStudentRepo };
+  const userRepo = createFakeUserRepository(options.users ?? []);
+  return {
+    courseRepo,
+    batchRepo,
+    enrollmentRepo,
+    classSessionRepo,
+    attendanceRepo,
+    studentProfileRepo,
+    parentStudentRepo,
+    userRepo,
+  };
 }
 
 const NOW = new Date('2026-09-14T10:00:00Z');
@@ -111,6 +138,7 @@ describe('dashboardService.getSummary — admin roles (SUPER_ADMIN/CENTER_ADMIN/
       activeStudentsCount: 1,
       activeBatchesCount: 1,
       batchesAtCapacityCount: 1,
+      unassignedTeachers: [],
     });
   });
 
@@ -134,6 +162,7 @@ describe('dashboardService.getSummary — admin roles (SUPER_ADMIN/CENTER_ADMIN/
       activeStudentsCount: 2,
       activeBatchesCount: 2,
       batchesAtCapacityCount: 1,
+      unassignedTeachers: [],
     });
   });
 
@@ -165,6 +194,73 @@ describe('dashboardService.getSummary — admin roles (SUPER_ADMIN/CENTER_ADMIN/
     );
 
     expect(summary).toMatchObject({ activeStudentsCount: 0, batchesAtCapacityCount: 0 });
+  });
+
+  it('flags an ACTIVE teacher with zero assigned batches (of any status) as unassigned', async () => {
+    const deps = makeDeps({
+      batches: [seedBatch({ branchId: 'branch_colombo', teacherUserId: 'teacher_assigned' })],
+      users: [
+        seedUser({ id: 'teacher_assigned', firstName: 'Assigned', lastName: 'Teacher' }),
+        seedUser({ id: 'teacher_unassigned', firstName: 'Idle', lastName: 'Teacher' }),
+      ],
+    });
+    const service = createDashboardService(deps);
+
+    const summary = await service.getSummary(
+      ctx({ role: 'CENTER_ADMIN', branchIds: ['branch_colombo'] }),
+      NOW,
+    );
+
+    expect(summary).toMatchObject({
+      unassignedTeachers: [{ userId: 'teacher_unassigned', firstName: 'Idle', lastName: 'Teacher' }],
+    });
+  });
+
+  it('does not flag a teacher whose only batch is ARCHIVED, and ignores INACTIVE teachers entirely', async () => {
+    const deps = makeDeps({
+      batches: [
+        seedBatch({ teacherUserId: 'teacher_archived_only', status: 'ARCHIVED', branchId: 'branch_colombo' }),
+      ],
+      users: [
+        seedUser({ id: 'teacher_archived_only', firstName: 'Archived', lastName: 'Only' }),
+        seedUser({ id: 'teacher_inactive', firstName: 'Inactive', lastName: 'Teacher', status: 'SUSPENDED' }),
+      ],
+    });
+    const service = createDashboardService(deps);
+
+    const summary = await service.getSummary(
+      ctx({ role: 'CENTER_ADMIN', branchIds: ['branch_colombo'] }),
+      NOW,
+    );
+
+    expect(summary).toMatchObject({ unassignedTeachers: [] });
+  });
+
+  it("scopes unassignedTeachers to the caller's branch, but Super Admin sees every branch", async () => {
+    const deps = makeDeps({
+      batches: [seedBatch({ branchId: 'branch_colombo' })],
+      users: [
+        seedUser({ id: 'teacher_colombo', branchId: 'branch_colombo' }),
+        seedUser({ id: 'teacher_kandy', branchId: 'branch_kandy' }),
+      ],
+    });
+    const service = createDashboardService(deps);
+
+    const scoped = await service.getSummary(
+      ctx({ role: 'CENTER_ADMIN', branchIds: ['branch_colombo'] }),
+      NOW,
+    );
+    expect(scoped).toMatchObject({
+      unassignedTeachers: [{ userId: 'teacher_colombo' }],
+    });
+
+    const superAdminView = await service.getSummary(ctx({ role: 'SUPER_ADMIN' }), NOW);
+    expect(superAdminView).toMatchObject({
+      unassignedTeachers: expect.arrayContaining([
+        { userId: 'teacher_colombo', firstName: 'Teacher', lastName: 'One' },
+        { userId: 'teacher_kandy', firstName: 'Teacher', lastName: 'One' },
+      ]),
+    });
   });
 });
 

@@ -90,6 +90,7 @@ describe('GET /api/dashboard/summary', () => {
       activeStudentsCount: 1,
       activeBatchesCount: 1,
       batchesAtCapacityCount: 1,
+      unassignedTeachers: [],
     });
   });
 

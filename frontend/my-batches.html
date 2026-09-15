@@ -54,12 +54,19 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">DW</span>
+            <span class="avatar" id="user-avatar">DW</span>
             <span class="meta"
-              ><span class="name">Dilshan Wickramasinghe</span
-              ><span class="role">Teacher</span></span
+              ><span class="name" id="user-name">Dilshan Wickramasinghe</span
+              ><span class="role" id="user-role-label">Teacher</span></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
@@ -174,6 +181,24 @@
       </main>
     </div>
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      (function () {
+        const user = tcmsRequireAuth();
+        if (!user) return;
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document.getElementById("user-role-label").textContent = tcmsRoleLabel(
+          user.role,
+        );
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
+      })();
+    </script>
   </body>
 </html>

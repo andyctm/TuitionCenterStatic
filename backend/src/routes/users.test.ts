@@ -25,6 +25,30 @@ async function loginAs(app: import('express').Express, user: UserRecord) {
   return res.body.data.accessToken as string;
 }
 
+describe('GET /api/users', () => {
+  it('returns 403 for a non-admin caller', async () => {
+    const teacher = await seedUser({ role: 'TEACHER' });
+    const { app } = createTestApp({ seedUsers: [teacher] });
+    const token = await loginAs(app, teacher);
+
+    const res = await request(app).get('/api/users').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it('scopes results to the caller branch for a Center Admin', async () => {
+    const admin = await seedUser({ id: 'admin_1', email: 'admin@example.com', role: 'CENTER_ADMIN', branchId: 'branch_1' });
+    const otherBranchUser = await seedUser({ id: 'user_2', email: 'other@example.com', branchId: 'branch_2' });
+    const { app } = createTestApp({ seedUsers: [admin, otherBranchUser] });
+    const token = await loginAs(app, admin);
+
+    const res = await request(app).get('/api/users').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.map((u: UserRecord) => u.id)).toEqual(['admin_1']);
+  });
+});
+
 describe('POST /api/users', () => {
   it('returns 403 for a non-admin caller', async () => {
     const teacher = await seedUser({ role: 'TEACHER' });

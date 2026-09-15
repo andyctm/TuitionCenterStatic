@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Users — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="desktop-first">
+    <div class="mockup-strip">
+      <span>GUI mockup: Users, visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item" href="admin-dashboard.html"
+            ><i data-icon="dashboard"></i
+            ><span class="label">Dashboard</span></a
+          >
+          <a class="nav-item" href="branches.html"
+            ><i data-icon="branches"></i><span class="label">Branches</span></a
+          >
+          <a class="nav-item is-active" href="users.html"
+            ><i data-icon="users"></i><span class="label">Users</span></a
+          >
+          <a class="nav-item" href="courses.html"
+            ><i data-icon="courses"></i><span class="label">Courses</span></a
+          >
+          <a class="nav-item" href="batches.html"
+            ><i data-icon="batches"></i><span class="label">Batches</span></a
+          >
+          <a class="nav-item" href="reports.html"
+            ><i data-icon="reports"></i><span class="label">Reports</span></a
+          >
+          <a class="nav-item" href="audit-log.html"
+            ><i data-icon="audit"></i><span class="label">Audit Log</span></a
+          >
+          <a class="nav-item" href="settings.html"
+            ><i data-icon="settings"></i><span class="label">Settings</span></a
+          >
+        </nav>
+        <div class="nav-footer">v1.0 · Design mockup</div>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span>Super Admin</span><span class="sep">/</span
+          ><span class="current">Users</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <div class="user-chip">
+            <span class="avatar">AR</span>
+            <span class="meta"
+              ><span class="name">Aruna Rathnayake</span
+              ><span class="role">Super Admin</span></span
+            >
+            <i data-icon="chevronDown" class="icon-sm"></i>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1>Users</h1>
+            <p class="subtitle">86 active staff & teachers across 4 branches</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" data-open-modal="add-user-dialog">
+              <i data-icon="plus" class="icon-sm"></i> Add User
+            </button>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div
+            class="panel-header"
+            style="gap: var(--space-4); flex-wrap: wrap"
+          >
+            <div class="input-icon-wrap" style="max-width: 260px">
+              <i data-icon="search" class="icon-sm"></i>
+              <input class="input" placeholder="Search users…" />
+            </div>
+            <div style="display: flex; gap: var(--space-2); margin-left: auto">
+              <select class="input" style="width: auto">
+                <option>Role: All</option>
+                <option>Super Admin</option>
+                <option>Center Admin</option>
+                <option>Accountant</option>
+                <option>Teacher</option>
+                <option>Student</option>
+                <option>Parent</option>
+              </select>
+              <select class="input" style="width: auto">
+                <option>Branch: All</option>
+                <option>Colombo Main</option>
+                <option>Kandy</option>
+                <option>Galle</option>
+                <option>Negombo</option>
+              </select>
+              <select class="input" style="width: auto">
+                <option>Status: All</option>
+                <option>Active</option>
+                <option>Suspended</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-body no-pad table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Branch</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">AR</span>
+                      <span class="cell-primary">Aruna Rathnayake</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-info">Super Admin</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    All branches
+                  </td>
+                  <td data-label="Email" class="cell-secondary">
+                    aruna.r@tcms.lk
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-ghost btn-sm"
+                      data-open-modal="edit-user-dialog"
+                    >
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">NP</span>
+                      <span class="cell-primary">Nadeesha Perera</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-neutral">Center Admin</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Email" class="cell-secondary">
+                    nadeesha.p@tcms.lk
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">RS</span>
+                      <span class="cell-primary">Ruwan Silva</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-neutral">Center Admin</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">Kandy</td>
+                  <td data-label="Email" class="cell-secondary">
+                    ruwan.s@tcms.lk
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">DW</span>
+                      <span class="cell-primary">D. Wickramasinghe</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-neutral">Teacher</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Email" class="cell-secondary">
+                    d.wick@tcms.lk
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">PK</span>
+                      <span class="cell-primary">Priya Kumar</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-neutral">Accountant</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Email" class="cell-secondary">
+                    priya.k@tcms.lk
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">HJ</span>
+                      <span class="cell-primary">Hasini Jayasuriya</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-neutral">Student</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Email" class="cell-secondary">
+                    hasini.j@gmail.com
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-success"
+                      ><i data-icon="checkCircle"></i>Active</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Name">
+                    <div class="row-people">
+                      <span class="avatar sm">CP</span>
+                      <span class="cell-primary">Chamodi Perera</span>
+                    </div>
+                  </td>
+                  <td data-label="Role">
+                    <span class="badge badge-neutral">Parent</span>
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Email" class="cell-secondary">
+                    chamodi.p@gmail.com
+                  </td>
+                  <td data-label="Status">
+                    <span class="badge badge-danger"
+                      ><i data-icon="xCircle"></i>Suspended</span
+                    >
+                  </td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm">
+                      <i data-icon="edit" class="icon-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="add-user-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Add user</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="user-name">Full name</label>
+          <input class="input" id="user-name" placeholder="e.g. Priya Kumar" />
+        </div>
+        <div class="field">
+          <label for="user-email">Email</label>
+          <input
+            class="input"
+            id="user-email"
+            type="email"
+            placeholder="name@tcms.lk"
+          />
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+          "
+        >
+          <div class="field">
+            <label for="user-role">Role</label>
+            <select class="input" id="user-role">
+              <option>Center Admin</option>
+              <option>Accountant</option>
+              <option>Teacher</option>
+              <option>Student</option>
+              <option>Parent</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="user-branch">Branch</label>
+            <select class="input" id="user-branch">
+              <option>Colombo Main</option>
+              <option>Kandy</option>
+              <option>Galle</option>
+              <option>Negombo</option>
+            </select>
+          </div>
+        </div>
+        <div class="banner banner-info">
+          <i data-icon="info" class="icon-sm"></i>
+          <span
+            >An email invite with a temporary password will be sent once
+            created.</span
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary">Send Invite</button>
+      </div>
+    </dialog>
+
+    <dialog id="edit-user-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Edit user</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="edit-user-name">Full name</label>
+          <input class="input" id="edit-user-name" value="Aruna Rathnayake" />
+        </div>
+        <div class="field">
+          <label for="edit-user-email">Email</label>
+          <input class="input" id="edit-user-email" value="aruna.r@tcms.lk" />
+        </div>
+        <div class="field">
+          <label for="edit-user-role">Role</label>
+          <select class="input" id="edit-user-role">
+            <option selected>Super Admin</option>
+            <option>Center Admin</option>
+            <option>Accountant</option>
+            <option>Teacher</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" style="margin-right: auto">
+          <i data-icon="minusCircle" class="icon-sm"></i> Suspend User
+        </button>
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary">Save Changes</button>
+      </div>
+    </dialog>
+
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

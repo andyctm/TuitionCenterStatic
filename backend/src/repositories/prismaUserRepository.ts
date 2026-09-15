@@ -9,6 +9,11 @@ export function createPrismaUserRepository(prisma: PrismaClient): UserRepository
     async findById(id) {
       return prisma.user.findUnique({ where: { id } });
     },
+    async findAll(filter) {
+      return prisma.user.findMany({
+        where: filter?.branchIds ? { branchId: { in: filter.branchIds } } : undefined,
+      });
+    },
     async create(input: NewUserInput): Promise<UserRecord> {
       return prisma.user.create({ data: input });
     },

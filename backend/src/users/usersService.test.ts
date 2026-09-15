@@ -14,6 +14,37 @@ async function makeService(seed: Parameters<typeof createFakeUserRepository>[0] 
   return { service: createUsersService({ userRepo, auditLogRepo }), userRepo, auditLogRepo };
 }
 
+describe('usersService.list', () => {
+  it('scopes results to the caller assigned branch for a Center Admin', async () => {
+    const colomboUser = { id: 'u1', email: 'a@example.com', passwordHash: await hashPassword('x'), firstName: 'A', lastName: 'B', role: 'TEACHER' as const, status: 'ACTIVE' as const, branchId: 'branch_1' };
+    const kandyUser = { id: 'u2', email: 'b@example.com', passwordHash: await hashPassword('x'), firstName: 'C', lastName: 'D', role: 'TEACHER' as const, status: 'ACTIVE' as const, branchId: 'branch_2' };
+    const { service } = await makeService([colomboUser, kandyUser]);
+
+    const users = await service.list(ctx({ role: 'CENTER_ADMIN', branchIds: ['branch_1'] }));
+
+    expect(users.map((u) => u.id)).toEqual(['u1']);
+  });
+
+  it('returns every user for a Super Admin, regardless of branch', async () => {
+    const colomboUser = { id: 'u1', email: 'a@example.com', passwordHash: await hashPassword('x'), firstName: 'A', lastName: 'B', role: 'TEACHER' as const, status: 'ACTIVE' as const, branchId: 'branch_1' };
+    const kandyUser = { id: 'u2', email: 'b@example.com', passwordHash: await hashPassword('x'), firstName: 'C', lastName: 'D', role: 'TEACHER' as const, status: 'ACTIVE' as const, branchId: 'branch_2' };
+    const { service } = await makeService([colomboUser, kandyUser]);
+
+    const users = await service.list(ctx({ role: 'SUPER_ADMIN', branchIds: [] }));
+
+    expect(users.map((u) => u.id).sort()).toEqual(['u1', 'u2']);
+  });
+
+  it('never includes passwordHash', async () => {
+    const user = { id: 'u1', email: 'a@example.com', passwordHash: await hashPassword('x'), firstName: 'A', lastName: 'B', role: 'TEACHER' as const, status: 'ACTIVE' as const, branchId: 'branch_1' };
+    const { service } = await makeService([user]);
+
+    const users = await service.list(ctx({ role: 'SUPER_ADMIN', branchIds: [] }));
+
+    expect(users[0]).not.toHaveProperty('passwordHash');
+  });
+});
+
 describe('usersService.createStaffUser', () => {
   it('creates an ACTIVE staff account (admin-created accounts skip the PENDING approval step)', async () => {
     const { service } = await makeService();

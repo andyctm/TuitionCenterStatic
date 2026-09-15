@@ -12,6 +12,15 @@ export function createUsersRouter(usersService: UsersService, accessTokenSecret:
   const router = Router();
   const adminOnly = [requireAuth(accessTokenSecret), requireRole('SUPER_ADMIN', 'CENTER_ADMIN')];
 
+  router.get(
+    '/',
+    ...adminOnly,
+    asyncHandler(async (req, res) => {
+      const users = await usersService.list(getAuthContext(req));
+      res.status(200).json({ data: users });
+    }),
+  );
+
   router.post(
     '/',
     ...adminOnly,

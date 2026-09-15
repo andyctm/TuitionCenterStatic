@@ -45,8 +45,14 @@ npx serve .
 - `.github/workflows/deploy-frontend.yml` — deploys `frontend/` to GitHub Pages on push to `main`
   (requires GitHub Pages to be enabled for this repo, source = GitHub Actions).
 - The backend (`backend/`) deploys to Render via Render's own GitHub integration (connect the repo
-  in the Render dashboard, root directory `backend/`, build command `npm ci && npm run build`,
-  start command `npm start`, **pre-deploy command `npx prisma migrate deploy`** so migrations run
-  before the new version receives traffic) — no GitHub Actions step is needed for this, Render
-  listens to pushes directly. Set `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`,
-  `ALLOWED_ORIGINS` in Render's environment variables (see `backend/.env.example`).
+  in the Render dashboard, root directory `backend/`, build command
+  `npm ci --include=dev && npx prisma generate && npm run build`, start command `npm start`,
+  **pre-deploy command `npx prisma migrate deploy`** so migrations run before the new version
+  receives traffic) — no GitHub Actions step is needed for this, Render listens to pushes directly.
+  Set `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `ALLOWED_ORIGINS` in Render's
+  environment variables (see `backend/.env.example`).
+  **Important:** `--include=dev` is required — with `NODE_ENV=production` set (as it should be),
+  Render's build step skips devDependencies by default, so `prisma` (a devDependency, pinned to
+  `^6.19.3`) never gets installed; `npx prisma generate` then silently downloads the _latest_
+  `prisma` from npm instead (currently v7, which replaced `generate`/`migrate` with an incompatible
+  "Prisma Platform" CLI) and fails with `CLI.UNKNOWN_COMMAND`.

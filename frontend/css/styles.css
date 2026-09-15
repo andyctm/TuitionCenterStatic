@@ -965,6 +965,10 @@ textarea.input:focus {
   background: var(--color-info-tint);
   color: #1f4a68;
 }
+.banner-danger {
+  background: var(--color-danger-tint);
+  color: #7a2318;
+}
 .banner .icon {
   margin-top: 2px;
   color: inherit;

@@ -3,5 +3,5 @@
 // backend/.env.example PORT). Production deploys should replace this file's value with the
 // Render service URL as part of the GitHub Pages deploy step (see docs/08-implementation-plan.md M0).
 window.TCMS_CONFIG = {
-  API_BASE_URL: 'http://localhost:4000/api',
+  API_BASE_URL: 'https://tuitioncenterstatic.onrender.com/api',
 };

@@ -10,6 +10,9 @@ coverage/
 .env.*.local
 backend/.env
 
+# Ephemeral one-off scripts/notes (e.g. wizard skill output) — never commit real secrets
+.scratch/
+
 # OS/editor cruft
 .DS_Store
 Thumbs.db

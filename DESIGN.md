@@ -49,6 +49,15 @@ for future student/reference codes (not yet used in these mockups).
   chosen over a grid calendar for mobile scanability and consistency with the roster/table vocabulary.
 - Batches management table + two modals (New Batch with an inline teacher/room double-booking
   warning per FR-ACAD-4, Edit Batch with an archive action) on `batches.html`.
+- Branches/Users/Courses management tables + add/edit modals (`branches.html`, `users.html`,
+  `courses.html`), reusing the same data-table + `<dialog>` pattern as Batches. Add Branch/Add User
+  on `admin-dashboard.html` now open the same modals inline instead of only living on the list pages.
+- Reports (`reports.html`): two filter+export panels (Enrollment, Attendance) mirroring the backend's
+  `GET /api/reports/{enrollment,attendance}` CSV endpoints (M5) — no live export, button is visual only.
+- Audit Log (`audit-log.html`): filterable table of the same entries teased in the dashboard's
+  "Recent audit activity" panel, expanded with Action/Entity/Branch columns.
+- Settings (`settings.html`): tab-strip (General/Academic/Security) reusing the Parent child-switcher
+  tab pattern, each tab a form panel with its own Save action.
 
 ## Icons
 
@@ -71,6 +80,7 @@ authored demo state until M1+ wires real API calls via `frontend/js/config.js` /
 
 ## Not yet built
 
-Branches/Users/Courses CRUD, Reports, Audit Log detail, Settings, and password reset/self-registration
-flows — still out of scope for this pass. Batches (Center/Super Admin), My Batches (Teacher), and
-Schedule (Student/Parent) were added after the initial pass once the nav placeholders were noticed.
+Password reset/self-registration flows — still out of scope for this pass. Batches (Center/Super
+Admin), My Batches (Teacher), Schedule (Student/Parent), and Branches/Users/Courses/Reports/Audit
+Log/Settings (Super Admin) were all added after the initial pass once nav placeholders and dead
+buttons were noticed/reported.

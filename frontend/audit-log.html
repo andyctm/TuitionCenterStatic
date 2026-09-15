@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Audit Log — TCMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-nav="desktop-first">
+    <div class="mockup-strip">
+      <span>GUI mockup: Audit Log, visual only, no live data</span>
+      <a href="index.html">All screens ↗</a>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item" href="admin-dashboard.html"
+            ><i data-icon="dashboard"></i
+            ><span class="label">Dashboard</span></a
+          >
+          <a class="nav-item" href="branches.html"
+            ><i data-icon="branches"></i><span class="label">Branches</span></a
+          >
+          <a class="nav-item" href="users.html"
+            ><i data-icon="users"></i><span class="label">Users</span></a
+          >
+          <a class="nav-item" href="courses.html"
+            ><i data-icon="courses"></i><span class="label">Courses</span></a
+          >
+          <a class="nav-item" href="batches.html"
+            ><i data-icon="batches"></i><span class="label">Batches</span></a
+          >
+          <a class="nav-item" href="reports.html"
+            ><i data-icon="reports"></i><span class="label">Reports</span></a
+          >
+          <a class="nav-item is-active" href="audit-log.html"
+            ><i data-icon="audit"></i><span class="label">Audit Log</span></a
+          >
+          <a class="nav-item" href="settings.html"
+            ><i data-icon="settings"></i><span class="label">Settings</span></a
+          >
+        </nav>
+        <div class="nav-footer">v1.0 · Design mockup</div>
+      </aside>
+      <header class="topbar">
+        <div class="breadcrumb">
+          <button
+            class="btn btn-ghost btn-icon menu-toggle"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <span>Super Admin</span><span class="sep">/</span
+          ><span class="current">Audit Log</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-icon" aria-label="Notifications">
+            <i data-icon="bell"></i>
+          </button>
+          <div class="user-chip">
+            <span class="avatar">AR</span>
+            <span class="meta"
+              ><span class="name">Aruna Rathnayake</span
+              ><span class="role">Super Admin</span></span
+            >
+            <i data-icon="chevronDown" class="icon-sm"></i>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1>Audit Log</h1>
+            <p class="subtitle">Attendance overrides and user status changes</p>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div
+            class="panel-header"
+            style="gap: var(--space-4); flex-wrap: wrap"
+          >
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap">
+              <select class="input" style="width: auto">
+                <option>Entity: All</option>
+                <option>User</option>
+                <option>Attendance</option>
+              </select>
+              <select class="input" style="width: auto">
+                <option>Branch: All</option>
+                <option>Colombo Main</option>
+                <option>Kandy</option>
+                <option>Galle</option>
+                <option>Negombo</option>
+              </select>
+              <input
+                class="input"
+                style="width: auto"
+                type="date"
+                value="2026-09-14"
+              />
+            </div>
+          </div>
+          <div class="panel-body no-pad table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Actor</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Branch</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Timestamp" class="cell-secondary">
+                    14 Sep 2026, 10:52 AM
+                  </td>
+                  <td data-label="Actor">
+                    <div class="row-people">
+                      <span class="avatar sm">NP</span>
+                      <span class="cell-primary">Nadeesha Perera</span>
+                    </div>
+                  </td>
+                  <td data-label="Action">
+                    <span class="badge badge-info">CREATE</span>
+                  </td>
+                  <td data-label="Entity" class="cell-secondary">
+                    Batch — Grade 6 Mathematics
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Details" class="cell-secondary">
+                    Created a new batch
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Timestamp" class="cell-secondary">
+                    14 Sep 2026, 10:19 AM
+                  </td>
+                  <td data-label="Actor">
+                    <div class="row-people">
+                      <span class="avatar sm">RS</span>
+                      <span class="cell-primary">Ruwan Silva</span>
+                    </div>
+                  </td>
+                  <td data-label="Action">
+                    <span class="badge badge-success">STATUS_CHANGE</span>
+                  </td>
+                  <td data-label="Entity" class="cell-secondary">
+                    User — Chamodi Perera (Parent)
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">Kandy</td>
+                  <td data-label="Details" class="cell-secondary">
+                    Approved a parent account
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Timestamp" class="cell-secondary">
+                    14 Sep 2026, 8:40 AM
+                  </td>
+                  <td data-label="Actor">
+                    <div class="row-people">
+                      <span class="avatar sm">AR</span>
+                      <span class="cell-primary">Aruna Rathnayake</span>
+                    </div>
+                  </td>
+                  <td data-label="Action">
+                    <span class="badge badge-danger">STATUS_CHANGE</span>
+                  </td>
+                  <td data-label="Entity" class="cell-secondary">
+                    User — J. Peiris (Teacher)
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Details" class="cell-secondary">
+                    Deactivated a staff account
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Timestamp" class="cell-secondary">
+                    13 Sep 2026, 4:05 PM
+                  </td>
+                  <td data-label="Actor">
+                    <div class="row-people">
+                      <span class="avatar sm">IF</span>
+                      <span class="cell-primary">Ishara Fernando</span>
+                    </div>
+                  </td>
+                  <td data-label="Action">
+                    <span class="badge badge-info">UPDATE</span>
+                  </td>
+                  <td data-label="Entity" class="cell-secondary">
+                    Batch — Grade 8 Science
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">Galle</td>
+                  <td data-label="Details" class="cell-secondary">
+                    Edited batch capacity
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Timestamp" class="cell-secondary">
+                    13 Sep 2026, 2:30 PM
+                  </td>
+                  <td data-label="Actor">
+                    <div class="row-people">
+                      <span class="avatar sm">DW</span>
+                      <span class="cell-primary">D. Wickramasinghe</span>
+                    </div>
+                  </td>
+                  <td data-label="Action">
+                    <span class="badge badge-warning">OVERRIDE</span>
+                  </td>
+                  <td data-label="Entity" class="cell-secondary">
+                    Attendance — Grade 6 Mathematics, 11 Sep
+                  </td>
+                  <td data-label="Branch" class="cell-secondary">
+                    Colombo Main
+                  </td>
+                  <td data-label="Details" class="cell-secondary">
+                    Edited attendance outside the 72-hour window (admin
+                    override)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

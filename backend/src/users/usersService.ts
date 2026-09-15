@@ -1,5 +1,6 @@
 import type { Role, UserStatus } from '@prisma/client';
 import { AppError } from '../errors/AppError';
+import { isSuperAdmin } from '../lib/branchScope';
 import type { AuditLogRepository, UserRepository } from '../repositories/types';
 import type { AuthContext } from '../types/authContext';
 import { hashPassword } from '../auth/password';
@@ -24,6 +25,11 @@ export function createUsersService(deps: UsersServiceDeps) {
   const { userRepo, auditLogRepo } = deps;
 
   return {
+    async list(ctx: AuthContext): Promise<PublicUser[]> {
+      const users = await userRepo.findAll(isSuperAdmin(ctx) ? undefined : { branchIds: ctx.branchIds });
+      return users.map(omitPasswordHash);
+    },
+
     async createStaffUser(input: CreateStaffUserInput): Promise<PublicUser> {
       const existing = await userRepo.findByEmail(input.email);
       if (existing) {

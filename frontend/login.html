@@ -139,7 +139,11 @@
             Sign in to continue to your dashboard.
           </p>
         </div>
-        <form onsubmit="return false;">
+        <form id="login-form">
+          <div class="banner banner-danger" id="login-error" hidden>
+            <i data-icon="alertTriangle" class="icon-sm"></i>
+            <span id="login-error-message"></span>
+          </div>
           <div class="field">
             <label for="email">Email</label>
             <input
@@ -173,6 +177,7 @@
           <button
             class="btn btn-primary"
             type="submit"
+            id="login-submit"
             style="justify-content: center; padding: var(--space-3)"
           >
             Sign in
@@ -188,6 +193,32 @@
       </div>
     </section>
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const errorBox = document.getElementById("login-error");
+          const submitBtn = document.getElementById("login-submit");
+          errorBox.hidden = true;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Signing in\u2026";
+          try {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const user = await tcmsLogin(email, password);
+            window.location.href = tcmsHomeForRole(user.role);
+          } catch (err) {
+            document.getElementById("login-error-message").textContent =
+              err.message || "Sign in failed — please try again.";
+            errorBox.hidden = false;
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign in";
+          }
+        });
+    </script>
   </body>
 </html>

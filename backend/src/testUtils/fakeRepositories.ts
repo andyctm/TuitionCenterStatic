@@ -49,6 +49,11 @@ export function createFakeUserRepository(seed: UserRecord[] = []): UserRepositor
     async findById(id) {
       return users.get(id) ?? null;
     },
+    async findAll(filter) {
+      const all = [...users.values()];
+      if (!filter?.branchIds) return all;
+      return all.filter((u) => u.branchId !== null && filter.branchIds!.includes(u.branchId));
+    },
     async create(input: NewUserInput) {
       const record: UserRecord = { id: randomUUID(), branchId: null, ...input };
       users.set(record.id, record);

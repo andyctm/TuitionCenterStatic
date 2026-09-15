@@ -31,6 +31,7 @@ export type NewUserInput = {
 export interface UserRepository {
   findByEmail(email: string): Promise<UserRecord | null>;
   findById(id: string): Promise<UserRecord | null>;
+  findAll(filter?: { branchIds?: string[] }): Promise<UserRecord[]>;
   create(input: NewUserInput): Promise<UserRecord>;
   updateStatus(id: string, status: UserStatus): Promise<UserRecord>;
   updatePasswordHash(id: string, passwordHash: string): Promise<void>;

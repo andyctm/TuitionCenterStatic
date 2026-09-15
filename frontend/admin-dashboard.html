@@ -27,25 +27,25 @@
             ><i data-icon="dashboard"></i
             ><span class="label">Dashboard</span></a
           >
-          <a class="nav-item" href="#"
+          <a class="nav-item" href="branches.html"
             ><i data-icon="branches"></i><span class="label">Branches</span></a
           >
-          <a class="nav-item" href="#"
+          <a class="nav-item" href="users.html"
             ><i data-icon="users"></i><span class="label">Users</span></a
           >
-          <a class="nav-item" href="#"
+          <a class="nav-item" href="courses.html"
             ><i data-icon="courses"></i><span class="label">Courses</span></a
           >
           <a class="nav-item" href="batches.html"
             ><i data-icon="batches"></i><span class="label">Batches</span></a
           >
-          <a class="nav-item" href="#"
+          <a class="nav-item" href="reports.html"
             ><i data-icon="reports"></i><span class="label">Reports</span></a
           >
-          <a class="nav-item" href="#"
+          <a class="nav-item" href="audit-log.html"
             ><i data-icon="audit"></i><span class="label">Audit Log</span></a
           >
-          <a class="nav-item" href="#"
+          <a class="nav-item" href="settings.html"
             ><i data-icon="settings"></i><span class="label">Settings</span></a
           >
         </nav>
@@ -68,28 +68,38 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">AR</span>
+            <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
-              ><span class="name">Aruna Rathnayake</span
-              ><span class="role">Super Admin</span></span
+              ><span class="name" id="user-name">Aruna Rathnayake</span
+              ><span class="role" id="user-role">Super Admin</span></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
       <main class="content">
         <div class="page-header">
           <div>
-            <h1>Good morning, Aruna</h1>
-            <p class="subtitle">
+            <h1 id="greeting">Good morning, Aruna</h1>
+            <p class="subtitle" id="today-subtitle">
               Here's what's happening across all branches today, 14 Sep 2026.
             </p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-secondary">
+            <button
+              class="btn btn-secondary"
+              data-open-modal="add-branch-dialog"
+            >
               <i data-icon="plus" class="icon-sm"></i> Add Branch
             </button>
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" data-open-modal="add-user-dialog">
               <i data-icon="plus" class="icon-sm"></i> Add User
             </button>
           </div>
@@ -98,22 +108,22 @@
         <div class="stat-strip">
           <div class="stat">
             <span class="label">Branches</span>
-            <span class="value">4</span>
+            <span class="value" id="stat-branches">4</span>
             <span class="delta up">All operating</span>
           </div>
           <div class="stat">
             <span class="label">Active staff & teachers</span>
-            <span class="value">86</span>
+            <span class="value" id="stat-staff">86</span>
             <span class="delta up">+3 this month</span>
           </div>
           <div class="stat">
             <span class="label">Active batches</span>
-            <span class="value">52</span>
+            <span class="value" id="stat-batches">52</span>
             <span class="delta up">+2 this term</span>
           </div>
           <div class="stat">
             <span class="label">Enrolled students</span>
-            <span class="value">612</span>
+            <span class="value" id="stat-students">612</span>
             <span class="delta up">+18 this month</span>
           </div>
         </div>
@@ -129,7 +139,7 @@
           <section class="panel">
             <div class="panel-header">
               <h2>Branches</h2>
-              <a class="btn btn-ghost btn-sm" href="#">View all</a>
+              <a class="btn btn-ghost btn-sm" href="branches.html">View all</a>
             </div>
             <div class="panel-body no-pad table-wrap">
               <table class="data">
@@ -142,66 +152,9 @@
                     <th>Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="branches-table-body">
                   <tr>
-                    <td data-label="Branch">
-                      <span class="cell-primary">Colombo Main</span>
-                    </td>
-                    <td data-label="Admin" class="cell-secondary">
-                      Nadeesha Perera
-                    </td>
-                    <td data-label="Students">248</td>
-                    <td data-label="Batches">21</td>
-                    <td data-label="Status">
-                      <span class="badge badge-success"
-                        ><i data-icon="checkCircle"></i>Active</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td data-label="Branch">
-                      <span class="cell-primary">Kandy</span>
-                    </td>
-                    <td data-label="Admin" class="cell-secondary">
-                      Ruwan Silva
-                    </td>
-                    <td data-label="Students">156</td>
-                    <td data-label="Batches">14</td>
-                    <td data-label="Status">
-                      <span class="badge badge-success"
-                        ><i data-icon="checkCircle"></i>Active</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td data-label="Branch">
-                      <span class="cell-primary">Galle</span>
-                    </td>
-                    <td data-label="Admin" class="cell-secondary">
-                      Ishara Fernando
-                    </td>
-                    <td data-label="Students">129</td>
-                    <td data-label="Batches">11</td>
-                    <td data-label="Status">
-                      <span class="badge badge-success"
-                        ><i data-icon="checkCircle"></i>Active</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td data-label="Branch">
-                      <span class="cell-primary">Negombo</span>
-                    </td>
-                    <td data-label="Admin" class="cell-secondary">
-                      Unassigned
-                    </td>
-                    <td data-label="Students">79</td>
-                    <td data-label="Batches">6</td>
-                    <td data-label="Status">
-                      <span class="badge badge-warning"
-                        ><i data-icon="alertTriangle"></i>Needs admin</span
-                      >
-                    </td>
+                    <td colspan="5" class="cell-secondary">Loading…</td>
                   </tr>
                 </tbody>
               </table>
@@ -211,62 +164,261 @@
           <section class="panel">
             <div class="panel-header">
               <h2>Recent audit activity</h2>
-              <a class="btn btn-ghost btn-sm" href="#">Open log</a>
+              <a class="btn btn-ghost btn-sm" href="audit-log.html">Open log</a>
             </div>
             <div
               class="panel-body"
+              id="audit-activity-body"
               style="display: flex; flex-direction: column; gap: var(--space-4)"
             >
-              <div class="row-people">
-                <span class="avatar sm">NP</span>
-                <div class="meta">
-                  <div>
-                    Nadeesha Perera
-                    <span class="cell-secondary">created a new batch</span>
-                  </div>
-                  <div class="sub">Colombo Main · 8 min ago</div>
-                </div>
-              </div>
-              <div class="row-people">
-                <span class="avatar sm">RS</span>
-                <div class="meta">
-                  <div>
-                    Ruwan Silva
-                    <span class="cell-secondary"
-                      >approved a parent account</span
-                    >
-                  </div>
-                  <div class="sub">Kandy · 41 min ago</div>
-                </div>
-              </div>
-              <div class="row-people">
-                <span class="avatar sm">AR</span>
-                <div class="meta">
-                  <div>
-                    Aruna Rathnayake
-                    <span class="cell-secondary"
-                      >deactivated a staff account</span
-                    >
-                  </div>
-                  <div class="sub">Colombo Main · 2 hr ago</div>
-                </div>
-              </div>
-              <div class="row-people">
-                <span class="avatar sm">IF</span>
-                <div class="meta">
-                  <div>
-                    Ishara Fernando
-                    <span class="cell-secondary">edited batch capacity</span>
-                  </div>
-                  <div class="sub">Galle · Yesterday</div>
-                </div>
-              </div>
+              <div class="cell-secondary">Loading…</div>
             </div>
           </section>
         </div>
       </main>
     </div>
+
+    <dialog id="add-branch-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Add branch</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="branch-name">Branch name</label>
+          <input class="input" id="branch-name" placeholder="e.g. Matara" />
+        </div>
+        <div class="field">
+          <label for="branch-address">Address</label>
+          <input class="input" id="branch-address" placeholder="Street, city" />
+        </div>
+        <div class="field">
+          <label for="branch-admin">Center admin</label>
+          <select class="input" id="branch-admin">
+            <option>Unassigned — invite later</option>
+            <option>Nadeesha Perera</option>
+            <option>Ruwan Silva</option>
+            <option>Ishara Fernando</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary">Create Branch</button>
+      </div>
+    </dialog>
+
+    <dialog id="add-user-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Add user</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="user-name">Full name</label>
+          <input class="input" id="user-name" placeholder="e.g. Priya Kumar" />
+        </div>
+        <div class="field">
+          <label for="user-email">Email</label>
+          <input
+            class="input"
+            id="user-email"
+            type="email"
+            placeholder="name@tcms.lk"
+          />
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+          "
+        >
+          <div class="field">
+            <label for="user-role">Role</label>
+            <select class="input" id="user-role">
+              <option>Center Admin</option>
+              <option>Accountant</option>
+              <option>Teacher</option>
+              <option>Student</option>
+              <option>Parent</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="user-branch">Branch</label>
+            <select class="input" id="user-branch">
+              <option>Colombo Main</option>
+              <option>Kandy</option>
+              <option>Galle</option>
+              <option>Negombo</option>
+            </select>
+          </div>
+        </div>
+        <div class="banner banner-info">
+          <i data-icon="info" class="icon-sm"></i>
+          <span
+            >An email invite with a temporary password will be sent once
+            created.</span
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary">Send Invite</button>
+      </div>
+    </dialog>
+
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      (async function () {
+        const user = tcmsRequireAuth();
+        if (!user) return;
+        if (user.role !== "SUPER_ADMIN") {
+          window.location.href = tcmsHomeForRole(user.role);
+          return;
+        }
+
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document.getElementById("greeting").textContent =
+          `Good morning, ${user.firstName}`;
+        document.getElementById("today-subtitle").textContent =
+          "Here's what's happening across all branches today, " +
+          new Date().toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }) +
+          ".";
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
+
+        try {
+          const [summary, branches, users, batches, enrollments, auditLogs] =
+            await Promise.all([
+              tcmsApiFetch("/dashboard/summary"),
+              tcmsApiFetch("/branches"),
+              tcmsApiFetch("/users"),
+              tcmsApiFetch("/batches"),
+              tcmsApiFetch("/enrollments?status=ACTIVE"),
+              tcmsApiFetch("/audit-logs"),
+            ]);
+
+          const staffRoles = new Set([
+            "SUPER_ADMIN",
+            "CENTER_ADMIN",
+            "ACCOUNTANT",
+            "TEACHER",
+          ]);
+          document.getElementById("stat-branches").textContent =
+            branches.length;
+          document.getElementById("stat-staff").textContent = users.filter(
+            (u) => staffRoles.has(u.role),
+          ).length;
+          document.getElementById("stat-batches").textContent =
+            summary.activeBatchesCount;
+          document.getElementById("stat-students").textContent =
+            summary.activeStudentsCount;
+
+          const batchesByBranch = new Map();
+          for (const batch of batches) {
+            if (!batchesByBranch.has(batch.branchId))
+              batchesByBranch.set(batch.branchId, []);
+            batchesByBranch.get(batch.branchId).push(batch);
+          }
+          const batchIdToBranchId = new Map(
+            batches.map((b) => [b.id, b.branchId]),
+          );
+          const studentsByBranch = new Map();
+          for (const enrollment of enrollments) {
+            const branchId = batchIdToBranchId.get(enrollment.batchId);
+            if (!branchId) continue;
+            if (!studentsByBranch.has(branchId))
+              studentsByBranch.set(branchId, new Set());
+            studentsByBranch.get(branchId).add(enrollment.studentProfileId);
+          }
+
+          const tbody = document.getElementById("branches-table-body");
+          tbody.innerHTML = branches
+            .map((branch) => {
+              const admin = users.find(
+                (u) => u.role === "CENTER_ADMIN" && u.branchId === branch.id,
+              );
+              const batchCount = (batchesByBranch.get(branch.id) || []).length;
+              const studentCount = (
+                studentsByBranch.get(branch.id) || new Set()
+              ).size;
+              const statusBadge = branch.isActive
+                ? '<span class="badge badge-success"><i data-icon="checkCircle"></i>Active</span>'
+                : '<span class="badge badge-warning"><i data-icon="alertTriangle"></i>Inactive</span>';
+              return `<tr>
+                <td data-label="Branch"><span class="cell-primary">${branch.name}</span></td>
+                <td data-label="Admin" class="cell-secondary">${admin ? admin.firstName + " " + admin.lastName : "Unassigned"}</td>
+                <td data-label="Students">${studentCount}</td>
+                <td data-label="Batches">${batchCount}</td>
+                <td data-label="Status">${statusBadge}</td>
+              </tr>`;
+            })
+            .join("");
+          renderIcons(tbody);
+
+          const usersById = new Map(users.map((u) => [u.id, u]));
+          const branchesById = new Map(branches.map((b) => [b.id, b]));
+          const auditBody = document.getElementById("audit-activity-body");
+          const recentLogs = [...auditLogs]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 4);
+          auditBody.innerHTML = recentLogs.length
+            ? recentLogs
+                .map((log) => {
+                  const actor = usersById.get(log.actorUserId);
+                  const actorName = actor
+                    ? `${actor.firstName} ${actor.lastName}`
+                    : "Unknown";
+                  const initials = actor
+                    ? actor.firstName[0] + actor.lastName[0]
+                    : "?";
+                  const branch = actor
+                    ? branchesById.get(actor.branchId)
+                    : null;
+                  const when = new Date(log.createdAt).toLocaleString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                  return `<div class="row-people">
+                    <span class="avatar sm">${initials}</span>
+                    <div class="meta">
+                      <div>${actorName} <span class="cell-secondary">${log.action.toLowerCase().replace("_", " ")} \u2014 ${log.entityType}</span></div>
+                      <div class="sub">${branch ? branch.name : "\u2014"} \u00b7 ${when}</div>
+                    </div>
+                  </div>`;
+                })
+                .join("")
+            : '<div class="cell-secondary">No recent activity.</div>';
+        } catch (err) {
+          console.error("Failed to load live dashboard data", err);
+        }
+      })();
+    </script>
   </body>
 </html>

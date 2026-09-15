@@ -60,7 +60,7 @@
           >
             <i data-icon="menu"></i>
           </button>
-          <span>Super Admin</span><span class="sep">/</span
+          <span id="breadcrumb-role">Super Admin</span><span class="sep">/</span
           ><span class="current">Reports</span>
         </div>
         <div class="topbar-actions">
@@ -71,7 +71,7 @@
             <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
               ><span class="name" id="user-name">Aruna Rathnayake</span
-              ><span class="role">Super Admin</span></span
+              ><span class="role" id="user-role-label">Super Admin</span></span
             >
             <button
               class="btn btn-ghost btn-icon"
@@ -181,6 +181,12 @@
           (user.firstName[0] || "") + (user.lastName[0] || "");
         document.getElementById("user-name").textContent =
           `${user.firstName} ${user.lastName}`;
+        document.getElementById("breadcrumb-role").textContent = tcmsRoleLabel(
+          user.role,
+        );
+        document.getElementById("user-role-label").textContent = tcmsRoleLabel(
+          user.role,
+        );
         document
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);

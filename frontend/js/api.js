@@ -105,6 +105,19 @@ function tcmsHomeForRole(role) {
   return TCMS_ROLE_HOME[role] || "login.html";
 }
 
+const TCMS_ROLE_LABELS = {
+  SUPER_ADMIN: "Super Admin",
+  CENTER_ADMIN: "Center Admin",
+  ACCOUNTANT: "Accountant",
+  TEACHER: "Teacher",
+  STUDENT: "Student",
+  PARENT: "Parent",
+};
+
+function tcmsRoleLabel(role) {
+  return TCMS_ROLE_LABELS[role] || role;
+}
+
 // Call at the top of every protected page's script. Redirects to login if not signed in.
 function tcmsRequireAuth() {
   const user = tcmsGetUser();

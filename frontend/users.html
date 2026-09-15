@@ -60,7 +60,7 @@
           >
             <i data-icon="menu"></i>
           </button>
-          <span>Super Admin</span><span class="sep">/</span
+          <span id="breadcrumb-role">Super Admin</span><span class="sep">/</span
           ><span class="current">Users</span>
         </div>
         <div class="topbar-actions">
@@ -68,12 +68,19 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">AR</span>
+            <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
-              ><span class="name">Aruna Rathnayake</span
-              ><span class="role">Super Admin</span></span
+              ><span class="name" id="user-name">Aruna Rathnayake</span
+              ><span class="role" id="user-role-label">Super Admin</span></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
@@ -368,6 +375,19 @@
           window.location.href = tcmsHomeForRole(user.role);
           return;
         }
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document.getElementById("breadcrumb-role").textContent = tcmsRoleLabel(
+          user.role,
+        );
+        document.getElementById("user-role-label").textContent = tcmsRoleLabel(
+          user.role,
+        );
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
 
         try {
           const [users, branches] = await Promise.all([

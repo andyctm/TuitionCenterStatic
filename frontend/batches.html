@@ -53,8 +53,8 @@
           >
             <i data-icon="menu"></i>
           </button>
-          <span>Center Admin</span><span class="sep">/</span
-          ><span class="current">Batches</span>
+          <span id="breadcrumb-role">Center Admin</span
+          ><span class="sep">/</span><span class="current">Batches</span>
         </div>
         <div class="topbar-actions">
           <button class="btn btn-ghost btn-icon" aria-label="Notifications">
@@ -474,6 +474,12 @@
           (user.firstName[0] || "") + (user.lastName[0] || "");
         document.getElementById("user-name").textContent =
           `${user.firstName} ${user.lastName}`;
+        document.getElementById("breadcrumb-role").textContent = tcmsRoleLabel(
+          user.role,
+        );
+        document.getElementById("user-role-label").textContent = tcmsRoleLabel(
+          user.role,
+        );
         document
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TCMS — GUI Mockups</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+      body {
+        background: var(--slate-900);
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: var(--space-12) var(--space-6);
+        color: var(--slate-100);
+      }
+      .wrap header {
+        margin-bottom: var(--space-8);
+      }
+      .wrap h1 {
+        font-size: var(--text-2xl);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #fff;
+      }
+      .wrap p {
+        color: var(--slate-400);
+        margin-top: var(--space-2);
+        max-width: 60ch;
+      }
+      .group {
+        margin-bottom: var(--space-8);
+      }
+      .group h2 {
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-accent);
+        font-weight: 700;
+        margin-bottom: var(--space-3);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: var(--space-4);
+      }
+      .card {
+        background: var(--slate-800);
+        border: 1px solid var(--slate-700);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        text-decoration: none;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        transition:
+          border-color 150ms var(--ease-out-expo),
+          transform 150ms var(--ease-out-expo);
+      }
+      .card:hover {
+        border-color: var(--color-accent);
+        transform: translateY(-2px);
+      }
+      .card .role {
+        font-size: var(--text-xs);
+        color: var(--slate-400);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .card .name {
+        font-size: var(--text-base);
+        font-weight: 700;
+      }
+      .card .desc {
+        font-size: var(--text-xs);
+        color: var(--slate-400);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand" style="color: #fff">
+          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
+        </div>
+        <h1 style="margin-top: var(--space-4)">GUI Design Mockups</h1>
+        <p>
+          Static HTML/CSS screens per docs/07-ui-ux-design.md — for stakeholder
+          review before any Next.js code is written. No backend, no persisted
+          data; interactive states (attendance segmented control, enrollment
+          modal, child switcher) are wired for demonstration only.
+        </p>
+      </header>
+
+      <div class="group">
+        <h2>Entry</h2>
+        <div class="grid">
+          <a class="card" href="index.html"
+            ><span class="role">All roles</span><span class="name">Sign in</span
+            ><span class="desc">Login screen</span></a
+          >
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Desktop-first roles</h2>
+        <div class="grid">
+          <a class="card" href="admin-dashboard.html"
+            ><span class="role">Super Admin</span
+            ><span class="name">Dashboard</span
+            ><span class="desc">Branches, users, audit activity</span></a
+          >
+          <a class="card" href="center-admin-dashboard.html"
+            ><span class="role">Center Admin</span
+            ><span class="name">Dashboard</span
+            ><span class="desc">Today's batches, attention panel</span></a
+          >
+          <a class="card" href="accountant-dashboard.html"
+            ><span class="role">Accountant</span
+            ><span class="name">Dashboard</span
+            ><span class="desc">Front-desk queue</span></a
+          >
+          <a class="card" href="enrollment.html"
+            ><span class="role">Accountant / Center Admin</span
+            ><span class="name">Enrollment</span
+            ><span class="desc">Roster + enroll modal, capacity error</span></a
+          >
+          <a class="card" href="batches.html"
+            ><span class="role">Super Admin / Center Admin</span
+            ><span class="name">Batches</span
+            ><span class="desc"
+              >Manage batches, new-batch conflict warning</span
+            ></a
+          >
+          <a class="card" href="branches.html"
+            ><span class="role">Super Admin</span
+            ><span class="name">Branches</span
+            ><span class="desc">Branch list, add/edit branch</span></a
+          >
+          <a class="card" href="users.html"
+            ><span class="role">Super Admin</span><span class="name">Users</span
+            ><span class="desc">User directory, add/edit/suspend</span></a
+          >
+          <a class="card" href="courses.html"
+            ><span class="role">Super Admin</span
+            ><span class="name">Courses</span
+            ><span class="desc">Subjects & grade levels</span></a
+          >
+          <a class="card" href="reports.html"
+            ><span class="role">Super Admin / Center Admin / Accountant</span
+            ><span class="name">Reports</span
+            ><span class="desc">Enrollment & attendance CSV export</span></a
+          >
+          <a class="card" href="audit-log.html"
+            ><span class="role">Super Admin</span
+            ><span class="name">Audit Log</span
+            ><span class="desc"
+              >Attendance overrides, user status changes</span
+            ></a
+          >
+          <a class="card" href="settings.html"
+            ><span class="role">Super Admin</span
+            ><span class="name">Settings</span
+            ><span class="desc">Organization, academic, security</span></a
+          >
+          <a class="card" href="teacher-dashboard.html"
+            ><span class="role">Teacher</span><span class="name">Today</span
+            ><span class="desc">Session cards, pending attendance</span></a
+          >
+          <a class="card" href="my-batches.html"
+            ><span class="role">Teacher</span
+            ><span class="name">My Batches</span
+            ><span class="desc">Assigned batches, attendance status</span></a
+          >
+          <a class="card" href="attendance.html"
+            ><span class="role">Teacher</span
+            ><span class="name">Mark Attendance</span
+            ><span class="desc">Segmented control, sticky save bar</span></a
+          >
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Mobile-first roles</h2>
+        <div class="grid">
+          <a class="card" href="student-home.html"
+            ><span class="role">Student</span><span class="name">Home</span
+            ><span class="desc">Next class, weekly schedule</span></a
+          >
+          <a class="card" href="schedule-student.html"
+            ><span class="role">Student</span><span class="name">Schedule</span
+            ><span class="desc">Full weekly agenda</span></a
+          >
+          <a class="card" href="parent-home.html"
+            ><span class="role">Parent</span><span class="name">Home</span
+            ><span class="desc">Child switcher, attendance summary</span></a
+          >
+          <a class="card" href="schedule-parent.html"
+            ><span class="role">Parent</span><span class="name">Schedule</span
+            ><span class="desc">Per-child weekly agenda</span></a
+          >
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

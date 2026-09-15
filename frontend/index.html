@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>TCMS — GUI Mockups</title>
+    <title>Sign in — TCMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,204 +12,216 @@
     />
     <link rel="stylesheet" href="css/styles.css" />
     <style>
-      body {
-        background: var(--slate-900);
-      }
-      .wrap {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: var(--space-12) var(--space-6);
-        color: var(--slate-100);
-      }
-      .wrap header {
-        margin-bottom: var(--space-8);
-      }
-      .wrap h1 {
-        font-size: var(--text-2xl);
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        color: #fff;
-      }
-      .wrap p {
-        color: var(--slate-400);
-        margin-top: var(--space-2);
-        max-width: 60ch;
-      }
-      .group {
-        margin-bottom: var(--space-8);
-      }
-      .group h2 {
-        font-size: var(--text-xs);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--color-accent);
-        font-weight: 700;
-        margin-bottom: var(--space-3);
-      }
-      .grid {
+      body.login-body {
+        min-height: 100vh;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: var(--space-4);
+        grid-template-columns: 1fr 1fr;
+        background: var(--surface-0);
       }
-      .card {
-        background: var(--slate-800);
-        border: 1px solid var(--slate-700);
-        border-radius: var(--radius-lg);
-        padding: var(--space-4);
-        text-decoration: none;
+      .login-visual {
+        background:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(232, 163, 61, 0.35),
+            transparent 45%
+          ),
+          linear-gradient(160deg, var(--color-primary) 0%, #12315e 100%);
         color: #fff;
+        padding: var(--space-12);
         display: flex;
         flex-direction: column;
-        gap: var(--space-2);
-        transition:
-          border-color 150ms var(--ease-out-expo),
-          transform 150ms var(--ease-out-expo);
+        justify-content: space-between;
       }
-      .card:hover {
-        border-color: var(--color-accent);
-        transform: translateY(-2px);
-      }
-      .card .role {
-        font-size: var(--text-xs);
-        color: var(--slate-400);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-      .card .name {
-        font-size: var(--text-base);
+      .login-visual .quote {
+        font-size: var(--text-xl);
         font-weight: 700;
+        letter-spacing: -0.015em;
+        max-width: 34ch;
+        line-height: 1.3;
       }
-      .card .desc {
-        font-size: var(--text-xs);
-        color: var(--slate-400);
+      .login-visual .quote-by {
+        margin-top: var(--space-4);
+        font-size: var(--text-sm);
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .login-form-side {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6);
+      }
+      .login-card {
+        width: 100%;
+        max-width: 380px;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+      }
+      .login-card form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+      .login-card .row-between {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: var(--text-sm);
+      }
+      .login-card .remember {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-secondary);
+      }
+      .login-card .forgot {
+        color: var(--color-primary);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .login-card .forgot:hover {
+        text-decoration: underline;
+      }
+      @media (max-width: 900px) {
+        body.login-body {
+          grid-template-columns: 1fr;
+        }
+        .login-visual {
+          display: none;
+        }
       }
     </style>
   </head>
-  <body>
-    <div class="wrap">
-      <header>
-        <div class="brand" style="color: #fff">
-          <span class="brand-mark">T</span><span class="brand-name">TCMS</span>
-        </div>
-        <h1 style="margin-top: var(--space-4)">GUI Design Mockups</h1>
-        <p>
-          Static HTML/CSS screens per docs/07-ui-ux-design.md — for stakeholder
-          review before any Next.js code is written. No backend, no persisted
-          data; interactive states (attendance segmented control, enrollment
-          modal, child switcher) are wired for demonstration only.
+  <body class="login-body">
+    <section class="login-visual">
+      <div class="brand" style="color: #fff">
+        <span
+          class="brand-mark"
+          style="background: #fff; color: var(--color-primary)"
+          >T</span
+        >
+        <span class="brand-name">TCMS</span>
+      </div>
+      <div>
+        <p class="quote">
+          "Attendance for all six batches, marked before the bell rings for
+          period two."
         </p>
-      </header>
-
-      <div class="group">
-        <h2>Entry</h2>
-        <div class="grid">
-          <a class="card" href="login.html"
-            ><span class="role">All roles</span><span class="name">Sign in</span
-            ><span class="desc">Login screen</span></a
+        <p class="quote-by">— what a calm Monday morning looks like here</p>
+      </div>
+      <div style="font-size: var(--text-xs); color: rgba(255, 255, 255, 0.6)">
+        Tuition Center Management System
+      </div>
+    </section>
+    <section class="login-form-side">
+      <div class="login-card">
+        <div>
+          <div class="brand" style="margin-bottom: var(--space-2)">
+            <span class="brand-mark">T</span>
+          </div>
+          <h1
+            style="
+              font-size: var(--text-xl);
+              font-weight: 700;
+              letter-spacing: -0.015em;
+            "
+          >
+            Welcome back
+          </h1>
+          <p
+            class="subtitle"
+            style="color: var(--text-secondary); margin-top: 4px"
+          >
+            Sign in to continue to your dashboard.
+          </p>
+        </div>
+        <form id="login-form">
+          <div class="banner banner-danger" id="login-error" hidden>
+            <i data-icon="alertTriangle" class="icon-sm"></i>
+            <span id="login-error-message"></span>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              class="input"
+              id="email"
+              type="email"
+              placeholder="you@tuitioncenter.com"
+              autocomplete="username"
+            />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              class="input"
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+          </div>
+          <div class="row-between">
+            <label class="remember"
+              ><input
+                type="checkbox"
+                style="accent-color: var(--color-primary)"
+              />
+              Remember me</label
+            >
+            <a class="forgot" href="#">Forgot password?</a>
+          </div>
+          <button
+            class="btn btn-primary"
+            type="submit"
+            id="login-submit"
+            style="justify-content: center; padding: var(--space-3)"
+          >
+            Sign in
+          </button>
+        </form>
+        <div class="banner banner-info">
+          <i data-icon="info" class="icon-sm"></i>
+          <span
+            >New student or parent? <a href="#">Create an account</a> —
+            activation requires Admin approval.</span
           >
         </div>
       </div>
+    </section>
+    <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      if (sessionStorage.getItem("tcms_session_expired")) {
+        sessionStorage.removeItem("tcms_session_expired");
+        document.getElementById("login-error-message").textContent =
+          "Your session expired — please sign in again.";
+        document.getElementById("login-error").hidden = false;
+      }
 
-      <div class="group">
-        <h2>Desktop-first roles</h2>
-        <div class="grid">
-          <a class="card" href="admin-dashboard.html"
-            ><span class="role">Super Admin</span
-            ><span class="name">Dashboard</span
-            ><span class="desc">Branches, users, audit activity</span></a
-          >
-          <a class="card" href="center-admin-dashboard.html"
-            ><span class="role">Center Admin</span
-            ><span class="name">Dashboard</span
-            ><span class="desc">Today's batches, attention panel</span></a
-          >
-          <a class="card" href="accountant-dashboard.html"
-            ><span class="role">Accountant</span
-            ><span class="name">Dashboard</span
-            ><span class="desc">Front-desk queue</span></a
-          >
-          <a class="card" href="enrollment.html"
-            ><span class="role">Accountant / Center Admin</span
-            ><span class="name">Enrollment</span
-            ><span class="desc">Roster + enroll modal, capacity error</span></a
-          >
-          <a class="card" href="batches.html"
-            ><span class="role">Super Admin / Center Admin</span
-            ><span class="name">Batches</span
-            ><span class="desc"
-              >Manage batches, new-batch conflict warning</span
-            ></a
-          >
-          <a class="card" href="branches.html"
-            ><span class="role">Super Admin</span
-            ><span class="name">Branches</span
-            ><span class="desc">Branch list, add/edit branch</span></a
-          >
-          <a class="card" href="users.html"
-            ><span class="role">Super Admin</span><span class="name">Users</span
-            ><span class="desc">User directory, add/edit/suspend</span></a
-          >
-          <a class="card" href="courses.html"
-            ><span class="role">Super Admin</span
-            ><span class="name">Courses</span
-            ><span class="desc">Subjects & grade levels</span></a
-          >
-          <a class="card" href="reports.html"
-            ><span class="role">Super Admin / Center Admin / Accountant</span
-            ><span class="name">Reports</span
-            ><span class="desc">Enrollment & attendance CSV export</span></a
-          >
-          <a class="card" href="audit-log.html"
-            ><span class="role">Super Admin</span
-            ><span class="name">Audit Log</span
-            ><span class="desc"
-              >Attendance overrides, user status changes</span
-            ></a
-          >
-          <a class="card" href="settings.html"
-            ><span class="role">Super Admin</span
-            ><span class="name">Settings</span
-            ><span class="desc">Organization, academic, security</span></a
-          >
-          <a class="card" href="teacher-dashboard.html"
-            ><span class="role">Teacher</span><span class="name">Today</span
-            ><span class="desc">Session cards, pending attendance</span></a
-          >
-          <a class="card" href="my-batches.html"
-            ><span class="role">Teacher</span
-            ><span class="name">My Batches</span
-            ><span class="desc">Assigned batches, attendance status</span></a
-          >
-          <a class="card" href="attendance.html"
-            ><span class="role">Teacher</span
-            ><span class="name">Mark Attendance</span
-            ><span class="desc">Segmented control, sticky save bar</span></a
-          >
-        </div>
-      </div>
-
-      <div class="group">
-        <h2>Mobile-first roles</h2>
-        <div class="grid">
-          <a class="card" href="student-home.html"
-            ><span class="role">Student</span><span class="name">Home</span
-            ><span class="desc">Next class, weekly schedule</span></a
-          >
-          <a class="card" href="schedule-student.html"
-            ><span class="role">Student</span><span class="name">Schedule</span
-            ><span class="desc">Full weekly agenda</span></a
-          >
-          <a class="card" href="parent-home.html"
-            ><span class="role">Parent</span><span class="name">Home</span
-            ><span class="desc">Child switcher, attendance summary</span></a
-          >
-          <a class="card" href="schedule-parent.html"
-            ><span class="role">Parent</span><span class="name">Schedule</span
-            ><span class="desc">Per-child weekly agenda</span></a
-          >
-        </div>
-      </div>
-    </div>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const errorBox = document.getElementById("login-error");
+          const submitBtn = document.getElementById("login-submit");
+          errorBox.hidden = true;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Signing in\u2026";
+          try {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const user = await tcmsLogin(email, password);
+            window.location.href = tcmsHomeForRole(user.role);
+          } catch (err) {
+            document.getElementById("login-error-message").textContent =
+              err.message || "Sign in failed — please try again.";
+            errorBox.hidden = false;
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign in";
+          }
+        });
+    </script>
   </body>
 </html>

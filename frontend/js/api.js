@@ -60,7 +60,7 @@ async function tcmsApiFetch(path, options = {}) {
   if (res.status === 401 && !path.startsWith("/auth/login")) {
     tcmsClearSession();
     sessionStorage.setItem("tcms_session_expired", "1");
-    window.location.href = "login.html";
+    window.location.href = "index.html";
     return new Promise(() => {}); // navigation is in flight; never resolve to this caller
   }
 
@@ -108,11 +108,11 @@ async function tcmsDownloadFile(path, filename) {
 
 function tcmsLogout() {
   tcmsClearSession();
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 function tcmsHomeForRole(role) {
-  return TCMS_ROLE_HOME[role] || "login.html";
+  return TCMS_ROLE_HOME[role] || "index.html";
 }
 
 const TCMS_ROLE_LABELS = {
@@ -132,7 +132,7 @@ function tcmsRoleLabel(role) {
 function tcmsRequireAuth() {
   const user = tcmsGetUser();
   if (!user || !tcmsGetToken()) {
-    window.location.href = "login.html";
+    window.location.href = "index.html";
     return null;
   }
   return user;

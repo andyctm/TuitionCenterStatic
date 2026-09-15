@@ -150,6 +150,26 @@ const app = createApp({
   internalJobSecret: env.internalJobSecret,
 });
 
+// No external cron was ever configured to hit POST /api/internal/jobs/materialize-sessions,
+// so ClassSession rows never got created past the initial manual seed. Self-heal in-process
+// instead of depending on an external scheduler: run on boot, then on a fixed interval.
+const SESSION_MATERIALIZATION_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
+function runSessionMaterialization(): void {
+  sessionMaterializationService
+    .run()
+    .then((result) => {
+      if (result.created > 0) {
+        console.log(`[session-materialization] created ${result.created} session(s)`);
+      }
+    })
+    .catch((err) => {
+      console.error('[session-materialization] failed', err);
+    });
+}
+
 app.listen(env.port, () => {
   console.log(`TCMS API listening on port ${env.port}`);
+  runSessionMaterialization();
+  setInterval(runSessionMaterialization, SESSION_MATERIALIZATION_INTERVAL_MS);
 });

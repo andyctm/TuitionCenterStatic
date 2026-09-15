@@ -290,7 +290,7 @@ textarea:focus-visible,
   align-items: center;
   gap: var(--space-3);
 }
-.menu-toggle {
+.btn.menu-toggle {
   display: none;
 }
 
@@ -1205,7 +1205,7 @@ dialog.modal::backdrop {
   body[data-nav="desktop-first"] .nav-item {
     justify-content: flex-start;
   }
-  .menu-toggle {
+  .btn.menu-toggle {
     display: inline-flex;
   }
 

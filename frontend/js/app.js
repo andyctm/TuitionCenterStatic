@@ -61,6 +61,71 @@ function initSegmented() {
   updateSaveBar();
 }
 
+function applyTableFilters(panel) {
+  const tbody = panel.querySelector("table tbody");
+  if (!tbody) return;
+  const searchInput = panel.querySelector("[data-filter-search]");
+  const term = searchInput ? searchInput.value.trim().toLowerCase() : "";
+  const selectFilters = [];
+  panel.querySelectorAll("select[data-filter-select]").forEach((sel) => {
+    const option = sel.options[sel.selectedIndex];
+    const raw = option ? option.textContent : "";
+    // Options may be prefixed like "Status: Active" — the value is the part after the colon.
+    const value = (raw.includes(":") ? raw.slice(raw.indexOf(":") + 1) : raw).trim();
+    if (value && value.toLowerCase() !== "all") {
+      selectFilters.push({ column: sel.getAttribute("data-filter-select"), term: value.toLowerCase() });
+    }
+  });
+  let visibleCount = 0;
+  tbody.querySelectorAll("tr").forEach((row) => {
+    if (row.hasAttribute("data-filter-empty")) return;
+    const rowText = row.textContent.toLowerCase();
+    let show = !term || rowText.includes(term);
+    for (const filter of selectFilters) {
+      if (!show) break;
+      const cell = row.querySelector(`[data-label="${filter.column}"]`);
+      const rowAttr = row.getAttribute("data-filter-" + filter.column.toLowerCase().replace(/\s+/g, "-"));
+      const haystack = cell
+        ? `${cell.getAttribute("data-filter-value") || ""} ${cell.textContent}`
+        : rowAttr || rowText;
+      show = haystack.toLowerCase().includes(filter.term);
+    }
+    row.hidden = !show;
+    if (show) visibleCount += 1;
+  });
+  let emptyRow = tbody.querySelector("[data-filter-empty]");
+  if (!visibleCount) {
+    if (!emptyRow) {
+      emptyRow = document.createElement("tr");
+      emptyRow.setAttribute("data-filter-empty", "");
+      const td = document.createElement("td");
+      td.className = "cell-secondary";
+      td.colSpan = panel.querySelectorAll("thead th").length || 1;
+      td.textContent = "No rows match the current search or filters.";
+      emptyRow.appendChild(td);
+      tbody.appendChild(emptyRow);
+    }
+    emptyRow.hidden = false;
+  } else if (emptyRow) {
+    emptyRow.hidden = true;
+  }
+}
+
+/* Re-applies filters on every [data-filter-panel] — call after re-rendering table rows. */
+function tcmsApplyTableFilters() {
+  document.querySelectorAll("[data-filter-panel]").forEach(applyTableFilters);
+}
+
+function initTableFilters() {
+  document.querySelectorAll("[data-filter-panel]").forEach((panel) => {
+    const search = panel.querySelector("[data-filter-search]");
+    if (search) search.addEventListener("input", () => applyTableFilters(panel));
+    panel.querySelectorAll("select[data-filter-select]").forEach((sel) => {
+      sel.addEventListener("change", () => applyTableFilters(panel));
+    });
+  });
+}
+
 function initModals() {
   document.querySelectorAll("[data-open-modal]").forEach((opener) => {
     opener.addEventListener("click", () => {
@@ -102,4 +167,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initSegmented();
   initModals();
   initSeatPicker();
+  initTableFilters();
 });

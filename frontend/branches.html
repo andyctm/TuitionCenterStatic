@@ -14,7 +14,7 @@
   </head>
   <body data-nav="desktop-first">
     <div class="mockup-strip">
-      <span>GUI mockup: Branches, visual only, no live data</span>
+      <span>Live: Branches — connected to the real API</span>
       <a href="index.html">All screens ↗</a>
     </div>
     <div class="app-shell">
@@ -123,17 +123,25 @@
           </div>
         </div>
 
-        <section class="panel">
+        <section class="panel" data-filter-panel>
           <div
             class="panel-header"
             style="gap: var(--space-4); flex-wrap: wrap"
           >
             <div class="input-icon-wrap" style="max-width: 260px">
               <i data-icon="search" class="icon-sm"></i>
-              <input class="input" placeholder="Search branches…" />
+              <input
+                class="input"
+                placeholder="Search branches…"
+                data-filter-search
+              />
             </div>
             <div style="display: flex; gap: var(--space-2); margin-left: auto">
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Status"
+              >
                 <option>Status: All</option>
                 <option>Status: Active</option>
                 <option>Status: Needs admin</option>
@@ -303,6 +311,7 @@
           })
           .join("");
         renderIcons(tbody);
+        tcmsApplyTableFilters();
         document.getElementById("stat-needs-admin").textContent =
           needsAdminCount;
 

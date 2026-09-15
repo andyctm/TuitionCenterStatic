@@ -14,7 +14,7 @@
   </head>
   <body data-nav="desktop-first">
     <div class="mockup-strip">
-      <span>GUI mockup: Batches, visual only, no live data</span>
+      <span>Live: Batches — connected to the real API</span>
       <a href="index.html">All screens ↗</a>
     </div>
     <div class="app-shell">
@@ -118,26 +118,39 @@
           </div>
         </div>
 
-        <section class="panel">
+        <section class="panel" data-filter-panel>
           <div
             class="panel-header"
             style="gap: var(--space-4); flex-wrap: wrap"
           >
             <div class="input-icon-wrap" style="max-width: 260px">
               <i data-icon="search" class="icon-sm"></i>
-              <input class="input" placeholder="Search batches…" />
+              <input
+                class="input"
+                placeholder="Search batches…"
+                data-filter-search
+              />
             </div>
             <div style="display: flex; gap: var(--space-2); margin-left: auto">
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Branch"
+              >
+                <option>Branch: All</option>
                 <option>Branch: Colombo Main</option>
                 <option>Branch: Kandy</option>
                 <option>Branch: Galle</option>
                 <option>Branch: Negombo</option>
-                <option>Branch: All</option>
               </select>
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Status"
+              >
                 <option>Status: Active</option>
                 <option>Status: Archived</option>
+                <option>Status: All</option>
               </select>
             </div>
           </div>
@@ -424,18 +437,20 @@
                 : isFull
                   ? '<span class="badge badge-warning"><i data-icon="alertTriangle"></i>Full</span>'
                   : '<span class="badge badge-success"><i data-icon="checkCircle"></i>Active</span>';
-            return `<tr>
+            const branch = branchesById.get(batch.branchId);
+            return `<tr data-filter-branch="${branch ? branch.name : ""}">
               <td data-label="Batch"><span class="cell-primary">${course ? course.name : "\u2014"}</span></td>
               <td data-label="Teacher" class="cell-secondary">${teacher ? teacher.firstName + " " + teacher.lastName : "Unassigned"}</td>
               <td data-label="Schedule" class="cell-secondary">${formatSchedule(schedulesByBatch[i])}</td>
               <td data-label="Room">${batch.room}</td>
               <td data-label="Seats">${seatsCell}</td>
-              <td data-label="Status">${statusBadge}</td>
+              <td data-label="Status" data-filter-value="${batch.status === "ARCHIVED" ? "Archived" : "Active"}">${statusBadge}</td>
               <td><button class="btn btn-ghost btn-sm" data-edit-batch="${batch.id}"><i data-icon="edit" class="icon-sm"></i></button></td>
             </tr>`;
           })
           .join("");
         renderIcons(tbody);
+        tcmsApplyTableFilters();
 
         tbody.querySelectorAll("[data-edit-batch]").forEach((btn) => {
           btn.addEventListener("click", () => {

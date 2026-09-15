@@ -1,7 +1,7 @@
 import type { Role, UserStatus } from '@prisma/client';
 import { AppError } from '../errors/AppError';
 import { isSuperAdmin } from '../lib/branchScope';
-import type { AuditLogRepository, UserRepository } from '../repositories/types';
+import type { AuditLogRepository, StudentProfileRepository, UserRepository } from '../repositories/types';
 import type { AuthContext } from '../types/authContext';
 import { hashPassword } from '../auth/password';
 import { omitPasswordHash } from '../lib/publicUser';
@@ -16,13 +16,22 @@ export type CreateStaffUserInput = {
   branchId: string;
 };
 
+export type CreateStudentUserInput = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  branchId?: string;
+};
+
 export type UsersServiceDeps = {
   userRepo: UserRepository;
   auditLogRepo: AuditLogRepository;
+  studentProfileRepo: StudentProfileRepository;
 };
 
 export function createUsersService(deps: UsersServiceDeps) {
-  const { userRepo, auditLogRepo } = deps;
+  const { userRepo, auditLogRepo, studentProfileRepo } = deps;
 
   return {
     async list(ctx: AuthContext): Promise<PublicUser[]> {
@@ -45,6 +54,27 @@ export function createUsersService(deps: UsersServiceDeps) {
         status: 'ACTIVE',
         branchId: input.branchId,
       });
+
+      return omitPasswordHash(user);
+    },
+
+    // admin-created student accounts skip self-registration's PENDING approval step, same as staff.
+    async createStudentUser(input: CreateStudentUserInput): Promise<PublicUser> {
+      const existing = await userRepo.findByEmail(input.email);
+      if (existing) {
+        throw new AppError('CONFLICT', 409, 'An account with this email already exists');
+      }
+
+      const user = await userRepo.create({
+        email: input.email,
+        passwordHash: await hashPassword(input.password),
+        firstName: input.firstName,
+        lastName: input.lastName,
+        role: 'STUDENT',
+        status: 'ACTIVE',
+        branchId: input.branchId ?? null,
+      });
+      await studentProfileRepo.create({ userId: user.id });
 
       return omitPasswordHash(user);
     },

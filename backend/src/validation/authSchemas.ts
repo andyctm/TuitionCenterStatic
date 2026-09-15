@@ -37,6 +37,14 @@ export const createStaffUserSchema = z.object({
   branchId: z.string().min(1),
 });
 
+export const createStudentUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  branchId: z.string().min(1).optional(),
+});
+
 export const updateUserStatusSchema = z.object({
   status: z.enum(['PENDING', 'ACTIVE', 'SUSPENDED', 'DEACTIVATED']),
 });

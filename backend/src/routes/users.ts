@@ -6,7 +6,7 @@ import { requireAuth } from '../middleware/requireAuth';
 import { requireRole } from '../middleware/requireRole';
 import { asyncHandler } from '../lib/asyncHandler';
 import { parseBody } from '../lib/validate';
-import { createStaffUserSchema, updateUserStatusSchema } from '../validation/authSchemas';
+import { createStaffUserSchema, createStudentUserSchema, updateUserStatusSchema } from '../validation/authSchemas';
 
 export function createUsersRouter(usersService: UsersService, accessTokenSecret: string): Router {
   const router = Router();
@@ -27,6 +27,16 @@ export function createUsersRouter(usersService: UsersService, accessTokenSecret:
     asyncHandler(async (req, res) => {
       const input = parseBody(createStaffUserSchema, req.body);
       const user = await usersService.createStaffUser(input);
+      res.status(201).json({ data: user });
+    }),
+  );
+
+  router.post(
+    '/students',
+    ...adminOnly,
+    asyncHandler(async (req, res) => {
+      const input = parseBody(createStudentUserSchema, req.body);
+      const user = await usersService.createStudentUser(input);
       res.status(201).json({ data: user });
     }),
   );

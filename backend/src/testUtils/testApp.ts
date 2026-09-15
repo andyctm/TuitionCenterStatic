@@ -97,7 +97,7 @@ export function createTestApp(
       sentEmails.push({ email, token });
     },
   });
-  const usersService = createUsersService({ userRepo, auditLogRepo });
+  const usersService = createUsersService({ userRepo, auditLogRepo, studentProfileRepo });
   const branchesService = createBranchesService({ branchRepo });
   const subjectsService = createSubjectsService({ subjectRepo });
   const gradeLevelsService = createGradeLevelsService({ gradeLevelRepo });

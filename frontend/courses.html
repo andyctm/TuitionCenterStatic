@@ -14,7 +14,7 @@
   </head>
   <body data-nav="desktop-first">
     <div class="mockup-strip">
-      <span>GUI mockup: Courses, visual only, no live data</span>
+      <span>Live: Courses — connected to the real API</span>
       <a href="index.html">All screens ↗</a>
     </div>
     <div class="app-shell">
@@ -99,23 +99,35 @@
           </div>
         </div>
 
-        <section class="panel">
+        <section class="panel" data-filter-panel>
           <div
             class="panel-header"
             style="gap: var(--space-4); flex-wrap: wrap"
           >
             <div class="input-icon-wrap" style="max-width: 260px">
               <i data-icon="search" class="icon-sm"></i>
-              <input class="input" placeholder="Search courses…" />
+              <input
+                class="input"
+                placeholder="Search courses…"
+                data-filter-search
+              />
             </div>
             <div style="display: flex; gap: var(--space-2); margin-left: auto">
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Subject"
+              >
                 <option>Subject: All</option>
                 <option>Mathematics</option>
                 <option>English</option>
                 <option>Science</option>
               </select>
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Grade level"
+              >
                 <option>Grade: All</option>
                 <option>Grade 6</option>
                 <option>Grade 8</option>
@@ -301,6 +313,7 @@
           })
           .join("");
         renderIcons(tbody);
+        tcmsApplyTableFilters();
 
         tbody.querySelectorAll("[data-edit-course]").forEach((btn) => {
           btn.addEventListener("click", () => {

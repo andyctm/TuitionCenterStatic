@@ -14,7 +14,7 @@
   </head>
   <body data-nav="desktop-first">
     <div class="mockup-strip">
-      <span>GUI mockup: Users, visual only, no live data</span>
+      <span>Live: Users — connected to the real API</span>
       <a href="index.html">All screens ↗</a>
     </div>
     <div class="app-shell">
@@ -91,23 +91,37 @@
             <p class="subtitle">86 active staff & teachers across 4 branches</p>
           </div>
           <div class="header-actions">
+            <button
+              class="btn btn-secondary"
+              data-open-modal="add-student-dialog"
+            >
+              <i data-icon="plus" class="icon-sm"></i> Add Student
+            </button>
             <button class="btn btn-primary" data-open-modal="add-user-dialog">
               <i data-icon="plus" class="icon-sm"></i> Add User
             </button>
           </div>
         </div>
 
-        <section class="panel">
+        <section class="panel" data-filter-panel>
           <div
             class="panel-header"
             style="gap: var(--space-4); flex-wrap: wrap"
           >
             <div class="input-icon-wrap" style="max-width: 260px">
               <i data-icon="search" class="icon-sm"></i>
-              <input class="input" placeholder="Search users…" />
+              <input
+                class="input"
+                placeholder="Search users…"
+                data-filter-search
+              />
             </div>
             <div style="display: flex; gap: var(--space-2); margin-left: auto">
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Role"
+              >
                 <option>Role: All</option>
                 <option>Super Admin</option>
                 <option>Center Admin</option>
@@ -116,14 +130,22 @@
                 <option>Student</option>
                 <option>Parent</option>
               </select>
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Branch"
+              >
                 <option>Branch: All</option>
                 <option>Colombo Main</option>
                 <option>Kandy</option>
                 <option>Galle</option>
                 <option>Negombo</option>
               </select>
-              <select class="input" style="width: auto">
+              <select
+                class="input"
+                style="width: auto"
+                data-filter-select="Status"
+              >
                 <option>Status: All</option>
                 <option>Active</option>
                 <option>Suspended</option>
@@ -152,6 +174,79 @@
         </section>
       </main>
     </div>
+
+    <dialog id="add-student-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Add student</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="banner banner-danger" id="add-student-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="add-student-error-message"></span>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+          "
+        >
+          <div class="field">
+            <label for="student-first-name">First name</label>
+            <input
+              class="input"
+              id="student-first-name"
+              placeholder="e.g. Nimasha"
+            />
+          </div>
+          <div class="field">
+            <label for="student-last-name">Last name</label>
+            <input
+              class="input"
+              id="student-last-name"
+              placeholder="e.g. Ranasinghe"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label for="student-email">Email</label>
+          <input
+            class="input"
+            id="student-email"
+            type="email"
+            placeholder="name@tcms.lk"
+          />
+        </div>
+        <div class="field">
+          <label for="student-branch">Branch (optional)</label>
+          <select class="input" id="student-branch">
+            <option value="">No branch</option>
+          </select>
+        </div>
+        <div class="banner banner-info">
+          <i data-icon="info" class="icon-sm"></i>
+          <span
+            >A temporary password will be generated and shown here once the
+            account is created — share it with the student directly (email
+            invites aren't wired up yet). Enroll them into a batch from the
+            Enrollment page next.</span
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary" id="send-student-invite-btn">
+          Add Student
+        </button>
+      </div>
+    </dialog>
 
     <dialog id="add-user-dialog" class="modal">
       <div class="modal-header">
@@ -342,6 +437,7 @@
           })
           .join("");
         renderIcons(tbody);
+        tcmsApplyTableFilters();
 
         tbody.querySelectorAll("[data-edit-user]").forEach((btn) => {
           btn.addEventListener("click", () => {
@@ -404,6 +500,13 @@
             .map((b) => `<option value="${b.id}">${b.name}</option>`)
             .join("");
 
+          const studentBranchSelect = document.getElementById("student-branch");
+          studentBranchSelect.innerHTML =
+            '<option value="">No branch</option>' +
+            branches
+              .map((b) => `<option value="${b.id}">${b.name}</option>`)
+              .join("");
+
           renderUsersTable();
         } catch (err) {
           console.error("Failed to load users", err);
@@ -450,6 +553,50 @@
               );
             } catch (err) {
               document.getElementById("add-user-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("send-student-invite-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("add-student-error");
+            errorBox.hidden = true;
+            const firstName = document
+              .getElementById("student-first-name")
+              .value.trim();
+            const lastName = document
+              .getElementById("student-last-name")
+              .value.trim();
+            const email = document.getElementById("student-email").value.trim();
+            const branchId = document.getElementById("student-branch").value;
+            const tempPassword =
+              Math.random().toString(36).slice(-6) +
+              Math.random().toString(36).slice(-6).toUpperCase();
+
+            try {
+              await tcmsApiFetch("/users/students", {
+                method: "POST",
+                body: JSON.stringify({
+                  email,
+                  password: tempPassword,
+                  firstName,
+                  lastName,
+                  branchId: branchId || undefined,
+                }),
+              });
+              tcmsUsersCache = await tcmsApiFetch("/users");
+              renderUsersTable();
+              document.getElementById("add-student-dialog").close();
+              document.getElementById("student-first-name").value = "";
+              document.getElementById("student-last-name").value = "";
+              document.getElementById("student-email").value = "";
+              alert(
+                `Student account created. Temporary password: ${tempPassword}\n\nShare this with ${firstName} directly, then enroll them into a batch from the Enrollment page.`,
+              );
+            } catch (err) {
+              document.getElementById("add-student-error-message").textContent =
                 err.message;
               errorBox.hidden = false;
             }

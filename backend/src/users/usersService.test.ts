@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createFakeAuditLogRepository, createFakeUserRepository } from '../testUtils/fakeRepositories';
+import {
+  createFakeAuditLogRepository,
+  createFakeStudentProfileRepository,
+  createFakeUserRepository,
+} from '../testUtils/fakeRepositories';
 import { hashPassword } from '../auth/password';
 import { createUsersService } from './usersService';
 import type { AuthContext } from '../types/authContext';
@@ -11,7 +15,13 @@ function ctx(overrides: Partial<AuthContext> = {}): AuthContext {
 async function makeService(seed: Parameters<typeof createFakeUserRepository>[0] = []) {
   const userRepo = createFakeUserRepository(seed);
   const auditLogRepo = createFakeAuditLogRepository();
-  return { service: createUsersService({ userRepo, auditLogRepo }), userRepo, auditLogRepo };
+  const studentProfileRepo = createFakeStudentProfileRepository();
+  return {
+    service: createUsersService({ userRepo, auditLogRepo, studentProfileRepo }),
+    userRepo,
+    auditLogRepo,
+    studentProfileRepo,
+  };
 }
 
 describe('usersService.list', () => {
@@ -83,6 +93,61 @@ describe('usersService.createStaffUser', () => {
         lastName: 'Y',
         role: 'ACCOUNTANT',
         branchId: 'branch_1',
+      }),
+    ).rejects.toMatchObject({ code: 'CONFLICT', httpStatus: 409 });
+  });
+});
+
+describe('usersService.createStudentUser', () => {
+  it('creates an ACTIVE student account with a linked StudentProfile', async () => {
+    const { service, studentProfileRepo } = await makeService();
+
+    const user = await service.createStudentUser({
+      email: 'student@example.com',
+      password: 'a-strong-password',
+      firstName: 'Sanduni',
+      lastName: 'Student',
+      branchId: 'branch_1',
+    });
+
+    expect(user.role).toBe('STUDENT');
+    expect(user.status).toBe('ACTIVE');
+    expect(user).not.toHaveProperty('passwordHash');
+    await expect(studentProfileRepo.findByUserId(user.id)).resolves.toMatchObject({ userId: user.id });
+  });
+
+  it('allows creating a student without a branchId', async () => {
+    const { service } = await makeService();
+
+    const user = await service.createStudentUser({
+      email: 'no-branch-student@example.com',
+      password: 'a-strong-password',
+      firstName: 'No',
+      lastName: 'Branch',
+    });
+
+    expect(user.branchId).toBeNull();
+  });
+
+  it('rejects a duplicate email with 409 CONFLICT', async () => {
+    const existing = {
+      id: 'u1',
+      email: 'dup-student@example.com',
+      passwordHash: await hashPassword('x'),
+      firstName: 'A',
+      lastName: 'B',
+      role: 'STUDENT' as const,
+      status: 'ACTIVE' as const,
+      branchId: null,
+    };
+    const { service } = await makeService([existing]);
+
+    await expect(
+      service.createStudentUser({
+        email: 'dup-student@example.com',
+        password: 'whatever123',
+        firstName: 'X',
+        lastName: 'Y',
       }),
     ).rejects.toMatchObject({ code: 'CONFLICT', httpStatus: 409 });
   });

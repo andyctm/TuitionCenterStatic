@@ -197,6 +197,13 @@
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
+      if (sessionStorage.getItem("tcms_session_expired")) {
+        sessionStorage.removeItem("tcms_session_expired");
+        document.getElementById("login-error-message").textContent =
+          "Your session expired — please sign in again.";
+        document.getElementById("login-error").hidden = false;
+      }
+
       document
         .getElementById("login-form")
         .addEventListener("submit", async (e) => {

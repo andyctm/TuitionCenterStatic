@@ -42,7 +42,7 @@
             ><i data-icon="reports"></i><span class="label">Reports</span></a
           >
         </nav>
-        <div class="nav-footer">Colombo Main branch</div>
+        <div class="nav-footer" id="nav-footer-branch">Colombo Main branch</div>
       </aside>
       <header class="topbar">
         <div class="breadcrumb">
@@ -477,15 +477,26 @@
         document.getElementById("breadcrumb-role").textContent = tcmsRoleLabel(
           user.role,
         );
-        document.getElementById("user-role-label").textContent = tcmsRoleLabel(
-          user.role,
-        );
         document
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);
 
         try {
           await refreshBatches();
+          const ownBranch = tcmsBranchesCache.find(
+            (b) => b.id === user.branchId,
+          );
+          const roleWithBranch = ownBranch
+            ? `${tcmsRoleLabel(user.role)} \u00b7 ${ownBranch.name}`
+            : tcmsRoleLabel(user.role);
+          document.getElementById("user-role-label").textContent =
+            roleWithBranch;
+          document.getElementById("nav-footer-branch").textContent = ownBranch
+            ? `${ownBranch.name} branch`
+            : "All branches";
+          document.getElementById("batches-subtitle").textContent = ownBranch
+            ? `${ownBranch.name} \u00b7 Term 3, 2026`
+            : "All branches \u00b7 Term 3, 2026";
           if (user.branchId)
             document.getElementById("batch-branch").value = user.branchId;
         } catch (err) {

@@ -46,6 +46,9 @@ function tcmsClearSession() {
 
 // Every route returns { data } on success or { error: { code, message } } on failure
 // (backend/src/lib/errorEnvelope.ts) — unwrap that here so callers just get plain values.
+// A 401 on any endpoint other than login itself means the 15-minute access token has expired —
+// without this, every page's fetch would fail silently (caught, console-only) leaving stuck
+// "Loading…" placeholders and stale numbers with no visible sign anything went wrong.
 async function tcmsApiFetch(path, options = {}) {
   const token = tcmsGetToken();
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
@@ -53,6 +56,13 @@ async function tcmsApiFetch(path, options = {}) {
 
   const res = await fetch(`${window.TCMS_CONFIG.API_BASE_URL}${path}`, { ...options, headers });
   const body = res.status === 204 ? null : await res.json().catch(() => null);
+
+  if (res.status === 401 && !path.startsWith("/auth/login")) {
+    tcmsClearSession();
+    sessionStorage.setItem("tcms_session_expired", "1");
+    window.location.href = "login.html";
+    return new Promise(() => {}); // navigation is in flight; never resolve to this caller
+  }
 
   if (!res.ok) {
     const message = body?.error?.message || `Request failed (${res.status})`;

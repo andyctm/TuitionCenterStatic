@@ -118,6 +118,11 @@ ol {
 button {
   font-family: inherit;
 }
+/* Author display rules (e.g. .banner{display:flex}) and inline styles otherwise
+   override the UA's [hidden]{display:none} */
+[hidden] {
+  display: none !important;
+}
 img {
   max-width: 100%;
   display: block;

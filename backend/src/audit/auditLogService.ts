@@ -19,9 +19,11 @@ export type AuditLogServiceDeps = {
 };
 
 // audit-log capability (FR-AUD-2): resolves the branch a given audit row belongs to by walking
-// the entity it references, since AuditLog itself has no branchId column in the approved schema
-// (03-database-design.md) — only User and Attendance entities are audited today (see FR-AUD-1),
-// so any other entityType is a safe-default-deny for non-Super-Admins rather than a crash.
+// the entity it references (the affected User/Attendance record), NOT the actor who performed the
+// action — a Super Admin (no branchId) can change the status of a user who does belong to a
+// branch, so scoping/filtering must key off the entity, not the actor.
+export type AuditLogListItem = AuditLogRecord & { branchId: string | null };
+
 export function createAuditLogService(deps: AuditLogServiceDeps) {
   const { auditLogRepo, userRepo, attendanceRepo, classSessionRepo, batchRepo } = deps;
 
@@ -42,18 +44,14 @@ export function createAuditLogService(deps: AuditLogServiceDeps) {
   }
 
   return {
-    async list(ctx: AuthContext, filter: AuditLogListFilter): Promise<AuditLogRecord[]> {
+    async list(ctx: AuthContext, filter: AuditLogListFilter): Promise<AuditLogListItem[]> {
       const logs = await auditLogRepo.findAll(filter);
-      if (isSuperAdmin(ctx)) return logs;
+      const withBranch = await Promise.all(
+        logs.map(async (log) => ({ ...log, branchId: await resolveBranchId(log) })),
+      );
+      if (isSuperAdmin(ctx)) return withBranch;
 
-      const scoped: AuditLogRecord[] = [];
-      for (const log of logs) {
-        const branchId = await resolveBranchId(log);
-        if (branchId && ctx.branchIds.includes(branchId)) {
-          scoped.push(log);
-        }
-      }
-      return scoped;
+      return withBranch.filter((log) => log.branchId !== null && ctx.branchIds.includes(log.branchId));
     },
   };
 }

@@ -98,13 +98,13 @@ function makeDeps(options: {
 }
 
 describe('auditLogService.list', () => {
-  it('returns every row for a Super Admin', async () => {
+  it('returns every row for a Super Admin, annotated with the resolved branchId', async () => {
     const deps = makeDeps();
     const service = createAuditLogService(deps);
 
     const logs = await service.list(ctx(), {});
 
-    expect(logs).toEqual([seedLog()]);
+    expect(logs).toEqual([{ ...seedLog(), branchId: 'branch_colombo' }]);
   });
 
   it('includes a User-entity row when the user belongs to the caller branch', async () => {
@@ -176,6 +176,6 @@ describe('auditLogService.list', () => {
 
     const logs = await service.list(ctx(), { entityId: 'user_2', actorUserId: 'admin_8' });
 
-    expect(logs).toEqual([logB]);
+    expect(logs).toEqual([{ ...logB, branchId: 'branch_colombo' }]);
   });
 });

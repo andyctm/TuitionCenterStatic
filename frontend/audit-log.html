@@ -166,10 +166,9 @@
         const filtered = tcmsAllLogs.filter((log) => {
           if (entityType && log.entityType !== entityType) return false;
           if (date && !log.createdAt.startsWith(date)) return false;
-          if (branchId) {
-            const actor = tcmsUsersById.get(log.actorUserId);
-            if (!actor || actor.branchId !== branchId) return false;
-          }
+          // log.branchId is the affected entity's branch (resolved server-side), not the actor's —
+          // e.g. a Super Admin has no branch but can still act on a user who belongs to one.
+          if (branchId && log.branchId !== branchId) return false;
           return true;
         });
 
@@ -188,10 +187,9 @@
             const initials = actor
               ? actor.firstName[0] + actor.lastName[0]
               : "?";
-            const branch =
-              actor && actor.branchId
-                ? tcmsBranchesById.get(actor.branchId)
-                : null;
+            const branch = log.branchId
+              ? tcmsBranchesById.get(log.branchId)
+              : null;
             const when = new Date(log.createdAt).toLocaleString("en-GB", {
               day: "numeric",
               month: "short",

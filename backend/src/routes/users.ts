@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { UsersService } from '../users/usersService';
 import { AppError } from '../errors/AppError';
+import { getAuthContext } from '../lib/authContext';
 import { requireAuth } from '../middleware/requireAuth';
 import { requireRole } from '../middleware/requireRole';
 import { asyncHandler } from '../lib/asyncHandler';
@@ -30,7 +31,7 @@ export function createUsersRouter(usersService: UsersService, accessTokenSecret:
         throw new AppError('NOT_FOUND', 404, 'User not found');
       }
       const { status } = parseBody(updateUserStatusSchema, req.body);
-      const user = await usersService.updateStatus(id, status);
+      const user = await usersService.updateStatus(getAuthContext(req), id, status);
       res.status(200).json({ data: user });
     }),
   );

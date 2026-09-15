@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { type Express } from 'express';
+import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import type { AuthService } from './auth/authService';
 import type { UsersService } from './users/usersService';
@@ -15,6 +16,7 @@ import type { SessionMaterializationService } from './attendance/sessionMaterial
 import type { DashboardService } from './reporting/dashboardService';
 import type { EnrollmentReportService } from './reporting/enrollmentReportService';
 import type { AttendanceReportService } from './reporting/attendanceReportService';
+import type { AuditLogService } from './audit/auditLogService';
 import { isOriginAllowed } from './lib/corsAllowlist';
 import { errorHandler } from './middleware/errorHandler';
 import { createAuthRouter } from './routes/auth';
@@ -29,6 +31,7 @@ import { createStudentsRouter } from './routes/students';
 import { createInternalRouter } from './routes/internal';
 import { createDashboardRouter } from './routes/dashboard';
 import { createReportsRouter } from './routes/reports';
+import { createAuditLogsRouter } from './routes/auditLogs';
 
 export type AppDeps = {
   allowedOrigins: string[];
@@ -47,6 +50,7 @@ export type AppDeps = {
   dashboardService: DashboardService;
   enrollmentReportService: EnrollmentReportService;
   attendanceReportService: AttendanceReportService;
+  auditLogService: AuditLogService;
   accessTokenSecret: string;
   internalJobSecret: string;
 };
@@ -55,6 +59,10 @@ export function createApp(deps: AppDeps): Express {
   const app = express();
 
   app.use(pinoHttp({ level: process.env.NODE_ENV === 'test' ? 'silent' : 'info' }));
+  // Security-headers hardening pass (M6, NFR-4/OWASP A05) — this is a pure JSON API with no
+  // HTML views of its own, so helmet's default CSP is a defense-in-depth backstop rather than
+  // the primary control; X-Frame-Options/X-Content-Type-Options are the headers that matter here.
+  app.use(helmet({ frameguard: { action: 'deny' } }));
   app.use(
     cors({
       origin: (origin, callback) => {
@@ -94,6 +102,7 @@ export function createApp(deps: AppDeps): Express {
     '/api/reports',
     createReportsRouter(deps.enrollmentReportService, deps.attendanceReportService, deps.accessTokenSecret),
   );
+  app.use('/api/audit-logs', createAuditLogsRouter(deps.auditLogService, deps.accessTokenSecret));
 
   app.use(errorHandler);
 

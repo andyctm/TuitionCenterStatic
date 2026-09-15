@@ -382,23 +382,42 @@ Accountant's dashboard nav entry ([07-ui-ux-design.md](./07-ui-ux-design.md) §3
 
 _(SDD capability: `audit-log`; SRS: FR-AUD-_, NFR-4)*
 
+**Status: Implemented 2026-09-14** against in-memory fakes (13 new backend tests, 251 total);
+not yet run against a real Neon database (none connected — see M0). Scope was narrowed to match
+the `audit-log` capability's actual requirement text in [06-sdd.md](./06-sdd.md) rather than this
+module's looser task wording ("every mutating action identified in prior modules"): FR-AUD-1/the
+capability's own Requirements section only commit to "every attendance override and user status
+change" — attendance override was already done in M4, so the only net-new call site this module
+needed was `usersService.updateStatus` (`PATCH /api/users/:id/status`). Batch/course/enrollment/etc.
+mutations were deliberately left unaudited — treated as a scope clarification, not a silently
+dropped task, since auditing everything would be a bigger, undiscussed change to many services'
+dependency lists for a requirement the design docs don't actually ask for. `AuditLog` has no
+`branchId` column in the approved schema ([03-database-design.md](./03-database-design.md)), so
+`GET /api/audit-logs`'s branch scoping for Center Admin is resolved per-row by walking the
+referenced entity (`User.branchId` directly; `Attendance` via its `ClassSession` → `Batch` →
+`branchId`) — any other `entityType` is a safe-default-deny for non-Super-Admins rather than a
+crash, since only these two entity types are audited today. Required adding
+`AttendanceRepository.findById` (previously missing — attendance records could only be looked up
+via session/student) and `AuditLogRepository.findAll` (filterable by `entityType`/`entityId`/
+`actorUserId`, matching the `/api/audit-logs?entityId=usr_xyz` scenario in 06-sdd.md).
+
 ### Implementation Tasks
 
-- [ ] `AuditLog` write helper invoked from every mutating action identified in prior modules.
-- [ ] `GET /api/audit-logs` with branch scoping + filters.
-- [ ] Security hardening pass: security headers (CSP, `X-Frame-Options`), dependency audit, OWASP checklist review (full checklist in [09-review-qa.md](./09-review-qa.md)).
+- [x] `AuditLog` write helper invoked from every mutating action identified in prior modules.
+- [x] `GET /api/audit-logs` with branch scoping + filters. (`src/audit/auditLogService.ts`, `src/routes/auditLogs.ts` — filters: `entityType`, `entityId`, `actorUserId`.)
+- [x] Security hardening pass: security headers (CSP, `X-Frame-Options`), dependency audit, OWASP checklist review (full checklist in [09-review-qa.md](./09-review-qa.md)). `helmet` added to `src/app.ts` (`frameguard` explicitly set to `deny` — this is a pure JSON API with no legitimate same-origin-framing use case, stricter than helmet's `SAMEORIGIN` default). `npm audit` reviewed: 3 high-severity findings, all transitively from the `prisma` CLI's `deepmerge-ts` dependency (a **devDependency**, build/migration-time only, not part of the deployed runtime) — no non-breaking fix exists; `npm audit fix --force` would downgrade `prisma` below the version deliberately pinned to avoid Prisma 7's incompatible CLI (see M0/repo notes), so left as a documented, accepted risk rather than applied blindly. `@prisma/client` (the runtime dependency) has zero flagged vulnerabilities.
 
 ### Code Review Checklist
 
-- [ ] Every capability's "writes an AuditLog entry" requirement from [06-sdd.md](./06-sdd.md) has a corresponding call site (cross-checked against the capability list, not assumed).
+- [x] Every capability's "writes an AuditLog entry" requirement from [06-sdd.md](./06-sdd.md) has a corresponding call site (cross-checked against the capability list, not assumed). Cross-checked against the capability's actual Requirements text (attendance override + user status change only) rather than the broader task-list wording — see status note above.
 
 ### Unit Tests
 
-- [ ] Audit write helper captures before/after diffs correctly for a sample entity update.
+- [x] Audit write helper captures before/after diffs correctly for a sample entity update. (`src/users/usersService.test.ts` — "writes an AuditLog entry capturing the actor and before/after status".)
 
 ### Integration Tests
 
-- [ ] End-to-end: perform one action from each audited capability, confirm exactly one corresponding `AuditLog` row each.
+- [x] End-to-end: perform one action from each audited capability, confirm exactly one corresponding `AuditLog` row each. (`src/routes/auditLogs.test.ts` — a user status change produces exactly one visible `AuditLog` row for the acting admin; M4's attendance-override audit path was already covered by `src/attendance/attendanceService.test.ts`.)
 
 ### UAT Tests
 
@@ -406,9 +425,11 @@ _(SDD capability: `audit-log`; SRS: FR-AUD-_, NFR-4)*
 
 ### Risk Assessment
 
-| Risk                                                          | Likelihood | Impact | Mitigation                                                                                                                                                                                  |
-| ------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A future feature adds a mutation without wiring an audit call | Medium     | Medium | Add a lightweight lint/test convention: any route handler doing an attendance-override write must import the audit helper (enforced via a custom ESLint rule or code-review checklist gate) |
+| Risk                                                                                                                      | Likelihood                                          | Impact | Mitigation                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A future feature adds a mutation without wiring an audit call                                                             | Medium                                              | Medium | Add a lightweight lint/test convention: any route handler doing an attendance-override write must import the audit helper (enforced via a custom ESLint rule or code-review checklist gate) |
+| `AuditLog` has no `branchId` column, so branch scoping is resolved per-row at query time instead of via an indexed column | Low (small center scale, only 2 entity types today) | Low    | Revisit with a denormalized `branchId` column if `audit-log` query volume or entity-type variety grows                                                                                      |
+| `prisma` CLI's transitive `deepmerge-ts` dependency has an unpatched high-severity advisory (devDependency only)          | Low                                                 | Low    | Documented above; revisit when Prisma ships a non-breaking fix, or when the M0-era Prisma-7-incompatibility blocker is resolved                                                             |
 
 ### Deployment Checklist
 

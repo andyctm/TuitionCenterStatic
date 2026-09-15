@@ -30,6 +30,7 @@ import { createSessionMaterializationService } from './attendance/sessionMateria
 import { createDashboardService } from './reporting/dashboardService';
 import { createEnrollmentReportService } from './reporting/enrollmentReportService';
 import { createAttendanceReportService } from './reporting/attendanceReportService';
+import { createAuditLogService } from './audit/auditLogService';
 
 const env = parseEnv(process.env);
 
@@ -60,7 +61,7 @@ const authService = createAuthService({
     console.log(`[password-reset] would email ${email} a reset token: ${token}`);
   },
 });
-const usersService = createUsersService({ userRepo });
+const usersService = createUsersService({ userRepo, auditLogRepo });
 const branchesService = createBranchesService({ branchRepo });
 const subjectsService = createSubjectsService({ subjectRepo });
 const gradeLevelsService = createGradeLevelsService({ gradeLevelRepo });
@@ -109,6 +110,13 @@ const attendanceReportService = createAttendanceReportService({
   classSessionRepo,
   attendanceRepo,
 });
+const auditLogService = createAuditLogService({
+  auditLogRepo,
+  userRepo,
+  attendanceRepo,
+  classSessionRepo,
+  batchRepo,
+});
 
 const app = createApp({
   allowedOrigins: env.allowedOrigins,
@@ -129,6 +137,7 @@ const app = createApp({
   dashboardService,
   enrollmentReportService,
   attendanceReportService,
+  auditLogService,
   accessTokenSecret: env.jwtAccessSecret,
   internalJobSecret: env.internalJobSecret,
 });

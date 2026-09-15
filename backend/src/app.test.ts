@@ -38,4 +38,13 @@ describe('createApp', () => {
 
     expect(res.headers['access-control-allow-origin']).toBeUndefined();
   });
+
+  it('sets baseline security headers (M6 hardening pass)', async () => {
+    const { app } = createTestApp();
+
+    const res = await request(app).get('/api/health');
+
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['x-frame-options']).toBe('DENY');
+  });
 });

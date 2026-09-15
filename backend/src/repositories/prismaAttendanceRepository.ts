@@ -3,6 +3,9 @@ import type { AttendanceRepository } from './types';
 
 export function createPrismaAttendanceRepository(prisma: PrismaClient): AttendanceRepository {
   return {
+    async findById(id) {
+      return prisma.attendance.findUnique({ where: { id } });
+    },
     async findBySession(classSessionId) {
       return prisma.attendance.findMany({ where: { classSessionId } });
     },

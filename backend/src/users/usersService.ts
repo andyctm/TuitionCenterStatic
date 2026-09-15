@@ -1,6 +1,7 @@
 import type { Role, UserStatus } from '@prisma/client';
 import { AppError } from '../errors/AppError';
-import type { UserRepository } from '../repositories/types';
+import type { AuditLogRepository, UserRepository } from '../repositories/types';
+import type { AuthContext } from '../types/authContext';
 import { hashPassword } from '../auth/password';
 import { omitPasswordHash } from '../lib/publicUser';
 import type { PublicUser } from '../auth/authService';
@@ -16,10 +17,11 @@ export type CreateStaffUserInput = {
 
 export type UsersServiceDeps = {
   userRepo: UserRepository;
+  auditLogRepo: AuditLogRepository;
 };
 
 export function createUsersService(deps: UsersServiceDeps) {
-  const { userRepo } = deps;
+  const { userRepo, auditLogRepo } = deps;
 
   return {
     async createStaffUser(input: CreateStaffUserInput): Promise<PublicUser> {
@@ -41,13 +43,22 @@ export function createUsersService(deps: UsersServiceDeps) {
       return omitPasswordHash(user);
     },
 
-    async updateStatus(userId: string, status: UserStatus): Promise<PublicUser> {
+    // audit-log capability (FR-AUD-1): every user status change is a logged, actor-attributed event.
+    async updateStatus(ctx: AuthContext, userId: string, status: UserStatus): Promise<PublicUser> {
       const existing = await userRepo.findById(userId);
       if (!existing) {
         throw new AppError('NOT_FOUND', 404, 'User not found');
       }
 
       const updated = await userRepo.updateStatus(userId, status);
+      await auditLogRepo.create({
+        actorUserId: ctx.userId,
+        entityType: 'User',
+        entityId: userId,
+        action: 'STATUS_CHANGE',
+        before: { status: existing.status },
+        after: { status: updated.status },
+      });
       return omitPasswordHash(updated);
     },
   };

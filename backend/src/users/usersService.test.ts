@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { createFakeUserRepository } from '../testUtils/fakeRepositories';
+import { createFakeAuditLogRepository, createFakeUserRepository } from '../testUtils/fakeRepositories';
 import { hashPassword } from '../auth/password';
 import { createUsersService } from './usersService';
+import type { AuthContext } from '../types/authContext';
+
+function ctx(overrides: Partial<AuthContext> = {}): AuthContext {
+  return { userId: 'admin_1', role: 'CENTER_ADMIN', branchIds: ['branch_1'], ...overrides };
+}
 
 async function makeService(seed: Parameters<typeof createFakeUserRepository>[0] = []) {
   const userRepo = createFakeUserRepository(seed);
-  return { service: createUsersService({ userRepo }), userRepo };
+  const auditLogRepo = createFakeAuditLogRepository();
+  return { service: createUsersService({ userRepo, auditLogRepo }), userRepo, auditLogRepo };
 }
 
 describe('usersService.createStaffUser', () => {
@@ -65,7 +71,7 @@ describe('usersService.updateStatus', () => {
     };
     const { service } = await makeService([pendingUser]);
 
-    const updated = await service.updateStatus('u2', 'ACTIVE');
+    const updated = await service.updateStatus(ctx(), 'u2', 'ACTIVE');
 
     expect(updated.status).toBe('ACTIVE');
   });
@@ -73,9 +79,37 @@ describe('usersService.updateStatus', () => {
   it('throws NOT_FOUND for an unknown user id', async () => {
     const { service } = await makeService();
 
-    await expect(service.updateStatus('nope', 'ACTIVE')).rejects.toMatchObject({
+    await expect(service.updateStatus(ctx(), 'nope', 'ACTIVE')).rejects.toMatchObject({
       code: 'NOT_FOUND',
       httpStatus: 404,
     });
+  });
+
+  it('writes an AuditLog entry capturing the actor and before/after status', async () => {
+    const pendingUser = {
+      id: 'u2',
+      email: 'pending@example.com',
+      passwordHash: await hashPassword('x'),
+      firstName: 'P',
+      lastName: 'Q',
+      role: 'STUDENT' as const,
+      status: 'PENDING' as const,
+      branchId: null,
+    };
+    const { service, auditLogRepo } = await makeService([pendingUser]);
+
+    await service.updateStatus(ctx({ userId: 'admin_9' }), 'u2', 'ACTIVE');
+
+    const logs = await auditLogRepo.findAll({});
+    expect(logs).toEqual([
+      expect.objectContaining({
+        actorUserId: 'admin_9',
+        entityType: 'User',
+        entityId: 'u2',
+        action: 'STATUS_CHANGE',
+        before: { status: 'PENDING' },
+        after: { status: 'ACTIVE' },
+      }),
+    ]);
   });
 });

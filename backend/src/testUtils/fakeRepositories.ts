@@ -423,6 +423,9 @@ export function createFakeAttendanceRepository(
   const attendances = new Map(seed.map((a) => [a.id, a]));
 
   return {
+    async findById(id) {
+      return attendances.get(id) ?? null;
+    },
     async findBySession(classSessionId) {
       return [...attendances.values()].filter((a) => a.classSessionId === classSessionId);
     },
@@ -458,8 +461,8 @@ export function createFakeAttendanceRepository(
   };
 }
 
-export function createFakeAuditLogRepository(): AuditLogRepository {
-  const logs: AuditLogRecord[] = [];
+export function createFakeAuditLogRepository(seed: AuditLogRecord[] = []): AuditLogRepository {
+  const logs: AuditLogRecord[] = [...seed];
 
   return {
     async create(input) {
@@ -473,6 +476,14 @@ export function createFakeAuditLogRepository(): AuditLogRepository {
       };
       logs.push(record);
       return record;
+    },
+    async findAll(filter) {
+      return logs.filter((log) => {
+        if (filter.entityType && log.entityType !== filter.entityType) return false;
+        if (filter.entityId && log.entityId !== filter.entityId) return false;
+        if (filter.actorUserId && log.actorUserId !== filter.actorUserId) return false;
+        return true;
+      });
     },
   };
 }

@@ -16,5 +16,15 @@ export function createPrismaAuditLogRepository(prisma: PrismaClient): AuditLogRe
         },
       });
     },
+    async findAll(filter) {
+      return prisma.auditLog.findMany({
+        where: {
+          entityType: filter.entityType,
+          entityId: filter.entityId,
+          actorUserId: filter.actorUserId,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    },
   };
 }

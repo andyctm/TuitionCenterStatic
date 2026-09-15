@@ -127,13 +127,22 @@ describe('attendanceService.override', () => {
 
     const tenDaysLater = new Date('2026-09-24T00:00:00.000Z');
     const result = await service.override(
-      ctx({ role: 'CENTER_ADMIN', branchIds: ['branch_colombo'] }),
+      ctx({ role: 'CENTER_ADMIN', userId: 'admin_1', branchIds: ['branch_colombo'] }),
       'session_1',
       { studentProfileId: 'stu_1', status: 'PRESENT', reason: 'parent dispute, verified' },
       tenDaysLater,
     );
 
     expect(result.status).toBe('PRESENT');
+    const logs = await deps.auditLogRepo.findAll({});
+    expect(logs).toEqual([
+      expect.objectContaining({
+        actorUserId: 'admin_1',
+        entityType: 'Attendance',
+        entityId: result.id,
+        action: 'OVERRIDE',
+      }),
+    ]);
   });
 
   it('returns 404 for a Center Admin outside the batch branch', async () => {

@@ -302,6 +302,7 @@ export type StudentAttendanceRecord = AttendanceRecord & {
 };
 
 export interface AttendanceRepository {
+  findById(id: string): Promise<AttendanceRecord | null>;
   findBySession(classSessionId: string): Promise<AttendanceRecord[]>;
   findByStudent(studentProfileId: string): Promise<StudentAttendanceRecord[]>;
   upsertMany(
@@ -325,8 +326,16 @@ export type AuditLogRecord = NewAuditLogInput & {
   createdAt: Date;
 };
 
+// Omitting any field means no restriction on that dimension (audit-log capability, FR-AUD-2).
+export type AuditLogListFilter = {
+  entityType?: string;
+  entityId?: string;
+  actorUserId?: string;
+};
+
 export interface AuditLogRepository {
   create(input: NewAuditLogInput): Promise<AuditLogRecord>;
+  findAll(filter: AuditLogListFilter): Promise<AuditLogRecord[]>;
 }
 
 

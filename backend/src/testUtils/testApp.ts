@@ -13,6 +13,7 @@ import { createSessionMaterializationService } from '../attendance/sessionMateri
 import { createDashboardService } from '../reporting/dashboardService';
 import { createEnrollmentReportService } from '../reporting/enrollmentReportService';
 import { createAttendanceReportService } from '../reporting/attendanceReportService';
+import { createAuditLogService } from '../audit/auditLogService';
 import {
   createFakeAttendanceRepository,
   createFakeAuditLogRepository,
@@ -32,6 +33,7 @@ import {
 } from './fakeRepositories';
 import type {
   AttendanceRecord,
+  AuditLogRecord,
   BatchRecord,
   BranchRecord,
   ClassSessionRecord,
@@ -60,6 +62,7 @@ export function createTestApp(
     seedParentLinks?: { parentUserId: string; studentProfileId: string }[];
     seedClassSessions?: ClassSessionRecord[];
     seedAttendances?: AttendanceRecord[];
+    seedAuditLogs?: AuditLogRecord[];
     checkDb?: AppDeps['checkDb'];
   } = {},
 ) {
@@ -82,7 +85,7 @@ export function createTestApp(
     options.seedAttendances ?? [],
     classSessionRepo,
   );
-  const auditLogRepo = createFakeAuditLogRepository();
+  const auditLogRepo = createFakeAuditLogRepository(options.seedAuditLogs ?? []);
 
   const authService = createAuthService({
     userRepo,
@@ -94,7 +97,7 @@ export function createTestApp(
       sentEmails.push({ email, token });
     },
   });
-  const usersService = createUsersService({ userRepo });
+  const usersService = createUsersService({ userRepo, auditLogRepo });
   const branchesService = createBranchesService({ branchRepo });
   const subjectsService = createSubjectsService({ subjectRepo });
   const gradeLevelsService = createGradeLevelsService({ gradeLevelRepo });
@@ -148,6 +151,13 @@ export function createTestApp(
     classSessionRepo,
     attendanceRepo,
   });
+  const auditLogService = createAuditLogService({
+    auditLogRepo,
+    userRepo,
+    attendanceRepo,
+    classSessionRepo,
+    batchRepo,
+  });
 
   const app = createApp({
     allowedOrigins: TEST_ALLOWED_ORIGINS,
@@ -166,6 +176,7 @@ export function createTestApp(
     dashboardService,
     enrollmentReportService,
     attendanceReportService,
+    auditLogService,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
     internalJobSecret: TEST_INTERNAL_JOB_SECRET,
   });
@@ -202,6 +213,7 @@ export function createTestApp(
     dashboardService,
     enrollmentReportService,
     attendanceReportService,
+    auditLogService,
   };
 }
 

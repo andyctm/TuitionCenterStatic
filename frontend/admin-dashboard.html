@@ -71,7 +71,7 @@
             <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
               ><span class="name" id="user-name">Aruna Rathnayake</span
-              ><span class="role" id="user-role">Super Admin</span></span
+              ><span class="role" id="user-role-label">Super Admin</span></span
             >
             <button
               class="btn btn-ghost btn-icon"
@@ -190,27 +190,24 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="banner banner-danger" id="add-branch-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="add-branch-error-message"></span>
+        </div>
         <div class="field">
           <label for="branch-name">Branch name</label>
           <input class="input" id="branch-name" placeholder="e.g. Matara" />
         </div>
-        <div class="field">
-          <label for="branch-address">Address</label>
-          <input class="input" id="branch-address" placeholder="Street, city" />
-        </div>
-        <div class="field">
-          <label for="branch-admin">Center admin</label>
-          <select class="input" id="branch-admin">
-            <option>Unassigned — invite later</option>
-            <option>Nadeesha Perera</option>
-            <option>Ruwan Silva</option>
-            <option>Ishara Fernando</option>
-          </select>
-        </div>
+        <p class="cell-secondary" style="margin: 0">
+          You can assign a Center Admin afterward via Add User, selecting this
+          branch.
+        </p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-close-modal>Cancel</button>
-        <button class="btn btn-primary">Create Branch</button>
+        <button class="btn btn-primary" id="create-branch-btn">
+          Create Branch
+        </button>
       </div>
     </dialog>
 
@@ -226,9 +223,29 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="field">
-          <label for="user-name">Full name</label>
-          <input class="input" id="user-name" placeholder="e.g. Priya Kumar" />
+        <div class="banner banner-danger" id="add-user-error" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="add-user-error-message"></span>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+          "
+        >
+          <div class="field">
+            <label for="user-first-name">First name</label>
+            <input
+              class="input"
+              id="user-first-name"
+              placeholder="e.g. Priya"
+            />
+          </div>
+          <div class="field">
+            <label for="user-last-name">Last name</label>
+            <input class="input" id="user-last-name" placeholder="e.g. Kumar" />
+          </div>
         </div>
         <div class="field">
           <label for="user-email">Email</label>
@@ -249,34 +266,32 @@
           <div class="field">
             <label for="user-role">Role</label>
             <select class="input" id="user-role">
-              <option>Center Admin</option>
-              <option>Accountant</option>
-              <option>Teacher</option>
-              <option>Student</option>
-              <option>Parent</option>
+              <option value="CENTER_ADMIN">Center Admin</option>
+              <option value="ACCOUNTANT">Accountant</option>
+              <option value="TEACHER">Teacher</option>
             </select>
           </div>
           <div class="field">
             <label for="user-branch">Branch</label>
             <select class="input" id="user-branch">
-              <option>Colombo Main</option>
-              <option>Kandy</option>
-              <option>Galle</option>
-              <option>Negombo</option>
+              <option>Loading…</option>
             </select>
           </div>
         </div>
         <div class="banner banner-info">
           <i data-icon="info" class="icon-sm"></i>
           <span
-            >An email invite with a temporary password will be sent once
-            created.</span
+            >A temporary password will be generated and shown here once the
+            account is created — share it with the new user directly (email
+            invites aren't wired up yet).</span
           >
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-close-modal>Cancel</button>
-        <button class="btn btn-primary">Send Invite</button>
+        <button class="btn btn-primary" id="send-invite-btn">
+          Send Invite
+        </button>
       </div>
     </dialog>
 
@@ -297,6 +312,7 @@
           (user.firstName[0] || "") + (user.lastName[0] || "");
         document.getElementById("user-name").textContent =
           `${user.firstName} ${user.lastName}`;
+        document.getElementById("user-role-label").textContent = "Super Admin";
         document.getElementById("greeting").textContent =
           `Good morning, ${user.firstName}`;
         document.getElementById("today-subtitle").textContent =
@@ -311,7 +327,7 @@
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);
 
-        try {
+        async function loadDashboard() {
           const [summary, branches, users, batches, enrollments, auditLogs] =
             await Promise.all([
               tcmsApiFetch("/dashboard/summary"),
@@ -415,9 +431,85 @@
                 })
                 .join("")
             : '<div class="cell-secondary">No recent activity.</div>';
+
+          document.getElementById("user-branch").innerHTML = branches
+            .map((b) => `<option value="${b.id}">${b.name}</option>`)
+            .join("");
+
+          return { branches, users };
+        }
+
+        try {
+          await loadDashboard();
         } catch (err) {
           console.error("Failed to load live dashboard data", err);
         }
+
+        document
+          .getElementById("create-branch-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("add-branch-error");
+            errorBox.hidden = true;
+            const name = document.getElementById("branch-name").value.trim();
+            try {
+              await tcmsApiFetch("/branches", {
+                method: "POST",
+                body: JSON.stringify({ name }),
+              });
+              await loadDashboard();
+              document.getElementById("add-branch-dialog").close();
+              document.getElementById("branch-name").value = "";
+            } catch (err) {
+              document.getElementById("add-branch-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("send-invite-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("add-user-error");
+            errorBox.hidden = true;
+            const firstName = document
+              .getElementById("user-first-name")
+              .value.trim();
+            const lastName = document
+              .getElementById("user-last-name")
+              .value.trim();
+            const email = document.getElementById("user-email").value.trim();
+            const role = document.getElementById("user-role").value;
+            const branchId = document.getElementById("user-branch").value;
+            const tempPassword =
+              Math.random().toString(36).slice(-6) +
+              Math.random().toString(36).slice(-6).toUpperCase();
+
+            try {
+              await tcmsApiFetch("/users", {
+                method: "POST",
+                body: JSON.stringify({
+                  email,
+                  password: tempPassword,
+                  firstName,
+                  lastName,
+                  role,
+                  branchId,
+                }),
+              });
+              await loadDashboard();
+              document.getElementById("add-user-dialog").close();
+              document.getElementById("user-first-name").value = "";
+              document.getElementById("user-last-name").value = "";
+              document.getElementById("user-email").value = "";
+              alert(
+                `User created. Temporary password: ${tempPassword}\n\nShare this with ${firstName} directly.`,
+              );
+            } catch (err) {
+              document.getElementById("add-user-error-message").textContent =
+                err.message;
+              errorBox.hidden = false;
+            }
+          });
       })();
     </script>
   </body>

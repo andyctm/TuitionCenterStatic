@@ -71,6 +71,31 @@ async function tcmsLogin(email, password) {
   return result.user;
 }
 
+// Downloads a file response (e.g. a CSV report) — fetch() + Authorization header is needed since
+// a plain <a href> navigation can't attach the bearer token.
+async function tcmsDownloadFile(path, filename) {
+  const token = tcmsGetToken();
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(`${window.TCMS_CONFIG.API_BASE_URL}${path}`, { headers });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new TcmsApiError(
+      body?.error?.message || `Request failed (${res.status})`,
+      body?.error?.code,
+      res.status,
+    );
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function tcmsLogout() {
   tcmsClearSession();
   window.location.href = "login.html";

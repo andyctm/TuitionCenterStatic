@@ -68,12 +68,19 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">AR</span>
+            <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
-              ><span class="name">Aruna Rathnayake</span
+              ><span class="name" id="user-name">Aruna Rathnayake</span
               ><span class="role">Super Admin</span></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
@@ -91,23 +98,19 @@
             style="gap: var(--space-4); flex-wrap: wrap"
           >
             <div style="display: flex; gap: var(--space-2); flex-wrap: wrap">
-              <select class="input" style="width: auto">
-                <option>Entity: All</option>
-                <option>User</option>
-                <option>Attendance</option>
+              <select class="input" style="width: auto" id="filter-entity-type">
+                <option value="">Entity: All</option>
+                <option value="User">User</option>
+                <option value="Attendance">Attendance</option>
               </select>
-              <select class="input" style="width: auto">
-                <option>Branch: All</option>
-                <option>Colombo Main</option>
-                <option>Kandy</option>
-                <option>Galle</option>
-                <option>Negombo</option>
+              <select class="input" style="width: auto" id="filter-branch">
+                <option value="">Branch: All</option>
               </select>
               <input
                 class="input"
                 style="width: auto"
                 type="date"
-                value="2026-09-14"
+                id="filter-date"
               />
             </div>
           </div>
@@ -123,118 +126,9 @@
                   <th>Details</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="audit-log-table-body">
                 <tr>
-                  <td data-label="Timestamp" class="cell-secondary">
-                    14 Sep 2026, 10:52 AM
-                  </td>
-                  <td data-label="Actor">
-                    <div class="row-people">
-                      <span class="avatar sm">NP</span>
-                      <span class="cell-primary">Nadeesha Perera</span>
-                    </div>
-                  </td>
-                  <td data-label="Action">
-                    <span class="badge badge-info">CREATE</span>
-                  </td>
-                  <td data-label="Entity" class="cell-secondary">
-                    Batch — Grade 6 Mathematics
-                  </td>
-                  <td data-label="Branch" class="cell-secondary">
-                    Colombo Main
-                  </td>
-                  <td data-label="Details" class="cell-secondary">
-                    Created a new batch
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Timestamp" class="cell-secondary">
-                    14 Sep 2026, 10:19 AM
-                  </td>
-                  <td data-label="Actor">
-                    <div class="row-people">
-                      <span class="avatar sm">RS</span>
-                      <span class="cell-primary">Ruwan Silva</span>
-                    </div>
-                  </td>
-                  <td data-label="Action">
-                    <span class="badge badge-success">STATUS_CHANGE</span>
-                  </td>
-                  <td data-label="Entity" class="cell-secondary">
-                    User — Chamodi Perera (Parent)
-                  </td>
-                  <td data-label="Branch" class="cell-secondary">Kandy</td>
-                  <td data-label="Details" class="cell-secondary">
-                    Approved a parent account
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Timestamp" class="cell-secondary">
-                    14 Sep 2026, 8:40 AM
-                  </td>
-                  <td data-label="Actor">
-                    <div class="row-people">
-                      <span class="avatar sm">AR</span>
-                      <span class="cell-primary">Aruna Rathnayake</span>
-                    </div>
-                  </td>
-                  <td data-label="Action">
-                    <span class="badge badge-danger">STATUS_CHANGE</span>
-                  </td>
-                  <td data-label="Entity" class="cell-secondary">
-                    User — J. Peiris (Teacher)
-                  </td>
-                  <td data-label="Branch" class="cell-secondary">
-                    Colombo Main
-                  </td>
-                  <td data-label="Details" class="cell-secondary">
-                    Deactivated a staff account
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Timestamp" class="cell-secondary">
-                    13 Sep 2026, 4:05 PM
-                  </td>
-                  <td data-label="Actor">
-                    <div class="row-people">
-                      <span class="avatar sm">IF</span>
-                      <span class="cell-primary">Ishara Fernando</span>
-                    </div>
-                  </td>
-                  <td data-label="Action">
-                    <span class="badge badge-info">UPDATE</span>
-                  </td>
-                  <td data-label="Entity" class="cell-secondary">
-                    Batch — Grade 8 Science
-                  </td>
-                  <td data-label="Branch" class="cell-secondary">Galle</td>
-                  <td data-label="Details" class="cell-secondary">
-                    Edited batch capacity
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Timestamp" class="cell-secondary">
-                    13 Sep 2026, 2:30 PM
-                  </td>
-                  <td data-label="Actor">
-                    <div class="row-people">
-                      <span class="avatar sm">DW</span>
-                      <span class="cell-primary">D. Wickramasinghe</span>
-                    </div>
-                  </td>
-                  <td data-label="Action">
-                    <span class="badge badge-warning">OVERRIDE</span>
-                  </td>
-                  <td data-label="Entity" class="cell-secondary">
-                    Attendance — Grade 6 Mathematics, 11 Sep
-                  </td>
-                  <td data-label="Branch" class="cell-secondary">
-                    Colombo Main
-                  </td>
-                  <td data-label="Details" class="cell-secondary">
-                    Edited attendance outside the 72-hour window (admin
-                    override)
-                  </td>
+                  <td colspan="6" class="cell-secondary">Loading…</td>
                 </tr>
               </tbody>
             </table>
@@ -244,6 +138,131 @@
     </div>
 
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      let tcmsAllLogs = [];
+      let tcmsUsersById = new Map();
+      let tcmsBranchesById = new Map();
+
+      function actionBadgeClass(action) {
+        if (action === "OVERRIDE") return "badge-warning";
+        if (action === "STATUS_CHANGE") return "badge-success";
+        return "badge-info";
+      }
+
+      function describeLog(log) {
+        if (log.entityType === "User" && log.before && log.after) {
+          return `Status changed: ${log.before.status || "?"} \u2192 ${log.after.status || "?"}`;
+        }
+        if (log.entityType === "Attendance" && log.after && log.after.reason) {
+          return `Edited attendance outside the 72-hour window \u2014 ${log.after.reason}`;
+        }
+        return `${log.action} on ${log.entityType}`;
+      }
+
+      function renderLogs() {
+        const entityType = document.getElementById("filter-entity-type").value;
+        const branchId = document.getElementById("filter-branch").value;
+        const date = document.getElementById("filter-date").value;
+
+        const filtered = tcmsAllLogs.filter((log) => {
+          if (entityType && log.entityType !== entityType) return false;
+          if (date && !log.createdAt.startsWith(date)) return false;
+          if (branchId) {
+            const actor = tcmsUsersById.get(log.actorUserId);
+            if (!actor || actor.branchId !== branchId) return false;
+          }
+          return true;
+        });
+
+        const tbody = document.getElementById("audit-log-table-body");
+        if (!filtered.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="cell-secondary">No audit activity matches these filters.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = filtered
+          .map((log) => {
+            const actor = tcmsUsersById.get(log.actorUserId);
+            const actorName = actor
+              ? `${actor.firstName} ${actor.lastName}`
+              : "Unknown";
+            const initials = actor
+              ? actor.firstName[0] + actor.lastName[0]
+              : "?";
+            const branch =
+              actor && actor.branchId
+                ? tcmsBranchesById.get(actor.branchId)
+                : null;
+            const when = new Date(log.createdAt).toLocaleString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return `<tr>
+              <td data-label="Timestamp" class="cell-secondary">${when}</td>
+              <td data-label="Actor"><div class="row-people"><span class="avatar sm">${initials}</span><span class="cell-primary">${actorName}</span></div></td>
+              <td data-label="Action"><span class="badge ${actionBadgeClass(log.action)}">${log.action}</span></td>
+              <td data-label="Entity" class="cell-secondary">${log.entityType} — ${log.entityId.slice(0, 8)}…</td>
+              <td data-label="Branch" class="cell-secondary">${branch ? branch.name : "—"}</td>
+              <td data-label="Details" class="cell-secondary">${describeLog(log)}</td>
+            </tr>`;
+          })
+          .join("");
+      }
+
+      (async function () {
+        const user = tcmsRequireAuth();
+        if (!user) return;
+        if (user.role !== "SUPER_ADMIN" && user.role !== "CENTER_ADMIN") {
+          window.location.href = tcmsHomeForRole(user.role);
+          return;
+        }
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
+
+        try {
+          const [logs, users, branches] = await Promise.all([
+            tcmsApiFetch("/audit-logs"),
+            tcmsApiFetch("/users"),
+            tcmsApiFetch("/branches"),
+          ]);
+          tcmsAllLogs = [...logs].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+          );
+          tcmsUsersById = new Map(users.map((u) => [u.id, u]));
+          tcmsBranchesById = new Map(branches.map((b) => [b.id, b]));
+          document.getElementById("filter-branch").innerHTML =
+            '<option value="">Branch: All</option>' +
+            branches
+              .map((b) => `<option value="${b.id}">${b.name}</option>`)
+              .join("");
+          renderLogs();
+        } catch (err) {
+          console.error("Failed to load audit log", err);
+          document.getElementById("audit-log-table-body").innerHTML =
+            '<tr><td colspan="6" class="cell-secondary">Failed to load audit log.</td></tr>';
+        }
+
+        document
+          .getElementById("filter-entity-type")
+          .addEventListener("change", renderLogs);
+        document
+          .getElementById("filter-branch")
+          .addEventListener("change", renderLogs);
+        document
+          .getElementById("filter-date")
+          .addEventListener("change", renderLogs);
+      })();
+    </script>
   </body>
 </html>

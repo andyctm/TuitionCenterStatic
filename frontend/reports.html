@@ -68,12 +68,19 @@
             <i data-icon="bell"></i>
           </button>
           <div class="user-chip">
-            <span class="avatar">AR</span>
+            <span class="avatar" id="user-avatar">AR</span>
             <span class="meta"
-              ><span class="name">Aruna Rathnayake</span
+              ><span class="name" id="user-name">Aruna Rathnayake</span
               ><span class="role">Super Admin</span></span
             >
-            <i data-icon="chevronDown" class="icon-sm"></i>
+            <button
+              class="btn btn-ghost btn-icon"
+              id="logout-btn"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <i data-icon="logout" class="icon-sm"></i>
+            </button>
           </div>
         </div>
       </header>
@@ -93,40 +100,35 @@
             class="panel-body"
             style="display: flex; flex-direction: column; gap: var(--space-4)"
           >
+            <div
+              class="banner banner-danger"
+              id="enrollment-report-error"
+              hidden
+            >
+              <i data-icon="alertTriangle" class="icon-sm"></i>
+              <span id="enrollment-report-error-message"></span>
+            </div>
             <div style="display: flex; gap: var(--space-3); flex-wrap: wrap">
-              <select class="input" style="width: auto">
-                <option>Branch: All</option>
-                <option>Colombo Main</option>
-                <option>Kandy</option>
-                <option>Galle</option>
-                <option>Negombo</option>
+              <select class="input" style="width: auto" id="enrollment-status">
+                <option value="ACTIVE">Status: Active</option>
+                <option value="">Status: All</option>
+                <option value="COMPLETED">Status: Completed</option>
+                <option value="WITHDRAWN">Status: Withdrawn</option>
               </select>
-              <select class="input" style="width: auto">
-                <option>Status: Active</option>
-                <option>Status: All</option>
-                <option>Status: Withdrawn</option>
-              </select>
-              <input
-                class="input"
-                style="width: auto"
-                type="date"
-                value="2026-01-01"
-              />
-              <span style="align-self: center; color: var(--text-muted)"
-                >to</span
+              <button
+                class="btn btn-primary"
+                style="margin-left: auto"
+                id="export-enrollment-btn"
               >
-              <input
-                class="input"
-                style="width: auto"
-                type="date"
-                value="2026-09-14"
-              />
-              <button class="btn btn-primary" style="margin-left: auto">
                 <i data-icon="reports" class="icon-sm"></i> Export CSV
               </button>
             </div>
-            <p class="cell-secondary" style="margin: 0">
-              612 active enrollments match the current filters.
+            <p
+              class="cell-secondary"
+              style="margin: 0"
+              id="enrollment-count-note"
+            >
+              Loading…
             </p>
           </div>
         </section>
@@ -139,41 +141,28 @@
             class="panel-body"
             style="display: flex; flex-direction: column; gap: var(--space-4)"
           >
+            <div
+              class="banner banner-danger"
+              id="attendance-report-error"
+              hidden
+            >
+              <i data-icon="alertTriangle" class="icon-sm"></i>
+              <span id="attendance-report-error-message"></span>
+            </div>
             <div style="display: flex; gap: var(--space-3); flex-wrap: wrap">
-              <select class="input" style="width: auto">
-                <option>Branch: All</option>
-                <option>Colombo Main</option>
-                <option>Kandy</option>
-                <option>Galle</option>
-                <option>Negombo</option>
+              <select class="input" style="width: auto" id="attendance-batch">
+                <option value="">Batch: All</option>
               </select>
-              <select class="input" style="width: auto">
-                <option>Batch: All</option>
-                <option>Grade 10 Mathematics</option>
-                <option>Grade 11 English</option>
-                <option>Grade 8 Science</option>
-              </select>
-              <input
-                class="input"
-                style="width: auto"
-                type="date"
-                value="2026-09-01"
-              />
-              <span style="align-self: center; color: var(--text-muted)"
-                >to</span
+              <button
+                class="btn btn-primary"
+                style="margin-left: auto"
+                id="export-attendance-btn"
               >
-              <input
-                class="input"
-                style="width: auto"
-                type="date"
-                value="2026-09-14"
-              />
-              <button class="btn btn-primary" style="margin-left: auto">
                 <i data-icon="reports" class="icon-sm"></i> Export CSV
               </button>
             </div>
             <p class="cell-secondary" style="margin: 0">
-              1,860 attendance records match the current filters.
+              Attendance records for the selected batch (or all batches).
             </p>
           </div>
         </section>
@@ -181,6 +170,82 @@
     </div>
 
     <script src="js/icons.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      (async function () {
+        const user = tcmsRequireAuth();
+        if (!user) return;
+        document.getElementById("user-avatar").textContent =
+          (user.firstName[0] || "") + (user.lastName[0] || "");
+        document.getElementById("user-name").textContent =
+          `${user.firstName} ${user.lastName}`;
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", tcmsLogout);
+
+        try {
+          const [enrollments, batches, courses] = await Promise.all([
+            tcmsApiFetch("/enrollments?status=ACTIVE"),
+            tcmsApiFetch("/batches"),
+            tcmsApiFetch("/courses"),
+          ]);
+          document.getElementById("enrollment-count-note").textContent =
+            `${enrollments.length} active enrollments match the current filters.`;
+          const coursesById = new Map(courses.map((c) => [c.id, c]));
+          document.getElementById("attendance-batch").innerHTML =
+            '<option value="">Batch: All</option>' +
+            batches
+              .map((b) => {
+                const course = coursesById.get(b.courseId);
+                return `<option value="${b.id}">${course ? course.name : b.id} (${b.room})</option>`;
+              })
+              .join("");
+        } catch (err) {
+          console.error("Failed to load report filters", err);
+        }
+
+        document
+          .getElementById("export-enrollment-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("enrollment-report-error");
+            errorBox.hidden = true;
+            const status = document.getElementById("enrollment-status").value;
+            const query = status ? `?status=${status}` : "";
+            try {
+              await tcmsDownloadFile(
+                `/reports/enrollment${query}`,
+                "enrollment-report.csv",
+              );
+            } catch (err) {
+              document.getElementById(
+                "enrollment-report-error-message",
+              ).textContent = err.message;
+              errorBox.hidden = false;
+            }
+          });
+
+        document
+          .getElementById("export-attendance-btn")
+          .addEventListener("click", async () => {
+            const errorBox = document.getElementById("attendance-report-error");
+            errorBox.hidden = true;
+            const batchId = document.getElementById("attendance-batch").value;
+            const query = batchId ? `?batchId=${batchId}` : "";
+            try {
+              await tcmsDownloadFile(
+                `/reports/attendance${query}`,
+                "attendance-report.csv",
+              );
+            } catch (err) {
+              document.getElementById(
+                "attendance-report-error-message",
+              ).textContent = err.message;
+              errorBox.hidden = false;
+            }
+          });
+      })();
+    </script>
   </body>
 </html>

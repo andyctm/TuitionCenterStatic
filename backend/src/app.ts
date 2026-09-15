@@ -17,6 +17,7 @@ import type { DashboardService } from './reporting/dashboardService';
 import type { EnrollmentReportService } from './reporting/enrollmentReportService';
 import type { AttendanceReportService } from './reporting/attendanceReportService';
 import type { AuditLogService } from './audit/auditLogService';
+import type { StudentsService } from './students/studentsService';
 import { isOriginAllowed } from './lib/corsAllowlist';
 import { errorHandler } from './middleware/errorHandler';
 import { createAuthRouter } from './routes/auth';
@@ -51,6 +52,7 @@ export type AppDeps = {
   enrollmentReportService: EnrollmentReportService;
   attendanceReportService: AttendanceReportService;
   auditLogService: AuditLogService;
+  studentsService: StudentsService;
   accessTokenSecret: string;
   internalJobSecret: string;
 };
@@ -92,7 +94,10 @@ export function createApp(deps: AppDeps): Express {
     createEnrollmentsRouter(deps.enrollmentService, deps.accessTokenSecret),
   );
   app.use('/api/sessions', createAttendanceRouter(deps.attendanceService, deps.accessTokenSecret));
-  app.use('/api/students', createStudentsRouter(deps.attendanceService, deps.accessTokenSecret));
+  app.use(
+    '/api/students',
+    createStudentsRouter(deps.attendanceService, deps.studentsService, deps.accessTokenSecret),
+  );
   app.use(
     '/api/internal',
     createInternalRouter(deps.sessionMaterializationService, deps.internalJobSecret),

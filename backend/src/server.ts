@@ -32,6 +32,7 @@ import { createDashboardService } from './reporting/dashboardService';
 import { createEnrollmentReportService } from './reporting/enrollmentReportService';
 import { createAttendanceReportService } from './reporting/attendanceReportService';
 import { createAuditLogService } from './audit/auditLogService';
+import { createStudentsService } from './students/studentsService';
 
 const env = parseEnv(process.env);
 
@@ -122,6 +123,7 @@ const auditLogService = createAuditLogService({
   classSessionRepo,
   batchRepo,
 });
+const studentsService = createStudentsService({ userRepo, studentProfileRepo });
 
 const app = createApp({
   allowedOrigins: env.allowedOrigins,
@@ -143,6 +145,7 @@ const app = createApp({
   enrollmentReportService,
   attendanceReportService,
   auditLogService,
+  studentsService,
   accessTokenSecret: env.jwtAccessSecret,
   internalJobSecret: env.internalJobSecret,
 });

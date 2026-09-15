@@ -154,51 +154,30 @@
             <input
               class="input"
               id="student-search"
-              placeholder="Search by name or student ID…"
-              value="Nimasha Ranasinghe"
+              placeholder="Search by name or email…"
             />
           </div>
+          <div
+            id="student-results"
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-2);
+              margin-top: var(--space-2);
+              max-height: 200px;
+              overflow-y: auto;
+            "
+          ></div>
         </div>
         <div class="field">
           <label>Choose a batch</label>
           <div
+            id="batch-results"
             style="display: flex; flex-direction: column; gap: var(--space-2)"
-          >
-            <label class="seat-option" data-seat-option>
-              <div class="row-people">
-                <input type="radio" name="batch" />
-                <div class="meta">
-                  <div class="cell-primary">Grade 10 Mathematics</div>
-                  <div class="sub">Mon/Wed/Fri · 8:00–9:30 AM · Room 2</div>
-                </div>
-              </div>
-              <span class="seat-fill">18 / 30 seats</span>
-            </label>
-            <label class="seat-option" data-seat-option>
-              <div class="row-people">
-                <input type="radio" name="batch" />
-                <div class="meta">
-                  <div class="cell-primary">Grade 10 Mathematics — Evening</div>
-                  <div class="sub">Tue/Thu · 5:00–6:30 PM · Room 1</div>
-                </div>
-              </div>
-              <span class="seat-fill">22 / 25 seats</span>
-            </label>
-            <label class="seat-option is-full" data-seat-option>
-              <div class="row-people">
-                <input type="radio" name="batch" disabled />
-                <div class="meta">
-                  <div class="cell-primary">Grade 11 English</div>
-                  <div class="sub">Mon/Wed/Fri · 11:15–12:30 PM · Room 3</div>
-                </div>
-              </div>
-              <span class="seat-fill">30 / 30 seats</span>
-            </label>
-          </div>
+          ></div>
           <div class="error-msg" data-seat-error hidden>
             <i data-icon="alertTriangle" class="icon-sm"></i>
-            This batch is at full capacity (30/30). Choose another batch or a
-            waitlist option.
+            <span data-seat-error-text></span>
           </div>
         </div>
       </div>
@@ -385,6 +364,165 @@
         });
       }
 
+      let tcmsEnrollStudents = [];
+      let tcmsEnrollBatches = [];
+      let tcmsEnrollCourses = [];
+      let tcmsEnrollSeats = new Map();
+      let tcmsSelectedStudentProfileId = null;
+      let tcmsSelectedBatchId = null;
+
+      function renderStudentOptions(filterText) {
+        const container = document.getElementById("student-results");
+        const term = (filterText || "").trim().toLowerCase();
+        const matches = tcmsEnrollStudents
+          .filter((s) => {
+            const haystack =
+              `${s.firstName} ${s.lastName} ${s.email}`.toLowerCase();
+            return !term || haystack.includes(term);
+          })
+          .slice(0, 8);
+        container.innerHTML = matches.length
+          ? matches
+              .map(
+                (s) => `<label class="seat-option" data-seat-option>
+            <div class="row-people">
+              <input type="radio" name="enroll-student" value="${s.studentProfileId}" ${s.studentProfileId === tcmsSelectedStudentProfileId ? "checked" : ""} />
+              <div class="meta">
+                <div class="cell-primary">${s.firstName} ${s.lastName}</div>
+                <div class="sub">${s.email}</div>
+              </div>
+            </div>
+          </label>`,
+              )
+              .join("")
+          : '<p class="cell-secondary">No matching students in this branch.</p>';
+        renderIcons(container);
+      }
+
+      function renderBatchOptions() {
+        const container = document.getElementById("batch-results");
+        container.innerHTML = tcmsEnrollBatches.length
+          ? tcmsEnrollBatches
+              .map((batch) => {
+                const course = tcmsEnrollCourses.find(
+                  (c) => c.id === batch.courseId,
+                );
+                const filled = tcmsEnrollSeats.get(batch.id) || 0;
+                const isFull = filled >= batch.capacity;
+                return `<label class="seat-option${isFull ? " is-full" : ""}" data-seat-option>
+            <div class="row-people">
+              <input type="radio" name="enroll-batch" value="${batch.id}" ${isFull ? "disabled" : ""} ${batch.id === tcmsSelectedBatchId ? "checked" : ""} />
+              <div class="meta">
+                <div class="cell-primary">${course ? course.name : "Unknown course"}</div>
+                <div class="sub">Room ${batch.room} \u00b7 ${batch.term}</div>
+              </div>
+            </div>
+            <span class="seat-fill">${filled} / ${batch.capacity}</span>
+          </label>`;
+              })
+              .join("")
+          : '<p class="cell-secondary">No active batches available for this branch yet.</p>';
+        renderIcons(container);
+      }
+
+      async function loadEnrollDialogData() {
+        const [students, batches, courses, activeEnrollments] =
+          await Promise.all([
+            tcmsApiFetch("/students"),
+            tcmsApiFetch("/batches"),
+            tcmsApiFetch("/courses"),
+            tcmsApiFetch("/enrollments?status=ACTIVE"),
+          ]);
+        tcmsEnrollStudents = students;
+        tcmsEnrollBatches = batches.filter((b) => b.status !== "ARCHIVED");
+        tcmsEnrollCourses = courses;
+        tcmsEnrollSeats = new Map();
+        for (const enrollment of activeEnrollments) {
+          tcmsEnrollSeats.set(
+            enrollment.batchId,
+            (tcmsEnrollSeats.get(enrollment.batchId) || 0) + 1,
+          );
+        }
+      }
+
+      function initEnrollDialog() {
+        const dialog = document.getElementById("enroll-dialog");
+        const openBtn = document.querySelector(
+          '[data-open-modal="enroll-dialog"]',
+        );
+        const searchInput = document.getElementById("student-search");
+        const studentResults = document.getElementById("student-results");
+        const batchResults = document.getElementById("batch-results");
+        const confirmBtn = document.querySelector("[data-enroll-confirm]");
+        const errorEl = document.querySelector("[data-seat-error]");
+        const errorText = document.querySelector("[data-seat-error-text]");
+
+        function updateConfirmState() {
+          confirmBtn.disabled =
+            !tcmsSelectedStudentProfileId || !tcmsSelectedBatchId;
+        }
+
+        openBtn.addEventListener("click", async () => {
+          tcmsSelectedStudentProfileId = null;
+          tcmsSelectedBatchId = null;
+          searchInput.value = "";
+          errorEl.hidden = true;
+          updateConfirmState();
+          studentResults.innerHTML = '<p class="cell-secondary">Loading…</p>';
+          batchResults.innerHTML = '<p class="cell-secondary">Loading…</p>';
+          try {
+            await loadEnrollDialogData();
+            renderStudentOptions("");
+            renderBatchOptions();
+          } catch (err) {
+            studentResults.innerHTML = `<p class="cell-secondary">Failed to load students: ${err.message}</p>`;
+            batchResults.innerHTML = "";
+          }
+        });
+
+        searchInput.addEventListener("input", () =>
+          renderStudentOptions(searchInput.value),
+        );
+
+        studentResults.addEventListener("change", (e) => {
+          if (e.target.name === "enroll-student") {
+            tcmsSelectedStudentProfileId = e.target.value;
+            updateConfirmState();
+          }
+        });
+
+        batchResults.addEventListener("change", (e) => {
+          if (e.target.name === "enroll-batch") {
+            tcmsSelectedBatchId = e.target.value;
+            errorEl.hidden = true;
+            updateConfirmState();
+          }
+        });
+
+        confirmBtn.addEventListener("click", async () => {
+          if (!tcmsSelectedStudentProfileId || !tcmsSelectedBatchId) return;
+          confirmBtn.disabled = true;
+          errorEl.hidden = true;
+          try {
+            await tcmsApiFetch("/enrollments", {
+              method: "POST",
+              body: JSON.stringify({
+                batchId: tcmsSelectedBatchId,
+                studentProfileId: tcmsSelectedStudentProfileId,
+              }),
+            });
+            dialog.close();
+            await refreshEnrollments();
+          } catch (err) {
+            errorText.textContent =
+              err.message || "Could not enroll this student.";
+            errorEl.hidden = false;
+          } finally {
+            confirmBtn.disabled = false;
+          }
+        });
+      }
+
       (function () {
         const user = tcmsRequireAuth();
         if (!user) return;
@@ -400,6 +538,7 @@
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);
         initManageEnrollment();
+        initEnrollDialog();
         refreshEnrollments().catch((err) => {
           document.getElementById("enrollment-table-body").innerHTML =
             `<tr><td colspan="5" class="cell-secondary">Failed to load enrollments: ${err.message}</td></tr>`;

@@ -14,6 +14,7 @@ import { createDashboardService } from '../reporting/dashboardService';
 import { createEnrollmentReportService } from '../reporting/enrollmentReportService';
 import { createAttendanceReportService } from '../reporting/attendanceReportService';
 import { createAuditLogService } from '../audit/auditLogService';
+import { createStudentsService } from '../students/studentsService';
 import {
   createFakeAttendanceRepository,
   createFakeAuditLogRepository,
@@ -162,6 +163,7 @@ export function createTestApp(
     classSessionRepo,
     batchRepo,
   });
+  const studentsService = createStudentsService({ userRepo, studentProfileRepo });
 
   const app = createApp({
     allowedOrigins: TEST_ALLOWED_ORIGINS,
@@ -181,6 +183,7 @@ export function createTestApp(
     enrollmentReportService,
     attendanceReportService,
     auditLogService,
+    studentsService,
     accessTokenSecret: TEST_ACCESS_TOKEN_SECRET,
     internalJobSecret: TEST_INTERNAL_JOB_SECRET,
   });
@@ -218,6 +221,7 @@ export function createTestApp(
     enrollmentReportService,
     attendanceReportService,
     auditLogService,
+    studentsService,
   };
 }
 

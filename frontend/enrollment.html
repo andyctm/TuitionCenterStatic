@@ -70,7 +70,7 @@
         <div class="page-header">
           <div>
             <h1>Enrollment</h1>
-            <p class="subtitle">Colombo Main · showing active enrollments</p>
+            <p class="subtitle" id="enrollment-subtitle">Loading…</p>
           </div>
           <div class="header-actions">
             <button class="btn btn-primary" data-open-modal="enroll-dialog">
@@ -107,10 +107,9 @@
                 class="input"
                 style="width: auto"
                 data-filter-select="Batch"
+                id="enrollment-batch-filter"
               >
                 <option>Batch: All</option>
-                <option>Grade 10 Mathematics</option>
-                <option>Grade 11 English</option>
               </select>
             </div>
           </div>
@@ -125,114 +124,9 @@
                   <th></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="enrollment-table-body">
                 <tr>
-                  <td data-label="Student">
-                    <div class="row-people">
-                      <span class="avatar sm">SP</span>
-                      <div class="meta">
-                        <div>Sithara Perera</div>
-                        <div class="sub">Grade 10</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td data-label="Batch" class="cell-secondary">
-                    Grade 10 Mathematics
-                  </td>
-                  <td data-label="Enrolled since" class="cell-secondary">
-                    14 Sep 2026
-                  </td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
-                      Manage
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Student">
-                    <div class="row-people">
-                      <span class="avatar sm">KD</span>
-                      <div class="meta">
-                        <div>Kasun Dias</div>
-                        <div class="sub">Grade 11</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td data-label="Batch" class="cell-secondary">
-                    Grade 11 English
-                  </td>
-                  <td data-label="Enrolled since" class="cell-secondary">
-                    14 Sep 2026
-                  </td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
-                      Manage
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Student">
-                    <div class="row-people">
-                      <span class="avatar sm">MW</span>
-                      <div class="meta">
-                        <div>Malsha Wijesinghe</div>
-                        <div class="sub">Grade 8</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td data-label="Batch" class="cell-secondary">
-                    Grade 8 Science
-                  </td>
-                  <td data-label="Enrolled since" class="cell-secondary">
-                    2 Sep 2026
-                  </td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
-                      Manage
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Student">
-                    <div class="row-people">
-                      <span class="avatar sm">HJ</span>
-                      <div class="meta">
-                        <div>Hasini Jayawardena</div>
-                        <div class="sub">Grade 6</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td data-label="Batch" class="cell-secondary">
-                    Grade 6 Mathematics
-                  </td>
-                  <td data-label="Enrolled since" class="cell-secondary">
-                    28 Aug 2026
-                  </td>
-                  <td data-label="Status">
-                    <span class="badge badge-success"
-                      ><i data-icon="checkCircle"></i>Active</span
-                    >
-                  </td>
-                  <td>
-                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
-                      Manage
-                    </button>
-                  </td>
+                  <td colspan="5" class="cell-secondary">Loading…</td>
                 </tr>
               </tbody>
             </table>
@@ -339,9 +233,9 @@
         <div class="field">
           <label for="manage-enrollment-status">Status</label>
           <select class="input" id="manage-enrollment-status">
-            <option value="Active">Active</option>
-            <option value="Completed">Completed</option>
-            <option value="Withdrawn">Withdrawn</option>
+            <option value="ACTIVE">Active</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="WITHDRAWN">Withdrawn</option>
           </select>
         </div>
       </div>
@@ -358,16 +252,94 @@
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
-      // Enrollment rows are static mockup data (this page isn't wired to the live API yet —
-      // see DESIGN.md), so "Manage" only updates the status badge shown on screen.
       const ENROLLMENT_STATUS_BADGES = {
-        Active:
+        ACTIVE:
           '<span class="badge badge-success"><i data-icon="checkCircle"></i>Active</span>',
-        Completed:
+        COMPLETED:
           '<span class="badge badge-info"><i data-icon="checkCircle"></i>Completed</span>',
-        Withdrawn:
+        WITHDRAWN:
           '<span class="badge badge-danger"><i data-icon="xCircle"></i>Withdrawn</span>',
       };
+
+      let tcmsEnrollmentsCache = [];
+
+      function initials(name) {
+        return name
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part[0].toUpperCase())
+          .join("");
+      }
+
+      function formatEnrolledDate(dateStr) {
+        return new Date(dateStr).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      function renderEnrollmentRow(enrollment) {
+        return `<tr>
+          <td data-label="Student">
+            <div class="row-people">
+              <span class="avatar sm">${initials(enrollment.studentName)}</span>
+              <div class="meta">
+                <div>${enrollment.studentName}</div>
+                <div class="sub">${enrollment.studentGradeLevel}</div>
+              </div>
+            </div>
+          </td>
+          <td data-label="Batch" class="cell-secondary">${enrollment.batchLabel}</td>
+          <td data-label="Enrolled since" class="cell-secondary">${formatEnrolledDate(enrollment.enrolledAt)}</td>
+          <td data-label="Status">${ENROLLMENT_STATUS_BADGES[enrollment.status]}</td>
+          <td>
+            <button class="btn btn-ghost btn-sm" data-manage-enrollment="${enrollment.id}">
+              Manage
+            </button>
+          </td>
+        </tr>`;
+      }
+
+      async function refreshEnrollments() {
+        const tbody = document.getElementById("enrollment-table-body");
+        const [enrollments, branches] = await Promise.all([
+          tcmsApiFetch("/enrollments"),
+          tcmsApiFetch("/branches"),
+        ]);
+        tcmsEnrollmentsCache = enrollments;
+
+        const user = tcmsGetUser();
+        const branch = user
+          ? branches.find((b) => b.id === user.branchId)
+          : null;
+        document.getElementById("enrollment-subtitle").textContent = branch
+          ? `${branch.name} \u00b7 showing active enrollments`
+          : "All branches \u00b7 showing active enrollments";
+
+        const batchLabels = [
+          ...new Set(enrollments.map((e) => e.batchLabel)),
+        ].sort();
+        const batchSelect = document.getElementById("enrollment-batch-filter");
+        const previousBatchValue = batchSelect.value;
+        batchSelect.innerHTML =
+          "<option>Batch: All</option>" +
+          batchLabels.map((label) => `<option>${label}</option>`).join("");
+        if (
+          [...batchSelect.options].some(
+            (o) => o.textContent === previousBatchValue,
+          )
+        ) {
+          batchSelect.value = previousBatchValue;
+        }
+
+        tbody.innerHTML = enrollments.length
+          ? enrollments.map(renderEnrollmentRow).join("")
+          : '<tr><td colspan="5" class="cell-secondary">No enrollments yet.</td></tr>';
+        renderIcons(tbody);
+        tcmsApplyTableFilters();
+      }
 
       function initManageEnrollment() {
         const dialog = document.getElementById("manage-enrollment-dialog");
@@ -377,39 +349,39 @@
           "manage-enrollment-status",
         );
         const saveBtn = document.querySelector("[data-manage-enrollment-save]");
-        let activeRow = null;
+        let activeEnrollmentId = null;
 
-        document.querySelectorAll("[data-manage-enrollment]").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            activeRow = btn.closest("tr");
-            if (!activeRow) return;
-            studentEl.textContent =
-              activeRow.querySelector(
-                '[data-label="Student"] .row-people > .meta > div',
-              )?.textContent || "";
-            batchEl.textContent =
-              activeRow
-                .querySelector('[data-label="Batch"]')
-                ?.textContent.trim() || "";
-            const currentStatus =
-              activeRow
-                .querySelector('[data-label="Status"]')
-                ?.textContent.trim() || "Active";
-            statusSelect.value =
-              currentStatus in ENROLLMENT_STATUS_BADGES
-                ? currentStatus
-                : "Active";
+        document
+          .getElementById("enrollment-table-body")
+          .addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-manage-enrollment]");
+            if (!btn) return;
+            activeEnrollmentId = btn.getAttribute("data-manage-enrollment");
+            const enrollment = tcmsEnrollmentsCache.find(
+              (en) => en.id === activeEnrollmentId,
+            );
+            if (!enrollment) return;
+            studentEl.textContent = enrollment.studentName;
+            batchEl.textContent = enrollment.batchLabel;
+            statusSelect.value = enrollment.status;
             if (dialog.showModal) dialog.showModal();
           });
-        });
 
-        saveBtn.addEventListener("click", () => {
-          if (!activeRow) return;
-          const statusCell = activeRow.querySelector('[data-label="Status"]');
-          statusCell.innerHTML = ENROLLMENT_STATUS_BADGES[statusSelect.value];
-          renderIcons(statusCell);
-          tcmsApplyTableFilters();
-          dialog.close();
+        saveBtn.addEventListener("click", async () => {
+          if (!activeEnrollmentId) return;
+          saveBtn.disabled = true;
+          try {
+            await tcmsApiFetch(`/enrollments/${activeEnrollmentId}`, {
+              method: "PATCH",
+              body: JSON.stringify({ status: statusSelect.value }),
+            });
+            dialog.close();
+            await refreshEnrollments();
+          } catch (err) {
+            alert(err.message || "Could not update the enrollment status.");
+          } finally {
+            saveBtn.disabled = false;
+          }
         });
       }
 
@@ -428,6 +400,10 @@
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);
         initManageEnrollment();
+        refreshEnrollments().catch((err) => {
+          document.getElementById("enrollment-table-body").innerHTML =
+            `<tr><td colspan="5" class="cell-secondary">Failed to load enrollments: ${err.message}</td></tr>`;
+        });
       })();
     </script>
   </body>

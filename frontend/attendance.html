@@ -50,7 +50,7 @@
             ><i data-icon="chevronLeft" class="icon-sm"></i
           ></a>
           <span id="breadcrumb-role">Teacher</span><span class="sep">/</span
-          ><span class="current">Grade 6 Mathematics</span>
+          ><span class="current" id="breadcrumb-current">Attendance</span>
         </div>
         <div class="topbar-actions">
           <div class="user-chip">
@@ -73,308 +73,84 @@
       <main class="content" style="padding-bottom: 0">
         <div class="page-header">
           <div>
-            <h1>Grade 6 Mathematics</h1>
-            <p class="subtitle">Monday, 14 Sep · 1:00–2:15 PM · Room 2</p>
+            <h1 id="page-title">Loading…</h1>
+            <p class="subtitle" id="page-subtitle"></p>
           </div>
         </div>
 
-        <section class="panel" style="display: flex; flex-direction: column">
+        <section
+          class="panel"
+          id="session-picker-panel"
+          hidden
+          style="margin-bottom: var(--space-4)"
+        >
+          <div class="panel-body">
+            <label for="session-picker">Choose a class session to mark</label>
+            <select
+              class="input"
+              id="session-picker"
+              style="max-width: 420px; margin-top: var(--space-2)"
+            ></select>
+          </div>
+        </section>
+
+        <section
+          class="panel"
+          id="roster-panel"
+          style="display: flex; flex-direction: column"
+          hidden
+        >
           <div class="roster">
             <div class="roster-head">
               <span>Student</span><span>Status</span><span>Remarks</span>
             </div>
 
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">SP</span>
-                <div class="meta">
-                  <div class="cell-primary">Sithara Perera</div>
+            <div id="roster-body">
+              <div class="roster-row" data-roster-loading>
+                <div class="row-people">
+                  <div class="meta">
+                    <div class="cell-primary">Loading roster…</div>
+                  </div>
                 </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button
-                  data-status="present"
-                  class="is-selected"
-                  aria-pressed="true"
-                >
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks hidden>
-                <input class="input" placeholder="Add a remark…" />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">KD</span>
-                <div class="meta">
-                  <div class="cell-primary">Kasun Dias</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button
-                  data-status="present"
-                  class="is-selected"
-                  aria-pressed="true"
-                >
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks hidden>
-                <input class="input" placeholder="Add a remark…" />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">MW</span>
-                <div class="meta">
-                  <div class="cell-primary">Malsha Wijesinghe</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button data-status="present" aria-pressed="false">
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button
-                  data-status="absent"
-                  class="is-selected"
-                  aria-pressed="true"
-                >
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks>
-                <input
-                  class="input"
-                  placeholder="Add a remark…"
-                  value="Called in sick — mother notified front desk"
-                />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">HJ</span>
-                <div class="meta">
-                  <div class="cell-primary">Hasini Jayawardena</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button data-status="present" aria-pressed="false">
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button
-                  data-status="late"
-                  class="is-selected"
-                  aria-pressed="true"
-                >
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks>
-                <input
-                  class="input"
-                  placeholder="Add a remark…"
-                  value="Arrived 15 minutes late"
-                />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">NR</span>
-                <div class="meta">
-                  <div class="cell-primary">Nimasha Ranasinghe</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button
-                  data-status="present"
-                  class="is-selected"
-                  aria-pressed="true"
-                >
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks hidden>
-                <input class="input" placeholder="Add a remark…" />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">TF</span>
-                <div class="meta">
-                  <div class="cell-primary">Tharusha Fonseka</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button data-status="present" aria-pressed="false">
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks hidden>
-                <input class="input" placeholder="Add a remark…" />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">RA</span>
-                <div class="meta">
-                  <div class="cell-primary">Ravindu Abeysekera</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button
-                  data-status="present"
-                  class="is-selected"
-                  aria-pressed="true"
-                >
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks hidden>
-                <input class="input" placeholder="Add a remark…" />
-              </div>
-            </div>
-
-            <div class="roster-row" data-roster-row>
-              <div class="row-people">
-                <span class="avatar sm">CW</span>
-                <div class="meta">
-                  <div class="cell-primary">Chamath Weerasinghe</div>
-                </div>
-              </div>
-              <div
-                class="segmented"
-                role="group"
-                aria-label="Attendance status"
-              >
-                <button data-status="present" aria-pressed="false">
-                  <i data-icon="check" class="icon-sm"></i>Present
-                </button>
-                <button data-status="absent" aria-pressed="false">
-                  <i data-icon="xCircle" class="icon-sm"></i>Absent
-                </button>
-                <button data-status="late" aria-pressed="false">
-                  <i data-icon="clock" class="icon-sm"></i>Late
-                </button>
-                <button data-status="excused" aria-pressed="false">
-                  <i data-icon="minusCircle" class="icon-sm"></i>Excused
-                </button>
-              </div>
-              <div class="remarks-field" data-remarks hidden>
-                <input class="input" placeholder="Add a remark…" />
               </div>
             </div>
           </div>
         </section>
 
-        <div class="banner banner-info">
+        <div class="banner banner-danger" id="load-error-banner" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="load-error-text">Failed to load this session.</span>
+        </div>
+
+        <div class="banner banner-info" id="window-banner" hidden>
           <i data-icon="info" class="icon-sm"></i>
           <span
-            ><strong>Example — outside the edit window:</strong> "This session
-            is outside the 72-hour edit window —
-            <a href="#">request an admin override</a>."</span
+            >This session is outside the 72-hour edit window — ask a Center
+            Admin or Super Admin to override it via the Audit Log.</span
           >
         </div>
 
-        <div class="save-bar" data-save-bar>
+        <div class="banner banner-danger" id="save-error-banner" hidden>
+          <i data-icon="alertTriangle" class="icon-sm"></i>
+          <span id="save-error-text">Failed to save attendance.</span>
+        </div>
+
+        <div class="save-bar" data-save-bar hidden>
           <span class="progress-text"
-            ><strong data-progress-count>0 of 8 marked</strong></span
+            ><strong data-progress-count>0 of 0 marked</strong></span
           >
           <button class="btn btn-primary" data-save-btn disabled>
             Save Attendance
           </button>
         </div>
+        <p
+          class="cell-secondary"
+          id="readonly-note"
+          hidden
+          style="margin-top: var(--space-2)"
+        >
+          Only the assigned teacher can save attendance for this session.
+        </p>
       </main>
     </div>
     <script src="js/icons.js"></script>
@@ -382,7 +158,255 @@
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
-      (function () {
+      const TCMS_ATTENDANCE_STATUSES = [
+        { value: "present", label: "Present", icon: "check" },
+        { value: "absent", label: "Absent", icon: "xCircle" },
+        { value: "late", label: "Late", icon: "clock" },
+        { value: "excused", label: "Excused", icon: "minusCircle" },
+      ];
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+
+      function rosterRowHtml(entry) {
+        const currentStatus = entry.status ? entry.status.toLowerCase() : null;
+        const buttons = TCMS_ATTENDANCE_STATUSES.map((s) => {
+          const selected = currentStatus === s.value;
+          return `<button data-status="${s.value}" class="${selected ? "is-selected" : ""}" aria-pressed="${selected}"><i data-icon="${s.icon}" class="icon-sm"></i>${s.label}</button>`;
+        }).join("");
+        const initials = (entry.firstName[0] || "") + (entry.lastName[0] || "");
+        const remarksHidden =
+          currentStatus === null || currentStatus === "present";
+        return `<div class="roster-row" data-roster-row data-student-id="${entry.studentProfileId}">
+          <div class="row-people">
+            <span class="avatar sm">${escapeHtml(initials)}</span>
+            <div class="meta"><div class="cell-primary">${escapeHtml(entry.firstName)} ${escapeHtml(entry.lastName)}</div></div>
+          </div>
+          <div class="segmented" role="group" aria-label="Attendance status">${buttons}</div>
+          <div class="remarks-field" data-remarks ${remarksHidden ? "hidden" : ""}>
+            <input class="input" placeholder="Add a remark…" value="${escapeHtml(entry.remarks || "")}" />
+          </div>
+        </div>`;
+      }
+
+      function formatSessionDate(dateStr) {
+        return new Date(dateStr).toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "numeric",
+          month: "short",
+        });
+      }
+
+      // Loads and renders one session's roster. Sets the URL's ?sessionId so the page is
+      // shareable/reloadable, without a full navigation.
+      async function loadSession(user, sessionId, batchId) {
+        const params = new URLSearchParams(window.location.search);
+        params.set("sessionId", sessionId);
+        if (batchId) params.set("batchId", batchId);
+        window.history.replaceState(
+          null,
+          "",
+          `attendance.html?${params.toString()}`,
+        );
+
+        document.getElementById("session-picker-panel").hidden = true;
+        document.getElementById("load-error-banner").hidden = true;
+        document.getElementById("window-banner").hidden = true;
+        document.getElementById("save-error-banner").hidden = true;
+        const rosterPanel = document.getElementById("roster-panel");
+        const saveBar = document.querySelector("[data-save-bar]");
+        rosterPanel.hidden = false;
+        document.getElementById("page-title").textContent = "Loading…";
+        document.getElementById("page-subtitle").textContent = "";
+
+        try {
+          const [batch, roster, courses, schedules] = await Promise.all([
+            batchId
+              ? tcmsApiFetch(`/batches/${batchId}`)
+              : Promise.resolve(null),
+            tcmsApiFetch(`/sessions/${sessionId}/attendance`),
+            tcmsApiFetch("/courses"),
+            batchId
+              ? tcmsApiFetch(`/batches/${batchId}/schedules`)
+              : Promise.resolve([]),
+          ]);
+
+          let sessionDate = null;
+          if (batchId) {
+            const sessions = await tcmsApiFetch(`/batches/${batchId}/sessions`);
+            const session = sessions.find((s) => s.id === sessionId);
+            sessionDate = session ? session.sessionDate : null;
+          }
+
+          const course = batch
+            ? courses.find((c) => c.id === batch.courseId)
+            : null;
+          const title = course ? course.name : "Class session";
+          document.getElementById("page-title").textContent = title;
+          document.getElementById("breadcrumb-current").textContent = title;
+
+          const subtitleParts = [];
+          if (sessionDate) subtitleParts.push(formatSessionDate(sessionDate));
+          if (batch && schedules.length) {
+            const daySchedule = sessionDate
+              ? schedules.find(
+                  (s) => s.dayOfWeek === new Date(sessionDate).getUTCDay(),
+                )
+              : schedules[0];
+            if (daySchedule)
+              subtitleParts.push(
+                `${daySchedule.startTime}–${daySchedule.endTime}`,
+              );
+          }
+          if (batch) subtitleParts.push(`Room ${batch.room}`);
+          document.getElementById("page-subtitle").textContent =
+            subtitleParts.join(" · ");
+
+          const rosterBody = document.getElementById("roster-body");
+          if (!roster.length) {
+            rosterBody.innerHTML =
+              '<div class="roster-row"><div class="row-people"><div class="meta"><div class="cell-primary">No active enrollments for this session.</div></div></div></div>';
+          } else {
+            rosterBody.innerHTML = roster.map(rosterRowHtml).join("");
+          }
+          renderIcons(rosterBody);
+          initSegmented();
+
+          const canSave = user.role === "TEACHER";
+          document.getElementById("readonly-note").hidden = canSave;
+          saveBar.hidden = !roster.length;
+          document.querySelector("[data-save-btn]").style.display = canSave
+            ? ""
+            : "none";
+        } catch (err) {
+          console.error("Failed to load attendance session", err);
+          document.getElementById("page-title").textContent = "Attendance";
+          document.getElementById("load-error-text").textContent =
+            err.message || "Failed to load this session.";
+          document.getElementById("load-error-banner").hidden = false;
+          rosterPanel.hidden = true;
+        }
+      }
+
+      // No ?sessionId given — offer the caller's own upcoming/recent sessions to pick from,
+      // since Teacher can't list all batches/enrollments directly (role-scoped elsewhere).
+      async function showSessionPicker(user) {
+        document.getElementById("page-title").textContent = "Attendance";
+        document.getElementById("page-subtitle").textContent =
+          "Choose a class session to mark.";
+        const picker = document.getElementById("session-picker");
+        const panel = document.getElementById("session-picker-panel");
+        try {
+          const [batches, courses] = await Promise.all([
+            tcmsApiFetch("/batches"),
+            tcmsApiFetch("/courses"),
+          ]);
+          const coursesById = new Map(courses.map((c) => [c.id, c]));
+          const sessionsByBatch = await Promise.all(
+            batches.map((batch) =>
+              tcmsApiFetch(`/batches/${batch.id}/sessions`).catch(() => []),
+            ),
+          );
+          const options = [];
+          batches.forEach((batch, i) => {
+            for (const session of sessionsByBatch[i]) {
+              options.push({ batch, session });
+            }
+          });
+          options.sort(
+            (a, b) =>
+              new Date(b.session.sessionDate) - new Date(a.session.sessionDate),
+          );
+
+          if (!options.length) {
+            document.getElementById("load-error-text").textContent =
+              "No class sessions found for your batches.";
+            document.getElementById("load-error-banner").hidden = false;
+            return;
+          }
+
+          picker.innerHTML = options
+            .slice(0, 30)
+            .map(({ batch, session }) => {
+              const course = coursesById.get(batch.courseId);
+              const label = `${course ? course.name : "Batch"} — ${formatSessionDate(session.sessionDate)}`;
+              return `<option value="${session.id}" data-batch-id="${batch.id}">${escapeHtml(label)}</option>`;
+            })
+            .join("");
+          panel.hidden = false;
+          picker.addEventListener("change", () => {
+            const selected = picker.selectedOptions[0];
+            loadSession(
+              user,
+              selected.value,
+              selected.getAttribute("data-batch-id"),
+            );
+          });
+          const first = picker.selectedOptions[0];
+          if (first)
+            loadSession(user, first.value, first.getAttribute("data-batch-id"));
+        } catch (err) {
+          console.error("Failed to load sessions", err);
+          document.getElementById("load-error-text").textContent =
+            err.message || "Failed to load your class sessions.";
+          document.getElementById("load-error-banner").hidden = false;
+        }
+      }
+
+      async function handleSave(user, sessionId) {
+        const saveBtn = document.querySelector("[data-save-btn]");
+        const rows = document.querySelectorAll("[data-roster-row]");
+        const records = Array.from(rows).map((row) => {
+          const selected = row.querySelector(".segmented button.is-selected");
+          const remarksInput = row.querySelector("[data-remarks] input");
+          const remarks = remarksInput ? remarksInput.value.trim() : "";
+          return {
+            studentProfileId: row.getAttribute("data-student-id"),
+            status: selected.getAttribute("data-status").toUpperCase(),
+            ...(remarks ? { remarks } : {}),
+          };
+        });
+
+        document.getElementById("save-error-banner").hidden = true;
+        document.getElementById("window-banner").hidden = true;
+        saveBtn.disabled = true;
+        const originalLabel = saveBtn.textContent;
+        saveBtn.textContent = "Saving…";
+        try {
+          await tcmsApiFetch(`/sessions/${sessionId}/attendance`, {
+            method: "PUT",
+            body: JSON.stringify({ records }),
+          });
+          saveBtn.textContent = "Saved ✓";
+          setTimeout(() => {
+            saveBtn.textContent = originalLabel;
+          }, 2000);
+        } catch (err) {
+          saveBtn.textContent = originalLabel;
+          if (err.status === 403) {
+            document.getElementById("window-banner").hidden = false;
+          } else {
+            document.getElementById("save-error-text").textContent =
+              err.message || "Failed to save attendance.";
+            document.getElementById("save-error-banner").hidden = false;
+          }
+        } finally {
+          updateSaveBar();
+        }
+      }
+
+      (async function () {
         const user = tcmsRequireAuth();
         if (!user) return;
         tcmsRenderSidebarForRole(user.role);
@@ -399,6 +423,24 @@
         document
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);
+
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get("sessionId");
+        const batchId = params.get("batchId");
+        if (sessionId) {
+          await loadSession(user, sessionId, batchId);
+        } else {
+          await showSessionPicker(user);
+        }
+
+        document
+          .querySelector("[data-save-btn]")
+          .addEventListener("click", () => {
+            const currentSessionId = new URLSearchParams(
+              window.location.search,
+            ).get("sessionId");
+            if (currentSessionId) handleSave(user, currentSessionId);
+          });
       })();
     </script>
   </body>

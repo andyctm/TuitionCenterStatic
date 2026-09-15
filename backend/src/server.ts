@@ -73,10 +73,14 @@ const enrollmentService = createEnrollmentService({
   batchRepo,
   studentProfileRepo,
   parentStudentRepo,
+  userRepo,
+  courseRepo,
+  gradeLevelRepo,
 });
 const classSessionsService = createClassSessionsService({ classSessionRepo, batchRepo });
 const attendanceService = createAttendanceService({
   attendanceRepo,
+  userRepo,
   classSessionRepo,
   batchRepo,
   studentProfileRepo,

@@ -16,6 +16,7 @@ import type {
   EnrollmentRepository,
   ParentStudentRepository,
   StudentProfileRepository,
+  UserRepository,
 } from '../repositories/types';
 
 export type AttendanceServiceDeps = {
@@ -26,6 +27,7 @@ export type AttendanceServiceDeps = {
   parentStudentRepo: ParentStudentRepository;
   enrollmentRepo: EnrollmentRepository;
   auditLogRepo: AuditLogRepository;
+  userRepo: UserRepository;
 };
 
 export type OverrideInput = {
@@ -33,6 +35,17 @@ export type OverrideInput = {
   status: AttendanceStatus;
   remarks?: string;
   reason: string;
+};
+
+// One row per actively-enrolled student, whether or not they've been marked yet for this
+// session — the frontend roster needs the full class list (not just already-marked rows) plus
+// display names, neither of which `AttendanceRepository.findBySession` alone can provide.
+export type AttendanceRosterEntry = {
+  studentProfileId: string;
+  firstName: string;
+  lastName: string;
+  status: AttendanceStatus | null;
+  remarks: string | null;
 };
 
 export function createAttendanceService(deps: AttendanceServiceDeps) {
@@ -44,6 +57,7 @@ export function createAttendanceService(deps: AttendanceServiceDeps) {
     parentStudentRepo,
     enrollmentRepo,
     auditLogRepo,
+    userRepo,
   } = deps;
 
   async function requireSessionAndBatch(
@@ -70,7 +84,7 @@ export function createAttendanceService(deps: AttendanceServiceDeps) {
   }
 
   return {
-    async getRoster(ctx: AuthContext, sessionId: string): Promise<AttendanceRecord[]> {
+    async getRoster(ctx: AuthContext, sessionId: string): Promise<AttendanceRosterEntry[]> {
       const { batch } = await requireSessionAndBatch(sessionId);
       if (ctx.role === 'TEACHER') {
         if (batch.teacherUserId !== ctx.userId) {
@@ -79,7 +93,30 @@ export function createAttendanceService(deps: AttendanceServiceDeps) {
       } else {
         assertAdminBranchScope(ctx, batch);
       }
-      return attendanceRepo.findBySession(sessionId);
+
+      const [enrollments, existingAttendance] = await Promise.all([
+        enrollmentRepo.findAll({ batchId: batch.id, status: 'ACTIVE' }),
+        attendanceRepo.findBySession(sessionId),
+      ]);
+      const attendanceByStudent = new Map(existingAttendance.map((a) => [a.studentProfileId, a]));
+
+      const entries: AttendanceRosterEntry[] = [];
+      for (const enrollment of enrollments) {
+        const profile = await studentProfileRepo.findById(enrollment.studentProfileId);
+        if (!profile) continue;
+        const user = await userRepo.findById(profile.userId);
+        if (!user) continue;
+        const existing = attendanceByStudent.get(enrollment.studentProfileId) ?? null;
+        entries.push({
+          studentProfileId: enrollment.studentProfileId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          status: existing?.status ?? null,
+          remarks: existing?.remarks ?? null,
+        });
+      }
+
+      return entries.sort((a, b) => `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`));
     },
 
     async bulkUpsert(

@@ -113,6 +113,9 @@ export function createTestApp(
     batchRepo,
     studentProfileRepo,
     parentStudentRepo,
+    userRepo,
+    courseRepo,
+    gradeLevelRepo,
   });
   const classSessionsService = createClassSessionsService({ classSessionRepo, batchRepo });
   const attendanceService = createAttendanceService({
@@ -123,6 +126,7 @@ export function createTestApp(
     parentStudentRepo,
     enrollmentRepo,
     auditLogRepo,
+    userRepo,
   });
   const sessionMaterializationService = createSessionMaterializationService({
     batchRepo,

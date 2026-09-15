@@ -4,11 +4,14 @@ import { isInBranchScope, isSuperAdmin } from '../lib/branchScope';
 import type { AuthContext } from '../types/authContext';
 import type {
   BatchRepository,
+  CourseRepository,
   EnrollmentListFilter,
   EnrollmentRecord,
   EnrollmentRepository,
+  GradeLevelRepository,
   ParentStudentRepository,
   StudentProfileRepository,
+  UserRepository,
 } from '../repositories/types';
 
 export type EnrollmentServiceDeps = {
@@ -16,12 +19,60 @@ export type EnrollmentServiceDeps = {
   batchRepo: BatchRepository;
   studentProfileRepo: StudentProfileRepository;
   parentStudentRepo: ParentStudentRepository;
+  userRepo: UserRepository;
+  courseRepo: CourseRepository;
+  gradeLevelRepo: GradeLevelRepository;
 };
 
 export type EnrollmentListQuery = Omit<EnrollmentListFilter, 'branchIds' | 'studentProfileIds'>;
 
+// Enrichment for list views (enrollment.html) — the raw EnrollmentRecord only has foreign-key ids.
+export type EnrollmentListItem = EnrollmentRecord & {
+  studentName: string;
+  studentGradeLevel: string;
+  branchId: string;
+  batchLabel: string;
+};
+
 export function createEnrollmentService(deps: EnrollmentServiceDeps) {
-  const { enrollmentRepo, batchRepo, studentProfileRepo, parentStudentRepo } = deps;
+  const { enrollmentRepo, batchRepo, studentProfileRepo, parentStudentRepo, userRepo, courseRepo, gradeLevelRepo } =
+    deps;
+
+  async function enrich(enrollments: EnrollmentRecord[]): Promise<EnrollmentListItem[]> {
+    const gradeLevels = await gradeLevelRepo.findAll();
+    const gradeLevelsById = new Map(gradeLevels.map((g) => [g.id, g]));
+
+    const batchIds = [...new Set(enrollments.map((e) => e.batchId))];
+    const batches = await Promise.all(batchIds.map((id) => batchRepo.findById(id)));
+    const batchesById = new Map(batchIds.map((id, i) => [id, batches[i]]));
+
+    const courseIds = [...new Set(batches.flatMap((b) => (b ? [b.courseId] : [])))];
+    const courses = await Promise.all(courseIds.map((id) => courseRepo.findById(id)));
+    const coursesById = new Map(courseIds.map((id, i) => [id, courses[i]]));
+
+    const studentProfileIds = [...new Set(enrollments.map((e) => e.studentProfileId))];
+    const profiles = await Promise.all(studentProfileIds.map((id) => studentProfileRepo.findById(id)));
+    const profilesById = new Map(studentProfileIds.map((id, i) => [id, profiles[i]]));
+
+    const userIds = [...new Set(profiles.flatMap((p) => (p ? [p.userId] : [])))];
+    const users = await Promise.all(userIds.map((id) => userRepo.findById(id)));
+    const usersById = new Map(userIds.map((id, i) => [id, users[i]]));
+
+    return enrollments.map((enrollment) => {
+      const batch = batchesById.get(enrollment.batchId);
+      const course = batch ? coursesById.get(batch.courseId) : undefined;
+      const gradeLevel = course ? gradeLevelsById.get(course.gradeLevelId) : undefined;
+      const profile = profilesById.get(enrollment.studentProfileId);
+      const user = profile ? usersById.get(profile.userId) : undefined;
+      return {
+        ...enrollment,
+        studentName: user ? `${user.firstName} ${user.lastName}` : 'Unknown student',
+        studentGradeLevel: gradeLevel?.name ?? '\u2014',
+        branchId: batch?.branchId ?? '',
+        batchLabel: course?.name ?? '\u2014',
+      };
+    });
+  }
 
   async function requireBatchInScope(ctx: AuthContext, batchId: string) {
     const batch = await batchRepo.findById(batchId);
@@ -32,25 +83,25 @@ export function createEnrollmentService(deps: EnrollmentServiceDeps) {
   }
 
   return {
-    async list(ctx: AuthContext, query: EnrollmentListQuery): Promise<EnrollmentRecord[]> {
+    async list(ctx: AuthContext, query: EnrollmentListQuery): Promise<EnrollmentListItem[]> {
       if (ctx.role === 'STUDENT') {
         const profile = await studentProfileRepo.findByUserId(ctx.userId);
         if (!profile) return [];
-        return enrollmentRepo.findAll({ ...query, studentProfileIds: [profile.id] });
+        return enrich(await enrollmentRepo.findAll({ ...query, studentProfileIds: [profile.id] }));
       }
       if (ctx.role === 'PARENT') {
         const studentProfileIds = await parentStudentRepo.listStudentProfileIdsForParent(
           ctx.userId,
         );
         if (studentProfileIds.length === 0) return [];
-        return enrollmentRepo.findAll({ ...query, studentProfileIds });
+        return enrich(await enrollmentRepo.findAll({ ...query, studentProfileIds }));
       }
 
       const filter: EnrollmentListFilter = { ...query };
       if (!isSuperAdmin(ctx)) {
         filter.branchIds = ctx.branchIds;
       }
-      return enrollmentRepo.findAll(filter);
+      return enrich(await enrollmentRepo.findAll(filter));
     },
 
     async create(

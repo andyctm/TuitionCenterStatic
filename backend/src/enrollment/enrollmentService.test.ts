@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { createEnrollmentService } from './enrollmentService';
 import {
   createFakeBatchRepository,
+  createFakeCourseRepository,
   createFakeEnrollmentRepository,
+  createFakeGradeLevelRepository,
   createFakeParentStudentRepository,
   createFakeStudentProfileRepository,
+  createFakeUserRepository,
 } from '../testUtils/fakeRepositories';
 import type { AuthContext } from '../types/authContext';
 import type { BatchRecord, EnrollmentRecord, StudentProfileRecord } from '../repositories/types';
@@ -43,7 +46,18 @@ function makeDeps(options: {
   );
   const parentStudentRepo = createFakeParentStudentRepository(options.parentLinks ?? []);
   const enrollmentRepo = createFakeEnrollmentRepository(options.enrollments ?? [], batchRepo);
-  return { batchRepo, studentProfileRepo, parentStudentRepo, enrollmentRepo };
+  const userRepo = createFakeUserRepository([]);
+  const courseRepo = createFakeCourseRepository([]);
+  const gradeLevelRepo = createFakeGradeLevelRepository([]);
+  return {
+    batchRepo,
+    studentProfileRepo,
+    parentStudentRepo,
+    enrollmentRepo,
+    userRepo,
+    courseRepo,
+    gradeLevelRepo,
+  };
 }
 
 describe('enrollmentService.create', () => {

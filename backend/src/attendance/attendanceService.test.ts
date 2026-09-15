@@ -8,9 +8,16 @@ import {
   createFakeEnrollmentRepository,
   createFakeParentStudentRepository,
   createFakeStudentProfileRepository,
+  createFakeUserRepository,
 } from '../testUtils/fakeRepositories';
 import type { AuthContext } from '../types/authContext';
-import type { BatchRecord, ClassSessionRecord, EnrollmentRecord, StudentProfileRecord } from '../repositories/types';
+import type {
+  BatchRecord,
+  ClassSessionRecord,
+  EnrollmentRecord,
+  StudentProfileRecord,
+  UserRecord,
+} from '../repositories/types';
 
 function ctx(overrides: Partial<AuthContext> = {}): AuthContext {
   return { userId: 'admin_1', role: 'SUPER_ADMIN', branchIds: [], ...overrides };
@@ -40,12 +47,27 @@ function seedSession(overrides: Partial<ClassSessionRecord> = {}): ClassSessionR
   };
 }
 
+function seedUser(overrides: Partial<UserRecord> = {}): UserRecord {
+  return {
+    id: 'student_user_1',
+    email: 'student@example.com',
+    passwordHash: 'hash',
+    firstName: 'Sithara',
+    lastName: 'Perera',
+    role: 'STUDENT',
+    status: 'ACTIVE',
+    branchId: null,
+    ...overrides,
+  };
+}
+
 function makeDeps(options: {
   batches?: BatchRecord[];
   sessions?: ClassSessionRecord[];
   profiles?: StudentProfileRecord[];
   enrollments?: EnrollmentRecord[];
   parentLinks?: { parentUserId: string; studentProfileId: string }[];
+  users?: UserRecord[];
 } = {}) {
   const batchRepo = createFakeBatchRepository(options.batches ?? [seedBatch()]);
   const classSessionRepo = createFakeClassSessionRepository(options.sessions ?? [seedSession()]);
@@ -56,6 +78,7 @@ function makeDeps(options: {
   const parentStudentRepo = createFakeParentStudentRepository(options.parentLinks ?? []);
   const enrollmentRepo = createFakeEnrollmentRepository(options.enrollments ?? [], batchRepo);
   const auditLogRepo = createFakeAuditLogRepository();
+  const userRepo = createFakeUserRepository(options.users ?? [seedUser()]);
   return {
     batchRepo,
     classSessionRepo,
@@ -64,6 +87,7 @@ function makeDeps(options: {
     parentStudentRepo,
     enrollmentRepo,
     auditLogRepo,
+    userRepo,
   };
 }
 
@@ -227,6 +251,71 @@ describe('attendanceService.studentAttendanceHistory', () => {
 
     await expect(
       service.studentAttendanceHistory(ctx({ role: 'TEACHER', userId: 'teacher_9' }), 'stu_1'),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND', httpStatus: 404 });
+  });
+});
+
+describe('attendanceService.getRoster', () => {
+  const enrollment: EnrollmentRecord = {
+    id: 'enr_1',
+    batchId: 'batch_1',
+    studentProfileId: 'stu_1',
+    status: 'ACTIVE',
+    enrolledAt: new Date(),
+  };
+
+  it('includes an enrolled-but-unmarked student with status null', async () => {
+    const deps = makeDeps({ enrollments: [enrollment] });
+    const service = createAttendanceService(deps);
+
+    const roster = await service.getRoster(ctx({ role: 'TEACHER', userId: 'teacher_1' }), 'session_1');
+
+    expect(roster).toEqual([
+      { studentProfileId: 'stu_1', firstName: 'Sithara', lastName: 'Perera', status: null, remarks: null },
+    ]);
+  });
+
+  it('reflects an already-marked status for the session', async () => {
+    const deps = makeDeps({ enrollments: [enrollment] });
+    const service = createAttendanceService(deps);
+    await service.bulkUpsert(
+      ctx({ role: 'TEACHER', userId: 'teacher_1' }),
+      'session_1',
+      [{ studentProfileId: 'stu_1', status: 'LATE', remarks: 'Arrived late' }],
+      new Date('2026-09-14T01:00:00.000Z'),
+    );
+
+    const roster = await service.getRoster(ctx({ role: 'TEACHER', userId: 'teacher_1' }), 'session_1');
+
+    expect(roster[0]).toMatchObject({ studentProfileId: 'stu_1', status: 'LATE', remarks: 'Arrived late' });
+  });
+
+  it('excludes withdrawn enrollments', async () => {
+    const deps = makeDeps({
+      enrollments: [{ ...enrollment, id: 'enr_2', status: 'WITHDRAWN' }],
+    });
+    const service = createAttendanceService(deps);
+
+    const roster = await service.getRoster(ctx({ role: 'TEACHER', userId: 'teacher_1' }), 'session_1');
+
+    expect(roster).toHaveLength(0);
+  });
+
+  it('returns 403 for a Teacher who does not teach the batch', async () => {
+    const deps = makeDeps({ batches: [seedBatch({ teacherUserId: 'teacher_2' })], enrollments: [enrollment] });
+    const service = createAttendanceService(deps);
+
+    await expect(
+      service.getRoster(ctx({ role: 'TEACHER', userId: 'teacher_1' }), 'session_1'),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN', httpStatus: 403 });
+  });
+
+  it('returns 404 for a Center Admin outside the batch branch', async () => {
+    const deps = makeDeps({ batches: [seedBatch({ branchId: 'branch_kandy' })], enrollments: [enrollment] });
+    const service = createAttendanceService(deps);
+
+    await expect(
+      service.getRoster(ctx({ role: 'CENTER_ADMIN', branchIds: ['branch_colombo'] }), 'session_1'),
     ).rejects.toMatchObject({ code: 'NOT_FOUND', httpStatus: 404 });
   });
 });

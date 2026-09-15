@@ -173,6 +173,7 @@
       (async function () {
         const user = tcmsRequireAuth();
         if (!user) return;
+        tcmsRenderSidebarForRole(user.role);
         document.getElementById("user-avatar").textContent =
           (user.firstName[0] || "") + (user.lastName[0] || "");
         document.getElementById("user-name").textContent =

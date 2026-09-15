@@ -42,7 +42,7 @@
           >
             <i data-icon="menu"></i>
           </button>
-          <span>Accountant</span><span class="sep">/</span
+          <span id="breadcrumb-role">Accountant</span><span class="sep">/</span
           ><span class="current">Enrollment</span>
         </div>
         <div class="topbar-actions">
@@ -147,7 +147,11 @@
                       ><i data-icon="checkCircle"></i>Active</span
                     >
                   </td>
-                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
+                      Manage
+                    </button>
+                  </td>
                 </tr>
                 <tr>
                   <td data-label="Student">
@@ -170,7 +174,11 @@
                       ><i data-icon="checkCircle"></i>Active</span
                     >
                   </td>
-                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
+                      Manage
+                    </button>
+                  </td>
                 </tr>
                 <tr>
                   <td data-label="Student">
@@ -193,7 +201,11 @@
                       ><i data-icon="checkCircle"></i>Active</span
                     >
                   </td>
-                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
+                      Manage
+                    </button>
+                  </td>
                 </tr>
                 <tr>
                   <td data-label="Student">
@@ -216,7 +228,11 @@
                       ><i data-icon="checkCircle"></i>Active</span
                     >
                   </td>
-                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" data-manage-enrollment>
+                      Manage
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -300,14 +316,107 @@
       </div>
     </dialog>
 
+    <dialog id="manage-enrollment-dialog" class="modal">
+      <div class="modal-header">
+        <h2>Manage enrollment</h2>
+        <button
+          class="btn btn-ghost btn-icon"
+          data-close-modal
+          aria-label="Close"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Student</label>
+          <p id="manage-enrollment-student" class="cell-primary"></p>
+        </div>
+        <div class="field">
+          <label>Batch</label>
+          <p id="manage-enrollment-batch" class="cell-secondary"></p>
+        </div>
+        <div class="field">
+          <label for="manage-enrollment-status">Status</label>
+          <select class="input" id="manage-enrollment-status">
+            <option value="Active">Active</option>
+            <option value="Completed">Completed</option>
+            <option value="Withdrawn">Withdrawn</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal>Cancel</button>
+        <button class="btn btn-primary" data-manage-enrollment-save>
+          Save Changes
+        </button>
+      </div>
+    </dialog>
+
     <script src="js/icons.js"></script>
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
+      // Enrollment rows are static mockup data (this page isn't wired to the live API yet —
+      // see DESIGN.md), so "Manage" only updates the status badge shown on screen.
+      const ENROLLMENT_STATUS_BADGES = {
+        Active:
+          '<span class="badge badge-success"><i data-icon="checkCircle"></i>Active</span>',
+        Completed:
+          '<span class="badge badge-info"><i data-icon="checkCircle"></i>Completed</span>',
+        Withdrawn:
+          '<span class="badge badge-danger"><i data-icon="xCircle"></i>Withdrawn</span>',
+      };
+
+      function initManageEnrollment() {
+        const dialog = document.getElementById("manage-enrollment-dialog");
+        const studentEl = document.getElementById("manage-enrollment-student");
+        const batchEl = document.getElementById("manage-enrollment-batch");
+        const statusSelect = document.getElementById(
+          "manage-enrollment-status",
+        );
+        const saveBtn = document.querySelector("[data-manage-enrollment-save]");
+        let activeRow = null;
+
+        document.querySelectorAll("[data-manage-enrollment]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            activeRow = btn.closest("tr");
+            if (!activeRow) return;
+            studentEl.textContent =
+              activeRow.querySelector(
+                '[data-label="Student"] .row-people > .meta > div',
+              )?.textContent || "";
+            batchEl.textContent =
+              activeRow
+                .querySelector('[data-label="Batch"]')
+                ?.textContent.trim() || "";
+            const currentStatus =
+              activeRow
+                .querySelector('[data-label="Status"]')
+                ?.textContent.trim() || "Active";
+            statusSelect.value =
+              currentStatus in ENROLLMENT_STATUS_BADGES
+                ? currentStatus
+                : "Active";
+            if (dialog.showModal) dialog.showModal();
+          });
+        });
+
+        saveBtn.addEventListener("click", () => {
+          if (!activeRow) return;
+          const statusCell = activeRow.querySelector('[data-label="Status"]');
+          statusCell.innerHTML = ENROLLMENT_STATUS_BADGES[statusSelect.value];
+          renderIcons(statusCell);
+          tcmsApplyTableFilters();
+          dialog.close();
+        });
+      }
+
       (function () {
         const user = tcmsRequireAuth();
         if (!user) return;
+        tcmsRenderSidebarForRole(user.role);
         document.getElementById("user-avatar").textContent =
           (user.firstName[0] || "") + (user.lastName[0] || "");
         document.getElementById("user-name").textContent =
@@ -318,6 +427,7 @@
         document
           .getElementById("logout-btn")
           .addEventListener("click", tcmsLogout);
+        initManageEnrollment();
       })();
     </script>
   </body>

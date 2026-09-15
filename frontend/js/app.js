@@ -1,5 +1,70 @@
 /* Shared interactivity for the TCMS static mockups — visual state only, no persistence. */
 
+// Per-role sidebar nav, keyed the same as TCMS_ROLE_HOME/TCMS_ROLE_LABELS in api.js.
+// [icon, label, href] tuples, in display order.
+const TCMS_NAV_ITEMS = {
+  SUPER_ADMIN: [
+    ["dashboard", "Dashboard", "admin-dashboard.html"],
+    ["branches", "Branches", "branches.html"],
+    ["users", "Users", "users.html"],
+    ["courses", "Courses", "courses.html"],
+    ["batches", "Batches", "batches.html"],
+    ["reports", "Reports", "reports.html"],
+    ["audit", "Audit Log", "audit-log.html"],
+    ["settings", "Settings", "settings.html"],
+  ],
+  CENTER_ADMIN: [
+    ["dashboard", "Dashboard", "center-admin-dashboard.html"],
+    ["batches", "Batches", "batches.html"],
+    ["enrollment", "Enrollment", "enrollment.html"],
+    ["attendance", "Attendance", "attendance.html"],
+    ["reports", "Reports", "reports.html"],
+  ],
+  ACCOUNTANT: [
+    ["dashboard", "Dashboard", "accountant-dashboard.html"],
+    ["enrollment", "Enrollment", "enrollment.html"],
+    ["reports", "Reports", "reports.html"],
+  ],
+  TEACHER: [
+    ["dashboard", "Dashboard", "teacher-dashboard.html"],
+    ["batches", "My Batches", "my-batches.html"],
+    ["attendance", "Attendance", "attendance.html"],
+  ],
+};
+
+const TCMS_NAV_FOOTER = {
+  SUPER_ADMIN: "v1.0 · Design mockup",
+  CENTER_ADMIN: "Colombo Main branch",
+  ACCOUNTANT: "Colombo Main branch",
+  TEACHER: "Colombo Main branch",
+};
+
+// Pages like enrollment.html/attendance.html/reports.html are reachable by more than one role,
+// but their sidebar markup is static HTML written for a single role — without this, whichever
+// role's mockup a page was authored against is the only nav a visitor of ANY role ever sees
+// (e.g. a Center Admin loses the Batches/Attendance links after clicking into Enrollment).
+// Call this once auth resolves so the sidebar/footer/breadcrumb match the actual signed-in user.
+function tcmsRenderSidebarForRole(role) {
+  const items = TCMS_NAV_ITEMS[role];
+  const navList = document.querySelector(".nav-list");
+  if (!items || !navList) return;
+
+  const current = window.location.pathname.split("/").pop() || "index.html";
+  navList.innerHTML = items
+    .map(([icon, label, href]) => {
+      const activeClass = href === current ? " is-active" : "";
+      return `<a class="nav-item${activeClass}" href="${href}"><i data-icon="${icon}"></i><span class="label">${label}</span></a>`;
+    })
+    .join("");
+  renderIcons(navList);
+
+  const footer = document.querySelector(".nav-footer");
+  if (footer && TCMS_NAV_FOOTER[role]) footer.textContent = TCMS_NAV_FOOTER[role];
+
+  const breadcrumbRole = document.getElementById("breadcrumb-role");
+  if (breadcrumbRole) breadcrumbRole.textContent = tcmsRoleLabel(role);
+}
+
 function initMobileNav() {
   const toggle = document.querySelector("[data-menu-toggle]");
   if (!toggle) return;
